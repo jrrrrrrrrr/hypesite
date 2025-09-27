@@ -43,7 +43,7 @@
 
     async function fetchCG(){
       try{
-        const res = await fetch('/api/cg?id=hype');
+        const res = await fetch('/api/cg?id=hyperliquid');
         if(!res.ok) throw new Error('CG error');
         const arr = await res.json();
         return Array.isArray(arr) && arr.length ? arr[0] : null;
