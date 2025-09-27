@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HYPE Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-black text-white">
+  <main class="p-6 max-w-6xl mx-auto grid gap-6">
+    <h1 class="text-3xl font-bold">HYPE Dashboard</h1>
+
+    <!-- KPI Cards -->
+    <section id="stats" class="grid gap-4 md:grid-cols-4">
+      <div class="rounded-xl border border-white/10 p-4">
+        <div class="text-xs opacity-70">Price</div>
+        <div class="text-2xl font-semibold" id="price">—</div>
+        <div class="text-xs opacity-60" id="price-change">24h: —</div>
+      </div>
+      <div class="rounded-xl border border-white/10 p-4">
+        <div class="text-xs opacity-70">24h Volume</div>
+        <div class="text-2xl font-semibold" id="volume">—</div>
+      </div>
+      <div class="rounded-xl border border-white/10 p-4">
+        <div class="text-xs opacity-70">Total Staked</div>
+        <div class="text-2xl font-semibold" id="staked">—</div>
+      </div>
+      <div class="rounded-xl border border-white/10 p-4">
+        <div class="text-xs opacity-70">Builders Rev (24h)</div>
+        <div class="text-2xl font-semibold" id="builders-rev">—</div>
+      </div>
+    </section>
+
+    <canvas id="priceChart" height="120"></canvas>
+  </main>
+
+  <script>
+    // Use Vercel proxies instead of direct APIs
+    const HL_INFO = '/api/hl';
+    const HL_WS = 'wss://api.hyperliquid.xyz/ws';
+    const HYPE_SPOT = '@107';
+
+    async function fetchCG(){
+      try{
+        const res = await fetch('/api/cg?id=hype');
+        if(!res.ok) throw new Error('CG error');
+        const arr = await res.json();
+        return Array.isArray(arr) && arr.length ? arr[0] : null;
+      }catch(e){ console.error('CG failed', e); return null; }
+    }
+
+    async function loadKPIs(){
+      const cg = await fetchCG();
+      if(cg){
+        document.getElementById('price').textContent = `$${cg.current_price.toFixed(cg.current_price<1?4:2)}`;
+        document.getElementById('price-change').textContent = `24h: ${cg.price_change_percentage_24h.toFixed(2)}%`;
+        document.getElementById('volume').textContent = `$${(cg.total_volume/1_000_000).toFixed(2)}M`;
+      }
+      // placeholder staked/builders until wired
+      document.getElementById('staked').textContent = '—';
+      document.getElementById('builders-rev').textContent = '—';
+    }
+
+    let chart;
+    function renderChart(series){
+      const ctx=document.getElementById('priceChart');
+      const data={labels:series.map(p=>p.t),datasets:[{label:'Price',data:series.map(p=>p.v)}]};
+      if(chart) chart.destroy();
+      chart=new Chart(ctx,{type:'line',data});
+    }
+
+    function connectWS(){
+      const ws=new WebSocket(HL_WS);
+      ws.onopen=()=>{
+        ws.send(JSON.stringify({method:'subscribe',subscription:{type:'candle',coin:HYPE_SPOT,interval:'1m'}}));
+      };
+      ws.onmessage=(ev)=>{
+        const msg=JSON.parse(ev.data||'{}');
+        if(msg.channel==='candle'&&Array.isArray(msg.data)){
+          const series=msg.data.slice(-120).map(c=>({t:new Date(c.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),v:Number(c.c)}));
+          renderChart(series);
+        }
+      };
+    }
+
+    loadKPIs();
+    connectWS();
+  </script>
+</body>
+</html>
 
