@@ -16,7 +16,7 @@
   <main class="p-6 max-w-6xl mx-auto grid gap-6">
     <h1 class="text-3xl font-bold">HYPE Dashboard</h1>
 
-    <!-- Optional: address input to show "Your Staked" -->
+    <!-- Address input for "Your Staked" -->
     <div class="flex items-center gap-2">
       <input id="addr" placeholder="Paste your Hyperliquid address (0x...)" class="w-full max-w-md bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm" />
       <button id="addrSave" class="rounded-lg border border-white/15 px-3 py-2 text-sm">Save</button>
@@ -52,36 +52,44 @@
       <canvas id="priceChart" height="120"></canvas>
     </section>
 
-    <!-- Simple debug area (hidden unless there are errors) -->
+    <!-- Debug messages if something fails -->
     <div id="debug" class="text-xs text-rose-300 hidden"></div>
   </main>
 
   <script>
-    // ========= CONFIG (via your Vercel proxies) =========
+    // ========= CONFIG (proxied by your Vercel functions) =========
     const HL_INFO = '/api/hl';                 // POST -> Hyperliquid info
     const HL_WS   = 'wss://api.hyperliquid.xyz/ws';
     let   HYPE_SPOT = '@107';                  // will auto-detect from spotMeta
-    const CG_ID  = 'hyperliquid';              // confirmed CoinGecko slug
+    const CG_ID  = 'hyperliquid';              // CoinGecko slug you confirmed
 
     // ========= Helpers =========
     const $ = (id) => document.getElementById(id);
     const fmtM = (n) => `$${(Number(n||0)/1_000_000).toFixed(2)}M`;
     function showErr(label, err){
-      const d = $('debug');
-      d.classList.remove('hidden');
-      const line = document.createElement('div');
-      line.textContent = `[${label}] ${err}`;
+      const d = $('debug'); d.classList.remove('hidden');
+      const line = document.createElement('div'); line.textContent = `[${label}] ${err}`;
       d.appendChild(line);
       console.error(`[${label}]`, err);
+    }
+
+    // ========= Simple HL POST wrapper =========
+    async function postHL(body){
+      const r = await fetch(HL_INFO, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      if(!r.ok) throw new Error(`HL ${r.status}`);
+      return r.json();
     }
 
     // ========= KPIs: CoinGecko =========
     async function fetchCG(){
       try{
         const r = await fetch(`/api/cg?id=${encodeURIComponent(CG_ID)}`);
-        if(!r.ok){ throw new Error(`HTTP ${r.status}`); }
+        if(!r.ok) throw new Error(`HTTP ${r.status}`);
         const arr = await r.json();
-        if(!Array.isArray(arr) || arr.length===0){ throw new Error('empty response'); }
+        if(!Array.isArray(arr) || arr.length===0) throw new Error('empty response');
         return arr[0];
       }catch(e){ showErr('CoinGecko', e.message || e); return null; }
     }
@@ -99,13 +107,8 @@
     // ========= Auto-detect HYPE spot index (for WS) =========
     async function detectHypeId(){
       try{
-        const r = await fetch(HL_INFO, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ type:'spotMeta' })
-        });
-        if(!r.ok) throw new Error(`HTTP ${r.status}`);
-        const meta = await r.json();
-        const uni = meta?.universe || meta?.spotMeta?.universe || [];
+        const meta = await postHL({ type:'spotMeta' });
+        const uni  = meta?.universe || meta?.spotMeta?.universe || [];
         const found = uni.find(u => String(u?.name||u?.token||'').toUpperCase().includes('HYPE'));
         if(found?.index) HYPE_SPOT = found.index; // e.g. "@107"
       }catch(e){ showErr('spotMeta', e.message || e); } // non-fatal
@@ -117,7 +120,6 @@
         const r = await fetch('/api/builders');
         if(!r.ok) throw new Error(`HTTP ${r.status}`);
         const rows = await r.json();
-        // Sum top rows (API may already be 24h)
         const sum = (Array.isArray(rows)? rows : []).slice(0, 20)
                      .reduce((s,x)=> s + Number(x.revenue||0), 0);
         $('builders-rev').textContent = `$${(sum/1000).toFixed(2)}k`;
@@ -131,18 +133,11 @@
     async function loadYourStaked(addr){
       if(!addr){ $('staked').textContent = '—'; return; }
       try{
-        const r = await fetch(HL_INFO, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ type:'delegatorSummary', user: addr })
-        });
-        if(!r.ok) throw new Error(`HTTP ${r.status}`);
-        const s = await r.json();
-        if(s && s.delegated){ $('staked').textContent = `${Number(s.delegated).toFixed(2)} HYPE`; }
-        else { $('staked').textContent = '—'; }
+        const s = await postHL({ type:'delegatorSummary', user: addr });
+        if(s && s.delegated) $('staked').textContent = `${Number(s.delegated).toFixed(2)} HYPE`;
+        else $('staked').textContent = '—';
       }catch(e){ $('staked').textContent = '—'; showErr('delegatorSummary', e.message || e); }
     }
-
-    // Wire address input
     (function setupAddr(){
       const saved = localStorage.getItem('hl_addr')||'';
       if(saved) $('addr').value = saved, loadYourStaked(saved);
@@ -153,13 +148,27 @@
       };
     })();
 
-    // ========= Live chart via WebSocket =========
+    // ========= Chart: seed with snapshot, then keep live via WS =========
     let chart;
     function renderChart(series){
       const ctx = $('priceChart');
       const data = { labels: series.map(p=>p.t), datasets:[{ label:'Price', data: series.map(p=>p.v) }] };
       if(chart) chart.destroy();
       chart = new Chart(ctx, { type:'line', data });
+    }
+    async function seedChart(){
+      try{
+        const now = Date.now();
+        const start = now - 24*60*60*1000;
+        const snap = await postHL({ type:'candleSnapshot', req:{ coin:HYPE_SPOT, interval:'1m', startTime:start, endTime:now } });
+        if(Array.isArray(snap) && snap.length){
+          const series = snap.slice(-120).map(c=>({
+            t: new Date(c.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+            v: Number(c.c)
+          }));
+          renderChart(series);
+        }
+      }catch(e){ showErr('seedChart', e.message || e); }
     }
     function connectWS(){
       try{
@@ -186,10 +195,11 @@
 
     // ========= Boot =========
     (async () => {
-      await detectHypeId();    // sets HYPE_SPOT if spotMeta is reachable
-      await loadKPIs();        // CG: price/24h/volume
-      await loadBuildersRev(); // HypurrScan: 24h revenue
-      connectWS();             // live 1m candles
+      await detectHypeId();     // set correct WS coin id if available
+      await loadKPIs();         // price / 24h / volume
+      await seedChart();        // fill chart immediately
+      await loadBuildersRev();  // builders 24h
+      connectWS();              // keep chart live
     })();
   </script>
 </body>
