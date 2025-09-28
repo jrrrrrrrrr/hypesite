@@ -38,8 +38,8 @@
         <div class="text-2xl font-semibold" id="staked">—</div>
       </div>
       <div class="card p-4">
-        <div class="text-xs opacity-70">Builders Rev (24h)</div>
-        <div class="text-2xl font-semibold" id="builders-rev">—</div>
+        <div class="text-xs opacity-70">Your Staked Value</div>
+        <div class="text-2xl font-semibold" id="staked-value">—</div>
       </div>
     </section>
 
@@ -57,15 +57,25 @@
   </main>
 
   <script>
-    // ======= CONFIG (through Vercel proxies) =======
+    // ======= CONFIG (through your Vercel proxies) =======
     const HL_INFO = '/api/hl';                 // POST -> Hyperliquid info
     const HL_WS   = 'wss://api.hyperliquid.xyz/ws';
     let   HYPE_SPOT = '@107';                  // will auto-detect from spotMeta
     const CG_ID  = 'hyperliquid';              // correct CoinGecko slug
 
+    // ======= State =======
+    let CG_PRICE = 0;      // USD price from CoinGecko
+    let STAKED_HYPE = 0;   // HYPE delegated (from delegatorSummary)
+
     // ======= Helpers =======
     const $ = (id) => document.getElementById(id);
     const fmtM = (n) => `$${(Number(n||0)/1_000_000).toFixed(2)}M`;
+    const fmtUsd = (n) => {
+      const v = Number(n||0);
+      if (v >= 1_000_000) return `$${(v/1_000_000).toFixed(2)}M`;
+      if (v >= 1_000)     return `$${(v/1_000).toFixed(2)}k`;
+      return `$${v.toFixed(v < 1 ? 4 : 2)}`;
+    };
     function showErr(label, err){
       const d=$('debug'); d.classList.remove('hidden');
       const line=document.createElement('div'); line.textContent=`[${label}] ${err}`;
@@ -96,11 +106,13 @@
     async function loadKPIs(){
       const cg = await fetchCG();
       if(cg){
-        const px = Number(cg.current_price||0);
-        $('price').textContent = `$${px.toFixed(px<1?4:2)}`;
+        CG_PRICE = Number(cg.current_price||0);
+        $('price').textContent = fmtUsd(CG_PRICE);
         const chg = Number(cg.price_change_percentage_24h||0);
         $('price-change').textContent = `24h: ${chg>=0?'+':''}${chg.toFixed(2)}%`;
         $('volume').textContent = fmtM(cg.total_volume||0);
+        // After price updates, recompute staked value if we already know HYPE amount
+        if (STAKED_HYPE > 0) $('staked-value').textContent = fmtUsd(STAKED_HYPE * CG_PRICE);
       }
     }
 
@@ -114,33 +126,20 @@
       }catch(e){ showErr('spotMeta', e.message || e); } // non-fatal
     }
 
-    // ======= Builders revenue (24h) via HypurrScan proxy =======
-    async function loadBuildersRev(){
-      try{
-        let r = await fetch('/api/builders');
-        if(r.status === 404){
-          // fallback if proxy missing (may be blocked by CORS locally)
-          r = await fetch('https://api.hypurrscan.io/v0/builders/revenues');
-        }
-        if(!r.ok) throw new Error(`HTTP ${r.status}`);
-        const rows = await r.json();
-        const sum = (Array.isArray(rows)? rows : []).slice(0, 20)
-                     .reduce((s,x)=> s + Number(x.revenue||0), 0);
-        $('builders-rev').textContent = `$${(sum/1000).toFixed(2)}k`;
-      }catch(e){
-        $('builders-rev').textContent = '—';
-        showErr('builders', e.message || e);
-      }
-    }
-
-    // ======= Your Staked (per address) =======
+    // ======= Your Staked (per address) + USD value =======
     async function loadYourStaked(addr){
-      if(!addr){ $('staked').textContent = '—'; return; }
+      if(!addr){ $('staked').textContent = '—'; $('staked-value').textContent = '—'; return; }
       try{
         const s = await postHL({ type:'delegatorSummary', user: addr });
-        if(s && s.delegated) $('staked').textContent = `${Number(s.delegated).toFixed(2)} HYPE`;
-        else $('staked').textContent = '—';
-      }catch(e){ $('staked').textContent = '—'; showErr('delegatorSummary', e.message || e); }
+        const amt = Number(s?.delegated || 0);
+        STAKED_HYPE = amt;
+        $('staked').textContent = amt > 0 ? `${amt.toFixed(2)} HYPE` : '—';
+        $('staked-value').textContent = (amt > 0 && CG_PRICE > 0) ? fmtUsd(amt * CG_PRICE) : (amt > 0 ? '—' : '—');
+      }catch(e){
+        $('staked').textContent = '—';
+        $('staked-value').textContent = '—';
+        showErr('delegatorSummary', e.message || e);
+      }
     }
     (function setupAddr(){
       const saved = localStorage.getItem('hl_addr')||'';
@@ -200,9 +199,11 @@
     // ======= Boot =======
     (async () => {
       await detectHypeId();     // set correct WS coin id if available
-      await loadKPIs();         // price / 24h / volume
+      await loadKPIs();         // price / 24h / volume (sets CG_PRICE)
       await seedChart();        // fill chart immediately
-      await loadBuildersRev();  // builders 24h
+      // load staked AFTER price so value can compute immediately if address is present
+      const saved = localStorage.getItem('hl_addr')||'';
+      if(saved) await loadYourStaked(saved);
       connectWS();              // keep chart live
     })();
   </script>
