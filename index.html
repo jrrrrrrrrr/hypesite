@@ -4,89 +4,115 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HYPE Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-</head>
-<body class="bg-black text-white">
-  <main class="p-6 max-w-6xl mx-auto grid gap-6">
-    <h1 class="text-3xl font-bold">HYPE Dashboard</h1>
-
-    <!-- KPI Cards -->
-    <section id="stats" class="grid gap-4 md:grid-cols-4">
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-xs opacity-70">Price</div>
-        <div class="text-2xl font-semibold" id="price">—</div>
-        <div class="text-xs opacity-60" id="price-change">24h: —</div>
-      </div>
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-xs opacity-70">24h Volume</div>
-        <div class="text-2xl font-semibold" id="volume">—</div>
-      </div>
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-xs opacity-70">Total Staked</div>
-        <div class="text-2xl font-semibold" id="staked">—</div>
-      </div>
-      <div class="rounded-xl border border-white/10 p-4">
-        <div class="text-xs opacity-70">Builders Rev (24h)</div>
-        <div class="text-2xl font-semibold" id="builders-rev">—</div>
-      </div>
-    </section>
-
-    <canvas id="priceChart" height="120"></canvas>
-  </main>
-
   <script>
-    // Use Vercel proxies instead of direct APIs
-    const HL_INFO = '/api/hl';
-    const HL_WS = 'wss://api.hyperliquid.xyz/ws';
-    const HYPE_SPOT = '@107';
+  // --- Config (all through your Vercel proxies) ---
+  const HL_INFO = '/api/hl';
+  const HL_WS   = 'wss://api.hyperliquid.xyz/ws';
+  let   HYPE_SPOT = '@107'; // will auto-detect below
+  const CG_ID  = 'hyperliquid';
 
-    async function fetchCG(){
+  // Small helpers
+  const $ = (id) => document.getElementById(id);
+  const fmtMoneyM = (n) => `$${(Number(n||0)/1_000_000).toFixed(2)}M`;
+
+  // CoinGecko KPIs
+  async function fetchCG() {
+    const r = await fetch(`/api/cg?id=${encodeURIComponent(CG_ID)}`);
+    if (!r.ok) return null;
+    const arr = await r.json();
+    return Array.isArray(arr) && arr.length ? arr[0] : null;
+  }
+
+  async function loadKPIs() {
+    const cg = await fetchCG();
+    if (cg) {
+      $('price').textContent = `$${Number(cg.current_price||0).toFixed((cg.current_price||0)<1?4:2)}`;
+      const chg = Number(cg.price_change_percentage_24h||0);
+      $('price-change').textContent = `24h: ${chg>=0?'+':''}${chg.toFixed(2)}%`;
+      $('volume').textContent = fmtMoneyM(cg.total_volume||0);
+    }
+  }
+
+  // Auto-detect HYPE spot index for WS candles
+  async function detectHypeId() {
+    try {
+      const r = await fetch(HL_INFO, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ type: 'spotMeta' })
+      });
+      const meta = await r.json();
+      const uni = meta?.universe || meta?.spotMeta?.universe || [];
+      const found = uni.find(u => String(u?.name||u?.token||'').toUpperCase().includes('HYPE'));
+      if (found?.index) HYPE_SPOT = found.index;
+    } catch { /* non-fatal */ }
+  }
+
+  // Live chart via WS
+  let chart;
+  function renderChart(series){
+    const ctx = document.getElementById('priceChart');
+    const data = { labels: series.map(p=>p.t), datasets:[{ label:'Price', data: series.map(p=>p.v) }] };
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, { type:'line', data });
+  }
+  function connectWS(){
+    const ws = new WebSocket(HL_WS);
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ method:'subscribe', subscription:{ type:'candle', coin:HYPE_SPOT, interval:'1m' }}));
+    };
+    ws.onmessage = (ev) => {
       try{
-        const res = await fetch('/api/cg?id=hyperliquid');
-        if(!res.ok) throw new Error('CG error');
-        const arr = await res.json();
-        return Array.isArray(arr) && arr.length ? arr[0] : null;
-      }catch(e){ console.error('CG failed', e); return null; }
-    }
-
-    async function loadKPIs(){
-      const cg = await fetchCG();
-      if(cg){
-        document.getElementById('price').textContent = `$${cg.current_price.toFixed(cg.current_price<1?4:2)}`;
-        document.getElementById('price-change').textContent = `24h: ${cg.price_change_percentage_24h.toFixed(2)}%`;
-        document.getElementById('volume').textContent = `$${(cg.total_volume/1_000_000).toFixed(2)}M`;
-      }
-      // placeholder staked/builders until wired
-      document.getElementById('staked').textContent = '—';
-      document.getElementById('builders-rev').textContent = '—';
-    }
-
-    let chart;
-    function renderChart(series){
-      const ctx=document.getElementById('priceChart');
-      const data={labels:series.map(p=>p.t),datasets:[{label:'Price',data:series.map(p=>p.v)}]};
-      if(chart) chart.destroy();
-      chart=new Chart(ctx,{type:'line',data});
-    }
-
-    function connectWS(){
-      const ws=new WebSocket(HL_WS);
-      ws.onopen=()=>{
-        ws.send(JSON.stringify({method:'subscribe',subscription:{type:'candle',coin:HYPE_SPOT,interval:'1m'}}));
-      };
-      ws.onmessage=(ev)=>{
-        const msg=JSON.parse(ev.data||'{}');
-        if(msg.channel==='candle'&&Array.isArray(msg.data)){
-          const series=msg.data.slice(-120).map(c=>({t:new Date(c.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),v:Number(c.c)}));
+        const m = JSON.parse(ev.data||'{}');
+        if (m.channel==='candle' && Array.isArray(m.data)) {
+          const series = m.data.slice(-120).map(c => ({
+            t: new Date(c.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+            v: Number(c.c)
+          }));
           renderChart(series);
         }
-      };
-    }
+      } catch {}
+    };
+    ws.onclose = () => setTimeout(connectWS, 3000);
+  }
 
-    loadKPIs();
-    connectWS();
-  </script>
+  // Builders revenue (24h) via HypurrScan proxy
+  async function loadBuildersRev(){
+    try{
+      const r = await fetch('/api/builders');
+      if(!r.ok) throw new Error('builders api failed');
+      const rows = await r.json(); // expect array of { name, revenue, code, timeframe? }
+      // If API returns mixed timeframes, filter to 24h; otherwise just sum top N
+      const sum = rows.slice(0, 20).reduce((s, x) => s + Number(x.revenue||0), 0);
+      $('builders-rev').textContent = `$${(sum/1000).toFixed(2)}k`;
+    }catch{
+      $('builders-rev').textContent = '—';
+    }
+  }
+
+  // Optional: show "Your Staked" using an address (if you want anything here today)
+  async function loadYourStaked(addr){
+    try{
+      const r = await fetch(HL_INFO, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ type:'delegatorSummary', user: addr })
+      });
+      if(!r.ok) return;
+      const s = await r.json();
+      if (s && s.delegated) $('staked').textContent = `${Number(s.delegated).toFixed(2)} HYPE`;
+    }catch{}
+  }
+
+  (async () => {
+    await detectHypeId();   // set correct WS coin id
+    await loadKPIs();       // fill price, change, volume
+    await loadBuildersRev();// fill builders 24h
+    connectWS();            // live chart
+    // If you want a quick personal staked value, uncomment and paste your address:
+    // loadYourStaked('0xYourAddressHere');
+  })();
+</script>
 </body>
 </html>
 
