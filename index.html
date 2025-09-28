@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HYPE Dashboard</title>
   <meta name="color-scheme" content="dark" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -52,28 +52,28 @@
       <canvas id="priceChart" height="120"></canvas>
     </section>
 
-    <!-- Debug messages if something fails -->
+    <!-- Debug messages -->
     <div id="debug" class="text-xs text-rose-300 hidden"></div>
   </main>
 
   <script>
-    // ========= CONFIG (proxied by your Vercel functions) =========
+    // ======= CONFIG (through Vercel proxies) =======
     const HL_INFO = '/api/hl';                 // POST -> Hyperliquid info
     const HL_WS   = 'wss://api.hyperliquid.xyz/ws';
     let   HYPE_SPOT = '@107';                  // will auto-detect from spotMeta
-    const CG_ID  = 'hyperliquid';              // CoinGecko slug you confirmed
+    const CG_ID  = 'hyperliquid';              // correct CoinGecko slug
 
-    // ========= Helpers =========
+    // ======= Helpers =======
     const $ = (id) => document.getElementById(id);
     const fmtM = (n) => `$${(Number(n||0)/1_000_000).toFixed(2)}M`;
     function showErr(label, err){
-      const d = $('debug'); d.classList.remove('hidden');
-      const line = document.createElement('div'); line.textContent = `[${label}] ${err}`;
+      const d=$('debug'); d.classList.remove('hidden');
+      const line=document.createElement('div'); line.textContent=`[${label}] ${err}`;
       d.appendChild(line);
       console.error(`[${label}]`, err);
     }
 
-    // ========= Simple HL POST wrapper =========
+    // ======= Simple HL POST wrapper =======
     async function postHL(body){
       const r = await fetch(HL_INFO, {
         method:'POST', headers:{'Content-Type':'application/json'},
@@ -83,7 +83,7 @@
       return r.json();
     }
 
-    // ========= KPIs: CoinGecko =========
+    // ======= KPIs: CoinGecko =======
     async function fetchCG(){
       try{
         const r = await fetch(`/api/cg?id=${encodeURIComponent(CG_ID)}`);
@@ -104,7 +104,7 @@
       }
     }
 
-    // ========= Auto-detect HYPE spot index (for WS) =========
+    // ======= Auto-detect HYPE spot index (for WS) =======
     async function detectHypeId(){
       try{
         const meta = await postHL({ type:'spotMeta' });
@@ -114,10 +114,14 @@
       }catch(e){ showErr('spotMeta', e.message || e); } // non-fatal
     }
 
-    // ========= Builders revenue (24h) via HypurrScan proxy =========
+    // ======= Builders revenue (24h) via HypurrScan proxy =======
     async function loadBuildersRev(){
       try{
-        const r = await fetch('/api/builders');
+        let r = await fetch('/api/builders');
+        if(r.status === 404){
+          // fallback if proxy missing (may be blocked by CORS locally)
+          r = await fetch('https://api.hypurrscan.io/v0/builders/revenues');
+        }
         if(!r.ok) throw new Error(`HTTP ${r.status}`);
         const rows = await r.json();
         const sum = (Array.isArray(rows)? rows : []).slice(0, 20)
@@ -129,7 +133,7 @@
       }
     }
 
-    // ========= Your Staked (per address) =========
+    // ======= Your Staked (per address) =======
     async function loadYourStaked(addr){
       if(!addr){ $('staked').textContent = '—'; return; }
       try{
@@ -148,7 +152,7 @@
       };
     })();
 
-    // ========= Chart: seed with snapshot, then keep live via WS =========
+    // ======= Chart: seed with snapshot, then keep live via WS =======
     let chart;
     function renderChart(series){
       const ctx = $('priceChart');
@@ -193,7 +197,7 @@
       }catch(e){ showErr('ws init', e.message || e); }
     }
 
-    // ========= Boot =========
+    // ======= Boot =======
     (async () => {
       await detectHypeId();     // set correct WS coin id if available
       await loadKPIs();         // price / 24h / volume
