@@ -13,7 +13,7 @@ export default async () => {
         'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
       },
     });
-  } catch (e) {
+  } catch {
     return new Response(JSON.stringify({ error: 'upstream_failed' }), {
       status: 502,
       headers: { 'Content-Type': 'application/json' },
