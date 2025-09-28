@@ -7,9 +7,7 @@ export default async (req: Request) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    // no-cors mode is not needed; Edge has server-side fetch
   });
-  // Pass through body and content-type (important for JSON streaming)
   return new Response(upstream.body, {
     status: upstream.status,
     headers: { 'Content-Type': upstream.headers.get('content-type') ?? 'application/json' }
