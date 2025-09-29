@@ -10,6 +10,9 @@
   <style>
     body{background:#0a0a0a;color:#fff}
     .card{border:1px solid rgba(255,255,255,.12);border-radius:1rem;background:rgba(255,255,255,.03)}
+    .btn{border:1px solid rgba(255,255,255,.14);border-radius:.6rem;padding:.4rem .7rem;font-size:.8rem}
+    .btn.active{background:rgba(255,255,255,.08)}
+    .badge{font-size:.7rem;opacity:.7}
   </style>
 </head>
 <body class="bg-black text-white">
@@ -19,7 +22,7 @@
     <!-- Address input for "Your Staked" -->
     <div class="flex items-center gap-2">
       <input id="addr" placeholder="Paste your Hyperliquid address (0x...)" class="w-full max-w-md bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm" />
-      <button id="addrSave" class="rounded-lg border border-white/15 px-3 py-2 text-sm">Save</button>
+      <button id="addrSave" class="btn">Save</button>
     </div>
 
     <!-- KPI Cards -->
@@ -46,10 +49,26 @@
     <!-- Price Chart -->
     <section class="card p-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="font-semibold">Price (Mini)</h2>
-        <div class="text-xs opacity-70">Live 1m candles</div>
+        <div>
+          <h2 class="font-semibold">Price</h2>
+          <div class="badge">Hyperliquid spot (live)</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn active" data-range="1h">Hour</button>
+          <button class="btn" data-range="1d">Day</button>
+          <button class="btn" data-range="1w">Week</button>
+        </div>
       </div>
-      <canvas id="priceChart" height="120"></canvas>
+      <canvas id="priceChart" height="140"></canvas>
+    </section>
+
+    <!-- HypurrScan Feeds -->
+    <section class="card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold">HypurrScan Feeds</h2>
+        <span class="text-xs opacity-70">via api.hypurrscan.io</span>
+      </div>
+      <div id="hs-feeds" class="grid gap-4 md:grid-cols-2"></div>
     </section>
 
     <!-- Debug messages -->
@@ -65,7 +84,9 @@
 
     // ======= State =======
     let CG_PRICE = 0;      // USD price from CoinGecko
-    let STAKED_HYPE = 0;   // HYPE delegated (from delegatorSummary)
+    let STAKED_HYPE = 0;   // delegated HYPE
+    let chart;             // Chart.js instance
+    let currentRange = '1h'; // '1h' | '1d' | '1w'
 
     // ======= Helpers =======
     const $ = (id) => document.getElementById(id);
@@ -85,10 +106,7 @@
 
     // ======= Simple HL POST wrapper =======
     async function postHL(body){
-      const r = await fetch(HL_INFO, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(body)
-      });
+      const r = await fetch(HL_INFO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
       if(!r.ok) throw new Error(`HL ${r.status}`);
       return r.json();
     }
@@ -111,7 +129,6 @@
         const chg = Number(cg.price_change_percentage_24h||0);
         $('price-change').textContent = `24h: ${chg>=0?'+':''}${chg.toFixed(2)}%`;
         $('volume').textContent = fmtM(cg.total_volume||0);
-        // After price updates, recompute staked value if we already know HYPE amount
         if (STAKED_HYPE > 0) $('staked-value').textContent = fmtUsd(STAKED_HYPE * CG_PRICE);
       }
     }
@@ -134,7 +151,7 @@
         const amt = Number(s?.delegated || 0);
         STAKED_HYPE = amt;
         $('staked').textContent = amt > 0 ? `${amt.toFixed(2)} HYPE` : '—';
-        $('staked-value').textContent = (amt > 0 && CG_PRICE > 0) ? fmtUsd(amt * CG_PRICE) : (amt > 0 ? '—' : '—');
+        $('staked-value').textContent = (amt > 0 && CG_PRICE > 0) ? fmtUsd(amt * CG_PRICE) : '—';
       }catch(e){
         $('staked').textContent = '—';
         $('staked-value').textContent = '—';
@@ -151,29 +168,70 @@
       };
     })();
 
-    // ======= Chart: seed with snapshot, then keep live via WS =======
-    let chart;
-    function renderChart(series){
-      const ctx = $('priceChart');
-      const data = { labels: series.map(p=>p.t), datasets:[{ label:'Price', data: series.map(p=>p.v) }] };
-      if(chart) chart.destroy();
-      chart = new Chart(ctx, { type:'line', data });
+    // ======= Price Chart (seed + live + range buttons) =======
+    function makeGradient(ctx, data){
+      const first = data[0], last = data[data.length-1];
+      const up = last >= first;
+      const color = up ? 'rgba(16,185,129,1)' : 'rgba(244,63,94,1)';   // green/red
+      const fill  = up ? 'rgba(16,185,129,0.18)' : 'rgba(244,63,94,0.18)';
+      const g = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+      g.addColorStop(0, fill);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      return { line: color, area: g };
     }
-    async function seedChart(){
+
+    function renderChart(series){
+      const ctx = $('priceChart').getContext('2d');
+      const ys = series.map(p=>p.v);
+      const { line, area } = makeGradient(ctx, ys);
+      const data = {
+        labels: series.map(p=>p.t),
+        datasets: [{
+          label:'Price',
+          data: ys,
+          borderColor: line,
+          backgroundColor: area,
+          tension: 0.25,
+          pointRadius: 0,
+          fill: true
+        }]
+      };
+      const opts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color:'#94a3b8' }, grid: { color:'rgba(148,163,184,.08)'} },
+          y: { ticks: { color:'#94a3b8' }, grid: { color:'rgba(148,163,184,.08)'} }
+        },
+        plugins: { legend: { display:false } }
+      };
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, { type:'line', data, options: opts });
+    }
+
+    async function seedChartFor(range){
+      // Map range -> (interval, points)
+      const now = Date.now();
+      let interval = '1m', durationMs = 60*60*1000;    // 1h
+      if(range==='1d'){ interval='1h'; durationMs = 24*60*60*1000; }
+      if(range==='1w'){ interval='1d'; durationMs = 7*24*60*60*1000; }
+      const start = now - durationMs;
+
       try{
-        const now = Date.now();
-        const start = now - 24*60*60*1000;
-        const snap = await postHL({ type:'candleSnapshot', req:{ coin:HYPE_SPOT, interval:'1m', startTime:start, endTime:now } });
+        const snap = await postHL({ type:'candleSnapshot', req:{ coin:HYPE_SPOT, interval, startTime:start, endTime:now } });
         if(Array.isArray(snap) && snap.length){
-          const series = snap.slice(-120).map(c=>({
-            t: new Date(c.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+          const series = snap.map(c=>({
+            t: new Date(c.t).toLocaleTimeString([], (range==='1w' ? { month:'short', day:'numeric' } : { hour:'2-digit', minute:'2-digit'})),
             v: Number(c.c)
           }));
           renderChart(series);
         }
       }catch(e){ showErr('seedChart', e.message || e); }
     }
-    function connectWS(){
+
+    function connectWS(range){
+      // Only keep live WS for the shortest range (1h with 1m candles).
+      if(range !== '1h') return;
       try{
         const ws = new WebSocket(HL_WS);
         ws.onopen = () => {
@@ -192,19 +250,104 @@
           }catch(e){ showErr('ws message', e.message || e); }
         };
         ws.onerror = () => showErr('ws', 'connection error');
-        ws.onclose  = () => setTimeout(connectWS, 3000);
+        ws.onclose  = () => setTimeout(()=>connectWS(range), 3000);
       }catch(e){ showErr('ws init', e.message || e); }
+    }
+
+    // Range buttons
+    function setActiveRange(btn){
+      document.querySelectorAll('[data-range]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    document.querySelectorAll('[data-range]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const r = btn.getAttribute('data-range');
+        currentRange = r;
+        setActiveRange(btn);
+        await seedChartFor(r);
+        connectWS(r);
+      });
+    });
+
+    // ======= HypurrScan Feeds =======
+    // Copy exact paths/params from https://api.hypurrscan.io/ui (you can tweak these later)
+    const FEEDS = [
+      { title: 'Auctions (latest)',         path: '/v0/auctions',                params: { limit: 10 } },
+      { title: 'Tokens by 24h Volume',      path: '/v0/tokens/volume',           params: { window: '24h', limit: 10 } },
+      { title: 'Unstaking Queue',           path: '/v0/staking/queue',           params: {} },
+      { title: 'Recent Large Transfers',    path: '/v0/transfers/recent',        params: { min_usd: 5000, limit: 10 } },
+      { title: 'Top Wallets by 24h Volume', path: '/v0/wallets/top',             params: { metric: 'volume', window: '24h', limit: 10 } },
+      { title: 'Leaderboard (Fees 24h)',    path: '/v0/leaderboard',             params: { metric: 'fees', window: '24h', limit: 10 } }
+    ];
+    const hsRoot = document.getElementById('hs-feeds');
+
+    function objToQuery(o={}) {
+      const u = new URLSearchParams();
+      for (const [k,v] of Object.entries(o)) if (v !== undefined && v !== null) u.set(k, v);
+      return u.toString();
+    }
+    function renderTableFromArray(arr) {
+      if (!Array.isArray(arr) || arr.length === 0) return '<div class="text-xs opacity-60">No data</div>';
+      const cols = Object.keys(arr[0]).slice(0, 5);
+      const th = cols.map(c => `<th class="py-1 px-2 text-left text-xs opacity-70">${c}</th>`).join('');
+      const rows = arr.slice(0, 10).map(r =>
+        `<tr class="border-t border-white/10">` +
+        cols.map(c => `<td class="py-1 px-2 text-xs">${(r[c] ?? '')}</td>`).join('') +
+        `</tr>`).join('');
+      return `<div class="overflow-x-auto"><table class="w-full"><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    async function loadHSFeeds() {
+      if (!FEEDS.length) {
+        hsRoot.innerHTML = '<div class="text-xs opacity-60">Configure FEEDS[] to show HypurrScan data.</div>';
+        return;
+      }
+      hsRoot.innerHTML = FEEDS.map((f, i) =>
+        `<div id="hs-card-${i}" class="rounded-xl border border-white/10 p-3">
+           <div class="flex items-center justify-between mb-2">
+             <div class="font-medium">${f.title}</div>
+             <a class="text-xs opacity-70 underline" target="_blank" rel="noreferrer"
+                href="/api/hs?path=${encodeURIComponent(f.path)}${f.params ? '&'+objToQuery(f.params) : ''}">raw</a>
+           </div>
+           <div class="text-xs opacity-60" id="hs-body-${i}">Loading…</div>
+         </div>`
+      ).join('');
+
+      for (let i = 0; i < FEEDS.length; i++) {
+        const f = FEEDS[i];
+        const url = `/api/hs?path=${encodeURIComponent(f.path)}${f.params ? '&'+objToQuery(f.params) : ''}`;
+        try {
+          const r = await fetch(url);
+          const type = r.headers.get('content-type') || '';
+          const body = type.includes('application/json') ? await r.json() : await r.text();
+
+          let html = '';
+          if (Array.isArray(body)) {
+            html = renderTableFromArray(body);
+          } else if (body && typeof body === 'object') {
+            html = `<pre class="whitespace-pre-wrap text-[11px] opacity-80">${JSON.stringify(body, null, 2).slice(0, 2000)}</pre>`;
+          } else {
+            html = `<pre class="whitespace-pre-wrap text-[11px] opacity-80">${String(body).slice(0, 2000)}</pre>`;
+          }
+          document.getElementById(`hs-body-${i}`).innerHTML = html;
+        } catch (e) {
+          document.getElementById(`hs-body-${i}`).textContent = 'Failed to load';
+        }
+      }
     }
 
     // ======= Boot =======
     (async () => {
-      await detectHypeId();     // set correct WS coin id if available
-      await loadKPIs();         // price / 24h / volume (sets CG_PRICE)
-      await seedChart();        // fill chart immediately
-      // load staked AFTER price so value can compute immediately if address is present
+      await detectHypeId();               // set correct WS coin id if available
+      await loadKPIs();                   // price / 24h / volume (sets CG_PRICE)
       const saved = localStorage.getItem('hl_addr')||'';
       if(saved) await loadYourStaked(saved);
-      connectWS();              // keep chart live
+
+      // Default chart range = 1h
+      await seedChartFor(currentRange);
+      connectWS(currentRange);
+
+      // Load HypurrScan feeds
+      loadHSFeeds();
     })();
   </script>
 </body>
