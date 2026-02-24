@@ -1,1250 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HYPE Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<style>
-  :root {
-    --bg: #060a0e;
-    --surface: #0c1219;
-    --surface2: #111820;
-    --border: #1a2430;
-    --border-bright: #263545;
-    --accent: #00d4ff;
-    --accent2: #ff5e1a;
-    --accent-dim: rgba(0,212,255,0.1);
-    --accent2-dim: rgba(255,94,26,0.1);
-    --text: #b8ccd8;
-    --text-dim: #4a6678;
-    --text-bright: #ddeeff;
-    --red: #ff3d50;
-    --red-dim: rgba(255,61,80,0.1);
-    --green: #00e676;
-    --green-dim: rgba(0,230,118,0.1);
-    --yellow: #ffcc44;
-    --yellow-dim: rgba(255,204,68,0.1);
-    --purple: #bb86fc;
-    --purple-dim: rgba(187,134,252,0.1);
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;line-height:1.5;overflow:hidden}
-  body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.015) 3px,rgba(0,0,0,.015) 4px);pointer-events:none;z-index:9999}
+  <meta charset="UTF-8" />
+  <title>HYPE Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  /* TOPBAR */
-  .topbar{height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;position:relative;z-index:10;flex-shrink:0}
-  .logo{font-size:14px;font-weight:600;letter-spacing:.12em;color:var(--accent);white-space:nowrap}
-  .logo em{color:var(--text-dim);font-style:normal;font-weight:300}
-  .divider{width:1px;height:24px;background:var(--border)}
-  .live-badge{display:flex;align-items:center;gap:5px;font-size:10px;letter-spacing:.1em;color:var(--text-dim)}
-  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-  .price-hero{display:flex;align-items:baseline;gap:6px}
-  .price-main{font-size:18px;font-weight:600;color:var(--text-bright);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-  .price-chg{font-size:11px;font-weight:500}
-  .up{color:var(--green)}.down{color:var(--red)}
-  .topbar-stats{display:flex;align-items:center;gap:16px;margin-left:auto}
-  .ts{display:flex;flex-direction:column;align-items:flex-end}
-  .ts-l{font-size:9px;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase}
-  .ts-v{font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-bright)}
-  .ts-v.a{color:var(--accent)}.ts-v.b{color:var(--accent2)}.ts-v.r{color:var(--red)}.ts-v.g{color:var(--green)}
-  .btn{background:none;border:1px solid var(--border-bright);color:var(--text-dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:4px 10px;cursor:pointer;border-radius:2px;transition:all .15s;white-space:nowrap}
-  .btn:hover{border-color:var(--accent);color:var(--accent)}
-  .btn.busy{opacity:.5;pointer-events:none}
+  <!-- Simple styling, no build tools needed -->
+  <style>
+    :root {
+      --bg: #050711;
+      --bg-dark: #020308;
+      --card: #0b1020;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.16);
+      --accent2: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #111827;
+      --danger: #fb7185;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
 
-  /* LAYOUT */
-  .layout{display:grid;grid-template-columns:210px 1fr 250px;height:calc(100vh - 48px);overflow:hidden}
+    * {
+      box-sizing: border-box;
+    }
 
-  /* SIDEBAR LEFT */
-  .sb-left{border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-  .sb-sec{padding:11px 13px;border-bottom:1px solid var(--border)}
-  .sb-lbl{font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:9px;display:flex;align-items:center;gap:5px}
-  .sb-lbl .dot{width:4px;height:4px;border-radius:50%;background:var(--accent)}
-  .sb-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0}
-  .sb-k{color:var(--text-dim);font-size:10px}
-  .sb-v{font-size:11px;font-weight:500;color:var(--text-bright);font-variant-numeric:tabular-nums}
-  .sb-v.a{color:var(--accent)}.sb-v.b{color:var(--accent2)}.sb-v.g{color:var(--green)}.sb-v.r{color:var(--red)}.sb-v.y{color:var(--yellow)}
-  .sig-box{margin-top:4px;padding:9px;border-radius:3px;text-align:center}
-  .sig-lbl{font-size:15px;font-weight:700;letter-spacing:.1em}
-  .sig-sub{font-size:9px;color:var(--text-dim);margin-top:2px;font-family:var(--sans)}
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: radial-gradient(circle at top, #020617 0, #020308 40%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
 
-  /* CENTER MAIN */
-  .main{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
-  .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow-x:auto}
-  .tab{padding:9px 13px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap}
-  .tab:hover{color:var(--text)}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-  .tbadge{background:var(--accent-dim);color:var(--accent);border-radius:2px;padding:0 4px;font-size:9px;min-width:14px;text-align:center}
-  .tbadge.r{background:var(--red-dim);color:var(--red)}
-  .content{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
 
-  /* PANELS */
-  .panel{background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden}
-  .ph{display:flex;justify-content:space-between;align-items:center;padding:8px 13px;border-bottom:1px solid var(--border);background:var(--surface2)}
-  .ptitle{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);display:flex;align-items:center;gap:5px}
-  .pdot{width:5px;height:5px;border-radius:50%}
-  .pmeta{font-size:10px;color:var(--text-dim)}
+    h1 {
+      font-size: 1.75rem;
+      margin: 0 0 4px;
+    }
 
-  /* KPIs */
-  .kgrid{display:grid;gap:10px}
-  .kg3{grid-template-columns:repeat(3,1fr)}
-  .kg2{grid-template-columns:repeat(2,1fr)}
-  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-top:2px solid transparent;border-radius:3px;padding:11px 13px}
-  .kpi.ca{border-top-color:var(--accent)}.kpi.cb{border-top-color:var(--accent2)}.kpi.cg{border-top-color:var(--green)}.kpi.cr{border-top-color:var(--red)}.kpi.cy{border-top-color:var(--yellow)}.kpi.cp{border-top-color:var(--purple)}
-  .kl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px}
-  .kv{font-size:20px;font-weight:600;color:var(--text-bright);font-variant-numeric:tabular-nums;line-height:1.2}
-  .ks{font-size:10px;color:var(--text-dim);margin-top:3px;font-family:var(--sans)}
-  .ks.g{color:var(--green)}.ks.r{color:var(--red)}
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
 
-  /* FEED */
-  .fi{display:grid;grid-template-columns:88px 1fr auto;gap:9px;align-items:start;padding:7px 13px;border-bottom:1px solid rgba(26,36,48,.7);transition:background .1s}
-  .fi:last-child{border-bottom:none}
-  .fi:hover{background:rgba(17,24,32,.8)}
-  .fi-t{font-size:10px;color:var(--text-dim);font-variant-numeric:tabular-nums;line-height:1.4}
-  .fi-d{font-size:11px;color:var(--text);line-height:1.5}
-  .fi-a{color:var(--accent);cursor:pointer;text-decoration:none}
-  .fi-a:hover{text-decoration:underline}
-  .fi-amt{font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.4}
-  .fi-usd{font-size:10px;color:var(--text-dim);font-variant-numeric:tabular-nums}
-  .bdg{display:inline-flex;align-items:center;padding:1px 5px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1px}
-  .bk{background:var(--accent-dim);color:var(--accent)}
-  .bu{background:var(--red-dim);color:var(--red)}
-  .bb{background:var(--accent2-dim);color:var(--accent2)}
-  .bg{background:var(--green-dim);color:var(--green)}
-  .by{background:var(--yellow-dim);color:var(--yellow)}
-  .bt{background:rgba(74,102,120,.15);color:var(--text-dim)}
-  .bp{background:var(--purple-dim);color:var(--purple)}
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
 
-  /* QUEUE ITEM */
-  .qi{display:grid;grid-template-columns:1fr auto 90px;gap:10px;align-items:center;padding:8px 13px;border-bottom:1px solid rgba(26,36,48,.7)}
-  .qi:last-child{border-bottom:none}
-  .qi:hover{background:var(--surface2)}
-  .qi-addr{color:var(--accent);font-size:11px;cursor:pointer}
-  .qi-addr:hover{text-decoration:underline}
-  .qi-sub{font-size:9px;color:var(--text-dim);margin-top:1px}
-  .qi-amt{font-size:13px;font-weight:700;color:var(--red);text-align:right;font-variant-numeric:tabular-nums}
-  .qi-usd{font-size:10px;color:var(--text-dim);text-align:right}
-  .qi-cd{font-size:11px;font-variant-numeric:tabular-nums;text-align:right}
-  .qi-pct{font-size:9px;color:var(--text-dim);margin-top:1px;text-align:right}
-  .prog{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:4px}
-  .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:1px}
+    .pill {
+      font-size: 0.8rem;
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      color: var(--muted);
+    }
 
-  /* VALIDATORS */
-  .vtbl{width:100%;border-collapse:collapse}
-  .vtbl th{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:7px 13px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap}
-  .vtbl td{padding:7px 13px;font-size:11px;border-bottom:1px solid rgba(26,36,48,.5);font-variant-numeric:tabular-nums}
-  .vtbl tr:last-child td{border-bottom:none}
-  .vtbl tr:hover td{background:rgba(17,24,32,.6)}
-  .vname{display:flex;align-items:center;gap:5px;font-weight:500;color:var(--text-bright)}
-  .vdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-  .vbcell{display:flex;align-items:center;gap:5px;min-width:90px}
-  .vbar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-  .vbar-fill{height:100%;background:var(--accent);border-radius:2px}
+    .pill strong {
+      color: var(--accent2);
+    }
 
-  /* AF */
-  .af-info{padding:11px 13px;background:rgba(0,212,255,.03);border-bottom:1px solid rgba(0,212,255,.1);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .af-addr{font-size:10px;color:var(--accent);letter-spacing:.04em}
-  .af-desc{font-size:9px;color:var(--text-dim);margin-top:1px;font-family:var(--sans)}
-  .af-link{margin-left:auto;color:var(--text-dim);font-size:10px;text-decoration:none;border:1px solid var(--border);padding:2px 7px;border-radius:2px;white-space:nowrap}
-  .af-link:hover{border-color:var(--accent);color:var(--accent)}
+    .tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 12px;
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* FEE BARS */
-  .fee-chart{padding:12px;display:flex;flex-direction:column;gap:5px}
-  .fbrow{display:flex;align-items:center;gap:7px}
-  .fblabel{font-size:9px;color:var(--text-dim);width:44px;text-align:right;flex-shrink:0}
-  .fbout{flex:1;height:15px;background:var(--border);border-radius:2px;overflow:hidden;position:relative}
-  .fbin{height:100%;background:linear-gradient(90deg,var(--accent2) 0%,rgba(255,94,26,.5) 100%);border-radius:2px;transition:width .5s ease}
-  .fbval{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--text-bright);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 999px 999px 0 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-  /* INSIGHT */
-  .insight{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.12);border-radius:3px;padding:11px 13px}
-  .insight-ttl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
-  .insight-body{font-size:11px;color:var(--text);line-height:1.7;font-family:var(--sans)}
-  .insight-body strong{color:var(--text-bright);font-family:var(--mono)}
+    .tab-btn span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--border);
+    }
 
-  /* RIGHT SIDEBAR */
-  .sb-right{overflow-y:auto;display:flex;flex-direction:column}
-  .sr-sec{padding:11px 13px;border-bottom:1px solid var(--border)}
-  .sr-ttl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:9px}
-  .alert-row{display:flex;align-items:flex-start;gap:7px;padding:6px 0;border-bottom:1px solid rgba(26,36,48,.5);font-size:10px;font-family:var(--sans);color:var(--text);line-height:1.5}
-  .alert-row:last-child{border-bottom:none}
-  .alert-ico{font-size:11px;flex-shrink:0;margin-top:1px}
-  .holder-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(26,36,48,.4);font-size:10px}
-  .holder-row:last-child{border-bottom:none}
-  .h-rank{color:var(--text-dim);width:14px;flex-shrink:0}
-  .h-addr{color:var(--accent);flex:1;padding:0 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
-  .h-addr:hover{text-decoration:underline}
-  .h-amt{font-variant-numeric:tabular-nums;color:var(--text-bright);font-weight:500}
+    .tab-btn.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.12), transparent);
+    }
 
-  /* TAB PANELS */
-  .tp{display:none}.tp.active{display:flex;flex-direction:column;gap:12px}
+    .tab-btn.active span.dot {
+      background: var(--accent);
+    }
 
-  /* ── CHARTS ── */
-  /* Critical: fixed heights prevent the infinite-grow bug */
-  .chart-outer{background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden;display:flex;flex-direction:column}
-  .chart-toolbar{display:flex;align-items:center;gap:0;padding:0 12px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;height:32px}
-  .ct-btn{background:none;border:none;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--text-dim);cursor:pointer;padding:6px 9px;text-transform:uppercase;border-bottom:2px solid transparent;height:32px;transition:color .12s,border-color .12s}
-  .ct-btn:hover{color:var(--text)}
-  .ct-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
-  .ct-sep{width:1px;height:14px;background:var(--border);margin:0 6px;flex-shrink:0}
-  .ct-type{background:none;border:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text-dim);cursor:pointer;padding:2px 7px;border-radius:2px;margin-left:2px;transition:all .12s}
-  .ct-type:hover{border-color:var(--accent);color:var(--accent)}
-  .ct-type.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-  .chart-stats{display:flex;gap:18px;padding:7px 13px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;background:var(--surface2)}
-  .cst-item{display:flex;flex-direction:column;gap:1px}
-  .cst-lbl{font-size:8px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em}
-  .cst-val{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-bright)}
-  /* The key fix: explicit pixel height, no auto-sizing */
-  .chart-canvas-wrap{position:relative;width:100%;height:280px;flex-shrink:0}
-  .chart-canvas-wrap.short{height:200px}
-  /* AF LIVE MONITOR */
-  .af-live-stats{display:flex;gap:20px;padding:8px 13px;border-bottom:1px solid var(--border);background:rgba(0,212,255,0.03);flex-wrap:wrap;flex-shrink:0}
+    .tab {
+      display: none;
+      padding-top: 10px;
+    }
+    .tab.active {
+      display: block;
+    }
 
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.3fr);
+      gap: 16px;
+    }
 
-  /* EMPTY */
-  .es{padding:20px;text-align:center;color:var(--text-dim);font-size:11px;font-family:var(--sans)}
-  .es a{color:var(--accent);text-decoration:none}
-  .es a:hover{text-decoration:underline}
-  .skel{background:linear-gradient(90deg,var(--border) 25%,var(--border-bright) 50%,var(--border) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:2px;display:inline-block;height:11px}
-  @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
 
-  ::-webkit-scrollbar{width:3px;height:3px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:2px}
+    .card {
+      background: radial-gradient(circle at top left, #020617 0, var(--card) 50%, #020617 100%);
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      padding: 14px 14px 10px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.66);
+      position: relative;
+      overflow: hidden;
+    }
 
-  @media(max-width:1100px){.layout{grid-template-columns:200px 1fr}.sb-right{display:none}}
-  @media(max-width:760px){.layout{grid-template-columns:1fr}.sb-left{display:none}.topbar-stats .ts:nth-child(n+3){display:none}}
-</style>
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.08), transparent 60%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card h3 span.sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .status-text.ok {
+      color: var(--accent);
+    }
+
+    .status-text.err {
+      color: var(--danger);
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.primary {
+      border-radius: 999px;
+      padding: 6px 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: linear-gradient(135deg, var(--accent-soft), rgba(15, 23, 42, 0.9));
+      color: var(--text);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.primary:active {
+      transform: translateY(1px);
+    }
+
+    button.primary small {
+      font-size: 0.8em;
+      color: var(--muted);
+    }
+
+    .pill-small {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .feed {
+      max-height: 320px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      padding-right: 4px;
+    }
+
+    .feed-item {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .feed-item:last-child {
+      border-bottom: none;
+    }
+
+    .feed-main {
+      color: var(--text);
+    }
+
+    .feed-sub {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .v {
+      font-variant-numeric: tabular-nums;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 260px !important;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+<div class="shell">
+  <header>
+    <h1>HYPE Dashboard</h1>
+    <div class="subtitle">
+      Hyperliquid AF / burn activity and unstaking queue – client-side dashboard.
+    </div>
 
-<header class="topbar">
-  <div class="logo">HYPE<em>/</em>INTEL</div>
-  <div class="divider"></div>
-  <div class="live-badge">
-    <div class="live-dot" id="liveDot"></div>
-    <span id="liveText">CONNECTING</span>
+    <div class="pill-row">
+      <div class="pill">Chain: <strong>Hyperliquid</strong></div>
+      <div class="pill">Pair: <strong>HYPE / USDC</strong></div>
+      <div class="pill">Mode: <strong>Read-only</strong></div>
+      <div class="pill" id="lastUpdated">Last updated: …</div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tab-row">
+    <button class="tab-btn active" data-tab="overview">
+      <span class="dot"></span> Overview
+    </button>
+    <button class="tab-btn" data-tab="af">
+      <span class="dot"></span> AF / Burns
+    </button>
+    <button class="tab-btn" data-tab="unstaking">
+      <span class="dot"></span> Unstaking Queue
+    </button>
   </div>
-  <div class="divider"></div>
-  <div class="price-hero">
-    <div class="price-main" id="topPrice">$—</div>
-    <div class="price-chg" id="topChg">—</div>
-  </div>
-  <div class="topbar-stats">
-    <div class="ts"><div class="ts-l">Staked</div><div class="ts-v a" id="tsStaked">—</div></div>
-    <div class="ts"><div class="ts-l">Burned</div><div class="ts-v b" id="tsBurned">—</div></div>
-    <div class="ts"><div class="ts-l">Queue</div><div class="ts-v r" id="tsQueue">—</div></div>
-    <div class="ts"><div class="ts-l">24h Fees</div><div class="ts-v g" id="tsFees">—</div></div>
-    <div class="ts"><div class="ts-l">Mkt Cap</div><div class="ts-v" id="tsMcap">—</div></div>
-    <div class="ts"><div class="ts-l">Updated</div><div class="ts-v" id="tsUpdated">—</div></div>
-    <button class="btn" id="refreshBtn" onclick="loadAll()">↻ REFRESH</button>
-  </div>
-</header>
 
-<div class="layout">
-
-  <!-- LEFT SIDEBAR -->
-  <aside class="sb-left">
-    <div class="sb-sec">
-      <div class="sb-lbl"><div class="dot"></div>Supply</div>
-      <div class="sb-row"><span class="sb-k">Max Supply</span><span class="sb-v">1.00B HYPE</span></div>
-      <div class="sb-row"><span class="sb-k">Circulating</span><span class="sb-v" id="sbCirc">—</span></div>
-      <div class="sb-row"><span class="sb-k">Total Burned</span><span class="sb-v b" id="sbBurned">—</span></div>
-      <div class="sb-row"><span class="sb-k">Burned %</span><span class="sb-v" id="sbBurnPct">—</span></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl"><div class="dot" style="background:var(--green)"></div>Staking</div>
-      <div class="sb-row"><span class="sb-k">Total Staked</span><span class="sb-v a" id="sbStaked">—</span></div>
-      <div class="sb-row"><span class="sb-k">Staked %</span><span class="sb-v" id="sbStakedPct">—</span></div>
-      <div class="sb-row"><span class="sb-k">Queue Total</span><span class="sb-v r" id="sbQTotal">—</span></div>
-      <div class="sb-row"><span class="sb-k">Queue Count</span><span class="sb-v" id="sbQCount">—</span></div>
-      <div class="sb-row"><span class="sb-k">Staking APR</span><span class="sb-v g" id="sbApr">—</span></div>
-      <div class="sb-row"><span class="sb-k">Validators</span><span class="sb-v" id="sbVals">—</span></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl"><div class="dot" style="background:var(--accent2)"></div>AF &amp; Burns</div>
-      <div class="sb-row"><span class="sb-k">AF Balance</span><span class="sb-v g" id="sbAfBal">—</span></div>
-      <div class="sb-row"><span class="sb-k">AF Bids</span><span class="sb-v y" id="sbAfBids">—</span></div>
-      <div class="sb-row"><span class="sb-k">Burn Rate</span><span class="sb-v b" id="sbBurnRate">—</span></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl"><div class="dot" style="background:var(--yellow)"></div>Market</div>
-      <div class="sb-row"><span class="sb-k">Price</span><span class="sb-v" id="sbPrice">—</span></div>
-      <div class="sb-row"><span class="sb-k">Mkt Cap</span><span class="sb-v" id="sbMcap">—</span></div>
-      <div class="sb-row"><span class="sb-k">24h Volume</span><span class="sb-v" id="sbVol">—</span></div>
-      <div class="sb-row"><span class="sb-k">FDV</span><span class="sb-v" id="sbFdv">—</span></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl"><div class="dot" style="background:var(--purple)"></div>Signal</div>
-      <div id="signalBox"><div class="sig-box" style="background:var(--surface2)"><div class="sig-lbl" style="color:var(--text-dim)">—</div><div class="sig-sub">Loading...</div></div></div>
-    </div>
-  </aside>
-
-  <!-- CENTER MAIN -->
-  <div class="main">
-    <nav class="tabs">
-      <div class="tab active" data-tab="overview">Overview</div>
-      <div class="tab" data-tab="charts">Charts</div>
-      <div class="tab" data-tab="unstaking">Unstaking <span class="tbadge r" id="tbUQ">0</span></div>
-      <div class="tab" data-tab="staking">Staking Flows</div>
-      <div class="tab" data-tab="af">AF &amp; Burns</div>
-      <div class="tab" data-tab="fees">Fees</div>
-      <div class="tab" data-tab="validators">Validators</div>
-    </nav>
-
-    <div class="content">
-
-      <!-- OVERVIEW -->
-      <div class="tp active" id="tab-overview">
-        <div class="kgrid kg3">
-          <div class="kpi ca"><div class="kl">Total Staked</div><div class="kv" id="kStaked">—</div><div class="ks" id="kStakedS">—</div></div>
-          <div class="kpi cb"><div class="kl">Total Burned</div><div class="kv" id="kBurned">—</div><div class="ks" id="kBurnedS">—</div></div>
-          <div class="kpi cr"><div class="kl">Pending Unstake</div><div class="kv" id="kQueue">—</div><div class="ks" id="kQueueS">—</div></div>
-        </div>
-        <div class="twocol">
-          <div class="insight" id="insightPanel"><div class="insight-ttl">📡 Trading Intelligence</div><div class="insight-body" id="insightBody">Loading...</div></div>
-          <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent2)"></div>24h Fee Revenue</div><div class="pmeta" id="feeMetaLabel">—</div></div><div class="fee-chart" id="feeChart24h"><div class="es"><span class="skel" style="width:120px"></span></div></div></div>
-        </div>
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--green)"></div>Live Activity Feed</div><div class="pmeta">Delegations + Transfers · Most recent first</div></div><div id="overviewFeed"><div class="es"><span class="skel" style="width:200px"></span></div></div></div>
-      </div>
-
-      <!-- CHARTS TAB -->
-      <div class="tp" id="tab-charts">
-
-        <!-- LIVE AF MONITOR CHART -->
-        <div class="chart-outer">
-          <div class="ph">
-            <div class="ptitle"><div class="pdot" style="background:var(--green)"></div>AF Live Monitor — HYPE Price vs Bid vs Fees</div>
-            <div class="pmeta" id="afChartMeta">Updating every 5s · Hyperliquid API</div>
-          </div>
-          <div class="af-live-stats" id="afLiveStats">
-            <div class="cst-item"><div class="cst-lbl">HYPE Price</div><div class="cst-val" style="color:var(--accent)" id="afLivePrice">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">AF Bid Price</div><div class="cst-val" style="color:var(--red)" id="afLiveBid">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Bid Size</div><div class="cst-val" style="color:var(--yellow)" id="afLiveSz">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">AF USDC Balance</div><div class="cst-val" style="color:var(--accent2)" id="afLiveUsdc">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Fees Collected (session)</div><div class="cst-val" style="color:var(--purple)" id="afLiveFees">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Spread to Bid</div><div class="cst-val" id="afLiveSpread">—</div></div>
-          </div>
-          <div class="chart-canvas-wrap" id="afWrap"></div>
-        </div>
-
-        <!-- PRICE CANDLESTICK CHART -->
-        <div class="chart-outer">
-          <div class="ph">
-            <div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>HYPE / USD — Price History</div>
-            <div class="pmeta" id="priceChartMeta">Hyperliquid spot · candleSnapshot</div>
-          </div>
-          <div class="chart-toolbar">
-            <button class="ct-btn active" data-ptf="60"    onclick="loadPriceChart(60,this)">1H</button>
-            <button class="ct-btn"        data-ptf="240"   onclick="loadPriceChart(240,this)">4H</button>
-            <button class="ct-btn"        data-ptf="1440"  onclick="loadPriceChart(1440,this)">1D</button>
-            <button class="ct-btn"        data-ptf="10080" onclick="loadPriceChart(10080,this)">1W</button>
-            <div class="ct-sep"></div>
-            <button class="ct-type active" id="btnCandle" onclick="setPriceType('candle')">Candle</button>
-            <button class="ct-type"        id="btnArea"   onclick="setPriceType('area')">Area</button>
-          </div>
-          <div class="chart-stats">
-            <div class="cst-item"><div class="cst-lbl">Open</div><div class="cst-val" id="csO">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">High</div><div class="cst-val" style="color:var(--green)" id="csH">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Low</div><div class="cst-val" style="color:var(--red)" id="csL">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Close</div><div class="cst-val" id="csC">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Change</div><div class="cst-val" id="csChg">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Volume</div><div class="cst-val" style="color:var(--text-dim)" id="csVol">—</div></div>
-          </div>
-          <div class="chart-canvas-wrap" id="priceWrap"></div>
-        </div>
-
-        <!-- CUMULATIVE BURN CHART -->
-        <div class="chart-outer">
-          <div class="ph">
-            <div class="ptitle"><div class="pdot" style="background:var(--accent2)"></div>HYPE Burned — Cumulative (from fees)</div>
-            <div class="pmeta">Implied burn: fees ÷ price · feesRecent API</div>
-          </div>
-          <div class="chart-toolbar">
-            <button class="ct-btn active" data-btf="24"  onclick="setBurnWindow(24,this)">24H</button>
-            <button class="ct-btn"        data-btf="168" onclick="setBurnWindow(168,this)">7D</button>
-            <button class="ct-btn"        data-btf="720" onclick="setBurnWindow(720,this)">30D</button>
-            <button class="ct-btn"        data-btf="0"   onclick="setBurnWindow(0,this)">All</button>
-          </div>
-          <div class="chart-stats">
-            <div class="cst-item"><div class="cst-lbl">Total Burned</div><div class="cst-val" style="color:var(--accent2)" id="bsTotal">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Period Burns</div><div class="cst-val" style="color:var(--yellow)" id="bsPeriod">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">USD Value</div><div class="cst-val" style="color:var(--text-dim)" id="bsUsd">—</div></div>
-            <div class="cst-item"><div class="cst-lbl">Rate</div><div class="cst-val" style="color:var(--text-dim)" id="bsRate">—</div></div>
-          </div>
-          <div class="chart-canvas-wrap short" id="burnWrap"></div>
-        </div>
-
-      </div>
-
-
-      <!-- UNSTAKING -->
-      <div class="tp" id="tab-unstaking">
-        <div class="kgrid kg3">
-          <div class="kpi cr"><div class="kl">Total Queued</div><div class="kv" id="kuTotal">—</div><div class="ks" id="kuTotalS">—</div></div>
-          <div class="kpi cy"><div class="kl">Unlocking ≤24h</div><div class="kv" id="kuSoon">—</div><div class="ks">Immediate sell pressure risk</div></div>
-          <div class="kpi ca"><div class="kl">Avg Position</div><div class="kv" id="kuAvg">—</div><div class="ks">Per unstaking wallet</div></div>
-        </div>
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--red)"></div>Full Unstaking Queue</div><div class="pmeta">Live · /fullUnstakingQueue · 8-day lock · Sorted by size</div></div><div id="queueList"><div class="es"><span class="skel" style="width:180px"></span></div></div></div>
-      </div>
-
-      <!-- STAKING FLOWS -->
-      <div class="tp" id="tab-staking">
-        <div class="twocol">
-          <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>Recent Delegations</div><div class="pmeta">/delegations</div></div><div id="stakeFeed"><div class="es"><span class="skel" style="width:140px"></span></div></div></div>
-          <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--red)"></div>Recent Undelegations</div><div class="pmeta">/delegations</div></div><div id="unstakeFeed"><div class="es"><span class="skel" style="width:140px"></span></div></div></div>
-        </div>
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--yellow)"></div>🐋 Whale Movements (≥10K HYPE)</div><div class="pmeta">High-impact stake events</div></div><div id="whaleFeed"><div class="es"><span class="skel" style="width:140px"></span></div></div></div>
-      </div>
-
-      <!-- AF & BURNS -->
-      <div class="tp" id="tab-af">
-        <div class="panel">
-          <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>Assistance Fund Wallet</div><div class="pmeta">0xfefe…fefe · System address</div></div>
-          <div class="af-info">
-            <div><div class="af-addr">0xfefefefefefefefefefefefefefefefefefefefe</div><div class="af-desc">Trading fees → auto buys HYPE → permanent burn. No private key exists.</div></div>
-            <a href="https://hypurrscan.io/address/0xfefefefefefefefefefefefefefefefefefefefe" target="_blank" class="af-link">HypurrScan ↗</a>
-            <a href="https://www.hypeburn.fun/" target="_blank" class="af-link">HypeBurn ↗</a>
-          </div>
-          <div id="afTxFeed"><div class="es"><span class="skel" style="width:180px"></span></div></div>
-        </div>
-        <div class="twocol">
-          <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent2)"></div>Burn Events</div><div class="pmeta">From /transfers to burn address</div></div><div id="burnFeed"><div class="es"><span class="skel" style="width:140px"></span></div></div></div>
-          <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--yellow)"></div>AF Open Buy Bids</div><div class="pmeta">Live HYPE/USDC orderbook</div></div><div id="afBidsFeed"><div class="es"><span class="skel" style="width:140px"></span></div></div></div>
+  <!-- === OVERVIEW TAB =================================================== -->
+  <section id="tab-overview" class="tab active">
+    <div class="grid">
+      <div class="card">
+        <div class="card-inner">
+          <h3>
+            Burns – Cumulative
+            <span class="sub" id="burnCumulativeMeta">24h</span>
+          </h3>
+          <canvas id="burnCumulativeChart"></canvas>
         </div>
       </div>
 
-      <!-- FEES -->
-      <div class="tp" id="tab-fees">
-        <div class="kgrid kg3">
-          <div class="kpi cp"><div class="kl">Fees All Time</div><div class="kv" id="kFeeAll">—</div><div class="ks">Cumulative protocol revenue</div></div>
-          <div class="kpi cg"><div class="kl">Fees Last 24h</div><div class="kv" id="kFee24">—</div><div class="ks">→ converted to HYPE burns</div></div>
-          <div class="kpi cb"><div class="kl">Implied Burn Rate</div><div class="kv" id="kFeeRate">—</div><div class="ks">HYPE/day at current price</div></div>
+      <div class="card">
+        <div class="card-inner">
+          <h3>
+            Snapshot
+            <span class="sub">High-level metrics</span>
+          </h3>
+          <div class="muted" id="overviewMetrics">
+            Loading…
+          </div>
         </div>
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--purple)"></div>48h Fee History</div><div class="pmeta">api.hypurrscan.io/feesRecent</div></div><div class="fee-chart" id="feeChart48h"><div class="es"><span class="skel" style="width:200px"></span></div></div></div>
-      </div>
-
-      <!-- VALIDATORS -->
-      <div class="tp" id="tab-validators">
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot"></div>Validator Set</div><div class="pmeta">Hyperliquid validatorSummaries API · Sorted by stake</div></div>
-          <table class="vtbl"><thead><tr><th>Validator</th><th>Stake</th><th>Share</th><th>Commission</th><th>Est. APR</th><th>Status</th></tr></thead>
-          <tbody id="valRows"><tr><td colspan="6" class="es"><span class="skel" style="width:200px"></span></td></tr></tbody></table>
-        </div>
-      </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-
-  <!-- RIGHT SIDEBAR -->
-  <aside class="sb-right">
-    <div class="sr-sec"><div class="sr-ttl">🚨 Live Alerts</div><div id="alertsPanel"><div class="alert-row"><span class="alert-ico">⏳</span> Loading...</div></div></div>
-    <div class="sr-sec"><div class="sr-ttl">🏆 Top HYPE Holders</div><div id="topHolders"><div class="es"><span class="skel" style="width:130px"></span></div></div></div>
-    <div class="sr-sec"><div class="sr-ttl">📊 Fee Trend (48h)</div><canvas id="feeSparkline" width="224" height="56"></canvas></div>
-    <div class="sr-sec">
-      <div class="sr-ttl">🔗 Quick Links</div>
-      <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px">
-        <a href="https://www.hypeburn.fun/" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">HypeBurn.fun ↗</a>
-        <a href="https://hypurrscan.io/staking" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">HypurrScan Staking ↗</a>
-        <a href="https://hypurrscan.io/address/0xfefefefefefefefefefefefefefefefefefefefe" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">Assistance Fund Wallet ↗</a>
-        <a href="https://app.hyperliquid.xyz/trade/HYPE" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">Trade HYPE ↗</a>
-        <a href="https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">Fees Documentation ↗</a>
-        <a href="https://api.hypurrscan.io/ui" target="_blank" style="color:var(--text-dim);font-size:10px;text-decoration:none">HypurrScan API Docs ↗</a>
       </div>
     </div>
-  </aside>
+  </section>
 
-</div><!-- /layout -->
+  <!-- === AF TAB ========================================================= -->
+  <section id="tab-af" class="tab">
+    <div class="controls-row">
+      <button class="primary" id="refreshAfBtn">
+        Refresh AF Data
+        <small>(fetch)</small>
+      </button>
+      <span id="afStatus" class="status-text"></span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-inner">
+          <h3>
+            AF Transactions
+            <span class="sub">Latest</span>
+          </h3>
+          <div class="feed" id="afTxList"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner">
+          <h3>
+            Burn Events (Feed)
+            <span class="sub">Latest burns</span>
+          </h3>
+          <div class="feed" id="burnFeedList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: live (non-cumulative) burn chart -->
+    <div style="margin-top:16px;">
+      <div class="card">
+        <div class="card-inner">
+          <h3 class="flex-between">
+            <span>Burns per Interval</span>
+            <span class="muted">Live, non-cumulative</span>
+          </h3>
+          <canvas id="burnLiveChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === UNSTAKING TAB ================================================== -->
+  <section id="tab-unstaking" class="tab">
+    <div class="controls-row">
+      <button class="primary" id="refreshQueueBtn">
+        Refresh Queue
+      </button>
+      <span id="queueStatus" class="status-text"></span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-inner">
+          <h3>
+            Queue Details
+            <span class="sub" id="queueMeta"></span>
+          </h3>
+          <div class="feed" id="queueTable"></div>
+        </div>
+      </div>
+
+      <!-- NEW: Wallet distribution bar (top 10 vs rest) -->
+      <div class="card">
+        <div class="card-inner">
+          <h3 class="flex-between">
+            <span>Wallet Distribution</span>
+            <span class="muted">Top 10 vs rest of queue</span>
+          </h3>
+          <canvas id="queueDistChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <script>
-// ─── CONFIG ────────────────────────────────────────────────────────────────
-const HL    = 'https://api.hyperliquid.xyz/info';
-const HS    = 'https://api.hypurrscan.io';
-const AF    = '0xfefefefefefefefefefefefefefefefefefefefe';
-const BURN  = '0x000000000000000000000000000000000000dead';
-const MAX_S = 1_000_000_000;
+  // ----------------------------------------------------------------------------
+  // CONFIG – tweak this to match your backend
+  // ----------------------------------------------------------------------------
+  const API_ENDPOINT = "/api/hype-dashboard"; // <— adjust if needed
 
-// ─── STATE ─────────────────────────────────────────────────────────────────
-const D = {
-  price:null, priceChg:null, vol24:null,
-  staked:null, apr:null, circSupply:null,
-  validators:[], queue:[], delegations:[],
-  transfers:[], feesRecent:[], feesAll:null,
-  fees24:null, afBal:null, afOrders:[],
-  holders:{}, burned:null,
-};
+  // Expected (example) JSON shape:
+  // {
+  //   "af": {
+  //     "txs": [{ "hash": "...", "amount": 123.45, "ts": 1700000000000 }],
+  //     "burns": [{ "ts": 1700000000000, "amount": 100.0 }]
+  //   },
+  //   "unstaking": {
+  //     "queue": [{ "wallet": "0x123", "amount": 1000.0 }]
+  //   }
+  // }
 
-// ─── FORMAT ────────────────────────────────────────────────────────────────
-const F = {
-  c:   n => { if(n==null)return'—'; n=+n; if(n>=1e9)return(n/1e9).toFixed(2)+'B'; if(n>=1e6)return(n/1e6).toFixed(2)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n.toFixed(2); },
-  f2:  n => n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
-  pct: n => n==null?'—':(n>=0?'+':'')+Number(n).toFixed(2)+'%',
-  addr:a => a?`${a.slice(0,6)}…${a.slice(-4)}`:'—',
-  usd: n => n==null?'—':'$'+F.c(n),
-  t:   ts => { if(!ts)return'—'; const d=new Date(+ts); return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}); },
-  ago: ts => { const s=(Date.now()-+ts)/1000; if(s<60)return Math.floor(s)+'s'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; },
-  cd:  ts => {
-    const ms=+ts-Date.now(); if(ms<=0)return{txt:'READY 🔓',urgent:true,pct:100};
-    const d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000),m=Math.floor((ms%3600000)/60000);
-    return{txt:`${d}d ${h}h ${m}m`,urgent:d===0,pct:Math.max(0,Math.min(100,(1-ms/(8*86400000))*100))};
-  }
-};
+  // ----------------------------------------------------------------------------
+  // TAB SWITCHING
+  // ----------------------------------------------------------------------------
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-tab");
 
-// ─── API ───────────────────────────────────────────────────────────────────
-async function hl(body) {
-  const r = await fetch(HL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!r.ok) throw new Error('HL '+r.status);
-  return r.json();
-}
-async function hs(path) {
-  try { const r=await fetch(HS+path); if(!r.ok)return null; return r.json(); } catch(e){return null;}
-}
+      document.querySelectorAll(".tab-btn").forEach((b) =>
+        b.classList.toggle("active", b === btn)
+      );
+      document.querySelectorAll(".tab").forEach((el) =>
+        el.classList.toggle("active", el.id === "tab-" + tab)
+      );
+    });
+  });
 
-// ─── FETCHERS ──────────────────────────────────────────────────────────────
-async function fPrice() {
-  const m = await hl({type:'allMids'});
-  const px = m['@107']||m['HYPE'];
-  if(px) D.price = parseFloat(px);
-}
-async function fSpot() {
-  try {
-    const [meta, ctxs] = await hl({type:'spotMetaAndAssetCtxs'});
-    if(ctxs&&ctxs[107]) {
-      const c=ctxs[107];
-      if(c.dayNtlVlm) D.vol24=parseFloat(c.dayNtlVlm);
-      if(c.prevDayPx&&D.price) D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;
-      if(c.circulatingSupply) D.circSupply=parseFloat(c.circulatingSupply);
+  // ----------------------------------------------------------------------------
+  // STATE + CHART INSTANCES
+  // ----------------------------------------------------------------------------
+  let dashboardData = null;
+  let burnCumulativeChart;
+  let burnLiveChart;
+  let queueDistChart;
+
+  // ----------------------------------------------------------------------------
+  // FETCH + TRANSFORM
+  // ----------------------------------------------------------------------------
+  async function fetchDashboard() {
+    try {
+      const res = await fetch(API_ENDPOINT);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      dashboardData = transformData(json);
+      document.getElementById("lastUpdated").textContent =
+        "Last updated: " + new Date().toLocaleTimeString();
+      renderAll();
+    } catch (err) {
+      console.error(err);
+      const el = document.getElementById("lastUpdated");
+      el.textContent = "Last updated: error";
+      el.classList.add("status-text", "err");
     }
-  } catch(e){}
-}
-async function fStaking() {
-  try { const d=await hl({type:'stakingSummary'}); if(d){if(d.totalStaked)D.staked=parseFloat(d.totalStaked);if(d.stakingApr!==undefined)D.apr=parseFloat(d.stakingApr);} } catch(e){}
-}
-async function fValidators() {
-  try { const d=await hl({type:'validatorSummaries'}); if(Array.isArray(d)) D.validators=d.sort((a,b)=>parseFloat(b.stake||b.totalStake||0)-parseFloat(a.stake||a.totalStake||0)); } catch(e){}
-}
-async function fAfBal() {
-  try { const d=await hl({type:'spotClearinghouseState',user:AF}); if(d?.balances){const h=d.balances.find(b=>b.coin==='HYPE');if(h)D.afBal=parseFloat(h.hold||h.total||0);} } catch(e){}
-}
-async function fAfOrders() {
-  try { const d=await hl({type:'openOrders',user:AF}); if(Array.isArray(d)) D.afOrders=d.filter(o=>o.side==='B'); } catch(e){}
-}
-async function fDelegations() {
-  const d=await hs('/delegations'); if(Array.isArray(d)&&d.length) D.delegations=d;
-}
-async function fQueue() {
-  let d=await hs('/fullUnstakingQueue');
-  if(d){const arr=Array.isArray(d)?d:(d.queue||d.data||d.entries||[]);if(arr.length){D.queue=arr;return;}}
-  d=await hs('/unstakingQueue');
-  if(d){const arr=Array.isArray(d)?d:(d.queue||d.data||[]);D.queue=arr;}
-}
-async function fTransfers() {
-  let d=await hs('/aLotOfTransfers'); if(Array.isArray(d)&&d.length){D.transfers=d;return;}
-  d=await hs('/transfers'); if(Array.isArray(d)) D.transfers=d;
-}
-async function fFees() {
-  const [recent,all]=await Promise.all([hs('/feesRecent'),hs('/fees')]);
-  if(Array.isArray(recent)&&recent.length){
-    D.feesRecent=recent;
-    const cut=Date.now()-86400000;
-    const pts=recent.filter(p=>+(p.time||p.timestamp||0)>cut);
-    if(pts.length) D.fees24=pts.reduce((s,p)=>s+parseFloat(p.total||p.fees||p.amount||p.value||0),0);
   }
-  if(all){
-    if(typeof all==='object'&&!Array.isArray(all)){
-      if(all.totalFees||all.total||all.cumulative) D.feesAll=parseFloat(all.totalFees||all.total||all.cumulative||0)||null;
-      if(all.totalBurned) D.burned=parseFloat(all.totalBurned);
-    }
-    if(Array.isArray(all)&&all.length) D.feesAll=all.reduce((s,p)=>s+parseFloat(p.total||p.fees||p.amount||0),0);
-  }
-}
-async function fHolders() {
-  const d=await hs('/holdersWithLimit/HYPE/20'); if(d?.addresses) D.holders=d.addresses;
-}
 
-// ─── MASTER LOAD ───────────────────────────────────────────────────────────
-async function loadAll() {
-  const btn=document.getElementById('refreshBtn');
-  btn.textContent='⟳ ...'; btn.classList.add('busy');
-  setStatus('FETCHING','yellow');
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders()]);
-  setStatus('LIVE','green');
-  renderAll();
-  // Refresh charts if currently visible
-  if(document.getElementById('tab-charts').classList.contains('active')) {
-    if(_priceChart && _priceCandleData.length) _drawPriceSeries();
-    if(_burnChart) _drawBurnSeries();
-  }
-  btn.textContent='↻ REFRESH'; btn.classList.remove('busy');
-}
+  // Map your real API into a shape we like internally.
+  function transformData(raw) {
+    // If your API already matches this, you can just `return raw;`
+    const af = raw.af || {};
+    const burns = af.burns || [];
+    const txs = af.txs || [];
 
-function setStatus(t,c) {
-  document.getElementById('liveText').textContent=t;
-  const d=document.getElementById('liveDot');
-  const col={green:'var(--green)',yellow:'var(--yellow)',red:'var(--red)'}[c]||'var(--text-dim)';
-  d.style.background=col; d.style.boxShadow=`0 0 6px ${col}`;
-}
+    const unstaking = raw.unstaking || {};
+    const queue = unstaking.queue || [];
 
-const $=id=>document.getElementById(id);
-const set=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
-const htm=(id,v)=>{const e=$(id);if(e)e.innerHTML=v;};
-
-// ─── RENDER ALL ────────────────────────────────────────────────────────────
-function renderAll() {
-  const qt=D.queue.reduce((s,e)=>s+parseFloat(e.amount||e.hype||e.nHype||e.value||0),0);
-
-  if(D.price){ set('topPrice','$'+F.f2(D.price)); set('sbPrice','$'+F.f2(D.price)); }
-  if(D.priceChg!=null){ const el=$('topChg'); el.textContent=F.pct(D.priceChg); el.className='price-chg '+(D.priceChg>=0?'up':'down'); }
-  if(D.staked) set('tsStaked',F.c(D.staked));
-  if(D.burned) set('tsBurned',F.c(D.burned));
-  if(qt>0)     set('tsQueue',F.c(qt));
-  if(D.fees24) set('tsFees',F.usd(D.fees24));
-  if(D.price&&D.circSupply) set('tsMcap',F.usd(D.price*D.circSupply));
-  set('tsUpdated',new Date().toLocaleTimeString());
-
-  if(D.circSupply||D.burned) set('sbCirc',F.c(D.circSupply||(MAX_S-(D.burned||0))));
-  if(D.burned){ set('sbBurned',F.c(D.burned)+' HYPE'); set('sbBurnPct',((D.burned/MAX_S)*100).toFixed(3)+'%'); }
-  if(D.staked){ set('sbStaked',F.c(D.staked)+' HYPE'); set('sbStakedPct',((D.staked/MAX_S)*100).toFixed(1)+'%'); }
-  if(qt>0) set('sbQTotal',F.c(qt)+' HYPE'); set('sbQCount',D.queue.length||'—');
-  if(D.apr!=null) set('sbApr',(D.apr*100).toFixed(2)+'%');
-  set('sbVals',D.validators.filter(v=>v.isActive!==false).length||D.validators.length||'—');
-  if(D.afBal!=null) set('sbAfBal',F.c(D.afBal)+' HYPE');
-  set('sbAfBids',D.afOrders.length||'—');
-  if(D.fees24&&D.price) set('sbBurnRate',F.c(D.fees24/D.price)+'/day');
-  if(D.vol24) set('sbVol',F.usd(D.vol24));
-  if(D.price) set('sbFdv',F.usd(D.price*MAX_S));
-  if(D.price&&D.circSupply) set('sbMcap',F.usd(D.price*D.circSupply));
-
-  const sp=D.staked?(D.staked/MAX_S)*100:0;
-  let bull=0,bear=0;
-  if(sp>35)bull++; if(sp<15)bear++;
-  if(qt<50000)bull++; if(qt>500000)bear++;
-  if(D.afOrders.length>0)bull++;
-  if(D.priceChg>3)bull++; if(D.priceChg<-5)bear++;
-  const sig=bull>bear?'BULLISH':bear>bull?'BEARISH':'NEUTRAL';
-  const sigCol={BULLISH:'var(--green)',BEARISH:'var(--red)',NEUTRAL:'var(--yellow)'}[sig];
-  htm('signalBox',`<div class="sig-box" style="background:${sigCol}18;border:1px solid ${sigCol}30"><div class="sig-lbl" style="color:${sigCol}">${sig}</div><div class="sig-sub">Staked:${sp.toFixed(1)}% · Q:${F.c(qt)} · Bids:${D.afOrders.length}</div></div>`);
-
-  if(D.staked){ set('kStaked',F.c(D.staked)); set('kStakedS',((D.staked/MAX_S)*100).toFixed(1)+'% of total supply locked'); }
-  if(D.burned){ set('kBurned',F.c(D.burned)); set('kBurnedS',((D.burned/MAX_S)*100).toFixed(3)+'% permanently removed'); }
-  if(qt){ set('kQueue',F.c(qt)); set('kQueueS',D.queue.length+' wallets'+(D.price?' · '+F.usd(qt*D.price):'')); }
-
-  set('kuTotal',qt?F.c(qt):'—'); if(qt) set('kuTotalS',D.queue.length+' wallets'+(D.price?' · '+F.usd(qt*D.price):''));
-  const soon=D.queue.filter(e=>{const u=+(e.unlockTime||e.unlock_time||e.completionTime||0);return u>Date.now()&&u<Date.now()+86400000;}).reduce((s,e)=>s+parseFloat(e.amount||e.hype||e.nHype||e.value||0),0);
-  set('kuSoon',soon>0?F.c(soon):'0');
-  if(D.queue.length&&qt) set('kuAvg',F.c(qt/D.queue.length));
-
-  const lines=[];
-  if(sp>0){const e=sp>40?'🟢':sp>20?'🟡':'🔴';lines.push(`${e} <strong>${sp.toFixed(1)}%</strong> of supply staked. ${sp>35?'High conviction — limited near-term float.':'Moderate lockup level.'}`)}
-  if(qt>0&&D.price){const e=qt>500000?'🔴':qt>100000?'🟡':'🟢';lines.push(`${e} <strong>${F.c(qt)} HYPE</strong> (~${F.usd(qt*D.price)}) in unstake queue — potential sell pressure within 8 days.`)}
-  if(D.fees24&&D.price) lines.push(`🔥 Today's fees (~${F.usd(D.fees24)}) imply <strong>${F.c(D.fees24/D.price)} HYPE</strong> burned at current prices.`);
-  if(D.afOrders.length){const tot=D.afOrders.reduce((s,o)=>s+parseFloat(o.sz||0),0);const avg=D.afOrders.reduce((s,o)=>s+parseFloat(o.limitPx||o.px||0),0)/D.afOrders.length;lines.push(`📡 AF has <strong>${D.afOrders.length} open buy bid${D.afOrders.length>1?'s':''}</strong> (~${F.c(tot)} HYPE, avg $${F.f2(avg)}) — protocol backstop active.`)}
-  if(D.priceChg!=null) lines.push(`${D.priceChg>=0?'↑':'↓'} Price <strong>${F.pct(D.priceChg)}</strong> in 24h @ $${F.f2(D.price)}.`);
-  if(!lines.length) lines.push('Fetching live data from Hyperliquid API + HypurrScan...');
-  htm('insightBody',lines.join('<br><br>'));
-
-  const alerts=[];
-  if(qt>1000000) alerts.push({i:'🚨',t:`Massive queue: ${F.c(qt)} HYPE (~${F.usd(qt*(D.price||0))}) — high sell pressure within 8 days`});
-  else if(qt>200000) alerts.push({i:'⚠️',t:`${F.c(qt)} HYPE queued to unstake — moderate sell pressure expected`});
-  else if(qt>0) alerts.push({i:'ℹ️',t:`${F.c(qt)} HYPE in unstake queue — manageable pressure`});
-  if(D.afOrders.length) alerts.push({i:'🛡️',t:`AF has ${D.afOrders.length} active HYPE buy bid${D.afOrders.length>1?'s':''} — protocol support active`});
-  if(D.fees24>2e6) alerts.push({i:'🔥',t:`High fee day: ${F.usd(D.fees24)} in 24h`});
-  else if(D.fees24) alerts.push({i:'💰',t:`24h fees: ${F.usd(D.fees24)} → AF → HYPE burns`});
-  if(D.priceChg!=null&&D.priceChg<-8) alerts.push({i:'📉',t:`Price down ${F.pct(D.priceChg)} — watch AF bids + staking`});
-  if(!alerts.length) alerts.push({i:'✅',t:'No critical alerts. Monitoring all feeds.'});
-  htm('alertsPanel',alerts.map(a=>`<div class="alert-row"><span class="alert-ico">${a.i}</span><span>${a.t}</span></div>`).join(''));
-
-  renderOverviewFeed();
-  renderQueueList(qt);
-  renderStakingFlows();
-  renderAF();
-  renderFees();
-  renderValidators();
-  renderHolders();
-  renderFeeSparkline();
-  set('tbUQ',D.queue.length||'0');
-}
-
-function renderOverviewFeed() {
-  const all=[...D.delegations.slice(0,10).map(e=>({...e,_t:'delegation'})),...D.transfers.slice(0,10).map(e=>({...e,_t:'transfer'}))].sort((a,b)=>+(b.time||b.timestamp||0)-(+(a.time||a.timestamp||0))).slice(0,20);
-  htm('overviewFeed',all.length?all.map(e=>feedRow(e)).join(''):es('No events yet','Will populate from /delegations + /aLotOfTransfers'));
-}
-
-function renderQueueList(qt) {
-  if(!D.queue.length){ htm('queueList',`<div class="es">Queue data from /fullUnstakingQueue<br><a href="https://hypurrscan.io/staking" target="_blank">View on HypurrScan ↗</a></div>`); return; }
-  const sorted=[...D.queue].sort((a,b)=>parseFloat(b.amount||b.hype||b.nHype||b.value||0)-parseFloat(a.amount||a.hype||a.nHype||a.value||0));
-  htm('queueList',`<div style="padding:7px 13px;background:var(--red-dim);border-bottom:1px solid rgba(255,61,80,.15);display:flex;justify-content:space-between;font-size:10px"><span style="color:var(--red)">⚠ ${sorted.length} wallets · ${F.c(qt)} HYPE${D.price?' (~'+F.usd(qt*D.price)+')':''}</span><span style="color:var(--text-dim)">8-day unlock window</span></div>`+
-    sorted.map(e=>{
-      const amt=parseFloat(e.amount||e.hype||e.nHype||e.value||0);
-      const addr=e.user||e.address||e.delegator||e.wallet;
-      const unlockTs=e.unlockTime||e.unlock_time||e.completionTime||e.finishTime;
-      const cd=unlockTs?F.cd(unlockTs):{txt:'Unknown',urgent:false,pct:50};
-      const val=e.validator||e.validatorAddress||e.from||'';
-      return `<div class="qi"><div><div class="qi-addr" onclick="openAddr('${addr}')">${F.addr(addr)}</div><div class="qi-sub">Validator: ${F.addr(val)}</div><div class="prog"><div class="prog-fill" style="width:${cd.pct||0}%"></div></div></div><div><div class="qi-amt">−${F.c(amt)} HYPE</div><div class="qi-usd">${D.price?F.usd(amt*D.price):'—'}</div></div><div><div class="qi-cd" style="color:${cd.urgent?'var(--red)':'var(--text-dim)'}">${cd.txt}</div><div class="qi-pct">${qt>0?(amt/qt*100).toFixed(1)+'% of Q':'—'}</div></div></div>`;
-    }).join(''));
-}
-
-function renderStakingFlows() {
-  const stakes=D.delegations.filter(e=>isStake(e));
-  const unstakes=D.delegations.filter(e=>isUnstake(e));
-  const whales=[...D.delegations].filter(e=>parseFloat(e.amount||e.hype||e.nHype||0)>=10000).sort((a,b)=>parseFloat(b.amount||b.hype||b.nHype||0)-parseFloat(a.amount||a.hype||a.nHype||0));
-  htm('stakeFeed',stakes.length?stakes.slice(0,15).map(e=>feedRow(e,'stake')).join(''):es('No delegation events yet','/delegations'));
-  htm('unstakeFeed',unstakes.length?unstakes.slice(0,15).map(e=>feedRow(e,'unstake')).join(''):es('No undelegation events yet','/delegations'));
-  htm('whaleFeed',whales.length?whales.slice(0,10).map(e=>feedRow(e,isUnstake(e)?'unstake':'stake')).join(''):`<div class="es">No whale movements (≥10K HYPE) in current data.</div>`);
-}
-
-function isStake(e){const t=(e.action?.type||e.type||e.actionType||'').toLowerCase();return(t.includes('cdelegate')||t.includes('delegate'))&&!t.includes('undelegate')&&!t.includes('undelegat');}
-function isUnstake(e){const t=(e.action?.type||e.type||e.actionType||'').toLowerCase();return t.includes('undelegate')||t.includes('undelegat');}
-
-function renderAF() {
-  const afTxs=D.transfers.filter(t=>{const f=(t.user||t.from||'').toLowerCase(),to=(t.to||'').toLowerCase();return f===AF||to===AF;});
-  const burns=D.transfers.filter(t=>{const to=(t.to||'').toLowerCase(),tp=(t.action?.type||t.type||'').toLowerCase();return to===BURN||tp.includes('burn');});
-  htm('afTxFeed',afTxs.length?afTxs.slice(0,15).map(e=>feedRow(e,detectAFType(e))).join(''):`<div class="es">AF transfers from /aLotOfTransfers<br><a href="https://hypurrscan.io/address/${AF}" target="_blank">View on HypurrScan ↗</a></div>`);
-  htm('burnFeed',burns.length?burns.slice(0,10).map(e=>feedRow(e,'burn')).join(''):`<div class="es">Burn events from /transfers feed<br><a href="https://www.hypeburn.fun/" target="_blank">View on HypeBurn ↗</a></div>`);
-  htm('afBidsFeed',D.afOrders.length?D.afOrders.map(o=>`<div class="fi"><div class="fi-t"><span class="bdg by">BID</span><br>${F.t(o.timestamp||o.time)}</div><div class="fi-d">Buy <strong style="color:var(--yellow)">${F.c(o.sz||0)}</strong> HYPE @ <strong style="color:var(--yellow)">$${F.f2(o.limitPx||o.px||0)}</strong></div><div class="fi-amt" style="color:var(--yellow)">${F.usd((o.sz||0)*(D.price||0))}</div></div>`).join(''):`<div class="es">No open AF buy bids detected.<br>AF typically maintains resting orders on HYPE/USDC book.</div>`);
-}
-
-function detectAFType(t){const tp=(t.action?.type||t.type||'').toLowerCase();if(tp.includes('burn'))return'burn';if(parseFloat(t.hype||t.amount||0)>0)return'buy';return'transfer';}
-
-function renderFees() {
-  if(D.feesAll) set('kFeeAll',F.usd(D.feesAll));
-  if(D.fees24){ set('kFee24',F.usd(D.fees24)); set('feeMetaLabel',F.usd(D.fees24)); }
-  if(D.fees24&&D.price) set('kFeeRate',F.c(D.fees24/D.price)+' HYPE/day');
-  const recent24=[...D.feesRecent].filter(p=>+(p.time||p.timestamp||0)>Date.now()-86400000).sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
-  renderFeeBarChart('feeChart24h',recent24.slice(-12),'h');
-  const all48=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
-  renderFeeBarChart('feeChart48h',all48.slice(-20),'full');
-}
-
-function renderFeeBarChart(id,pts,labelMode) {
-  if(!pts.length){ htm(id,`<div class="es">Fee data from /feesRecent</div>`); return; }
-  const max=Math.max(...pts.map(p=>parseFloat(p.total||p.fees||p.amount||0)));
-  htm(id,pts.map(p=>{
-    const v=parseFloat(p.total||p.fees||p.amount||0);
-    const w=max>0?(v/max*100).toFixed(1):'0';
-    const ts=+(p.time||p.timestamp||0);
-    const lbl=labelMode==='h'?new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}):new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',hour12:false});
-    return `<div class="fbrow"><div class="fblabel" style="width:${labelMode==='h'?38:70}px;font-size:9px">${lbl}</div><div class="fbout"><div class="fbin" style="width:${w}%"></div><div class="fbval">${F.usd(v)}</div></div></div>`;
-  }).join(''));
-}
-
-function renderValidators() {
-  if(!D.validators.length){ htm('valRows',`<tr><td colspan="6">${es('Loading validators...','Hyperliquid validatorSummaries API')}</td></tr>`); return; }
-  const total=D.validators.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||v.stakedAmount||0),0);
-  htm('valRows',D.validators.slice(0,25).map(v=>{
-    const stk=parseFloat(v.stake||v.totalStake||v.stakedAmount||0);
-    const pct=total>0?(stk/total*100).toFixed(1):'0.0';
-    const comm=v.commission!=null?(parseFloat(v.commission)*100).toFixed(0)+'%':'—';
-    const ok=v.isActive!==false&&v.jailed!==true;
-    const name=(v.name||v.moniker||F.addr(v.validator||v.address||''));
-    const apr=D.apr!=null?((D.apr*(1-parseFloat(v.commission||0)))*100).toFixed(1)+'%':'—';
-    const dc=ok?'var(--green)':'var(--red)';
-    return `<tr><td><div class="vname"><div class="vdot" style="background:${dc};box-shadow:0 0 4px ${dc}"></div>${name.length>22?name.slice(0,20)+'…':name}</div></td><td>${F.c(stk)}</td><td><div class="vbcell"><div class="vbar"><div class="vbar-fill" style="width:${Math.min(100,parseFloat(pct)*2.5).toFixed(0)}%"></div></div>${pct}%</div></td><td>${comm}</td><td style="color:var(--green)">${apr}</td><td><span class="bdg ${ok?'bk':'bu'}">${ok?'ACTIVE':'JAILED'}</span></td></tr>`;
-  }).join(''));
-}
-
-function renderHolders() {
-  const entries=Object.entries(D.holders).sort((a,b)=>b[1]-a[1]);
-  if(!entries.length){ htm('topHolders',`<div class="es">Loading... (holdersWithLimit/HYPE/20)</div>`); return; }
-  htm('topHolders',entries.slice(0,10).map(([addr,bal],i)=>`<div class="holder-row"><span class="h-rank">${i+1}</span><span class="h-addr" onclick="openAddr('${addr}')" title="${addr}">${F.addr(addr)}</span><span class="h-amt">${F.c(bal)}</span></div>`).join(''));
-}
-
-function renderFeeSparkline() {
-  const cv=$('feeSparkline'); if(!cv)return;
-  const ctx=cv.getContext('2d'); ctx.clearRect(0,0,224,56);
-  const pts=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
-  if(pts.length<2)return;
-  const vals=pts.map(p=>parseFloat(p.total||p.fees||p.amount||0));
-  const max=Math.max(...vals),min=Math.min(...vals),range=max-min||1;
-  const W=224,H=56,P=3;
-  const step=(W-P*2)/(vals.length-1);
-  const grad=ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,'rgba(255,94,26,.4)'); grad.addColorStop(1,'rgba(255,94,26,.02)');
-  ctx.beginPath();
-  vals.forEach((v,i)=>{const x=P+i*step,y=H-P-((v-min)/range)*(H-P*2);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  const lx=P+(vals.length-1)*step; ctx.lineTo(lx,H); ctx.lineTo(P,H); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-  ctx.beginPath();
-  vals.forEach((v,i)=>{const x=P+i*step,y=H-P-((v-min)/range)*(H-P*2);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  ctx.strokeStyle='rgba(255,94,26,.9)'; ctx.lineWidth=1.5; ctx.stroke();
-}
-
-function feedRow(e,forceType) {
-  const ts=e.time||e.timestamp||e.createdAt;
-  const addr=e.user||e.address||e.from||e.delegator;
-  const to=e.to||e.validator||e.validatorAddress||'';
-  const amt=parseFloat(e.amount||e.hype||e.nHype||e.sz||e.value||0);
-  const at=(e.action?.type||e.type||e.actionType||'').toLowerCase();
-  let type=forceType;
-  if(!type){
-    if((at.includes('cdelegate')||at.includes('delegate'))&&!at.includes('undelegate')) type='stake';
-    else if(at.includes('undelegate')||at.includes('undelegat')) type='unstake';
-    else if(at.includes('burn')||(to||'').toLowerCase()===BURN) type='burn';
-    else if((addr||'').toLowerCase()===AF||(to||'').toLowerCase()===AF) type=amt>0?'buy':'transfer';
-    else type='transfer';
-  }
-  const bdgMap={stake:'<span class="bdg bk">STAKE</span>',unstake:'<span class="bdg bu">UNSTAKE</span>',burn:'<span class="bdg bb">BURN</span>',buy:'<span class="bdg bg">BUY</span>',bid:'<span class="bdg by">BID</span>',transfer:'<span class="bdg bt">TX</span>'};
-  const aclr={stake:'var(--accent)',unstake:'var(--red)',burn:'var(--accent2)',buy:'var(--green)',bid:'var(--yellow)',transfer:'var(--text-dim)'}[type]||'var(--text)';
-  let desc='';
-  if(type==='stake') desc=`<span class="fi-a" onclick="openAddr('${addr}')">${F.addr(addr)}</span> delegated to <span style="color:var(--text-dim)">${F.addr(to)}</span>`;
-  else if(type==='unstake') desc=`<span class="fi-a" onclick="openAddr('${addr}')">${F.addr(addr)}</span> undelegated from <span style="color:var(--text-dim)">${F.addr(to)}</span>`;
-  else if(type==='burn') desc=`HYPE permanently burned to <span style="color:var(--accent2)">${F.addr(BURN)}</span>`;
-  else if(type==='buy') desc=`AF bought HYPE${e.px||e.price?' @ <strong style="color:var(--green)">$'+(e.px||e.price)+'</strong>':''}`;
-  else desc=`<span class="fi-a" onclick="openAddr('${addr}')">${F.addr(addr)}</span> → <span class="fi-a" onclick="openAddr('${to}')">${F.addr(to)}</span>`;
-  return `<div class="fi"><div class="fi-t">${bdgMap[type]||''}<br>${ts?F.t(ts):'—'}<br><span style="font-size:9px">${ts?F.ago(ts)+' ago':''}</span></div><div class="fi-d">${desc}${at?`<br><span style="font-size:9px;color:var(--text-dim)">${at}</span>`:''}</div><div class="fi-amt" style="color:${aclr}">${amt>0?F.c(amt)+' HYPE':'—'}${amt>0&&D.price?`<br><span class="fi-usd">${F.usd(amt*D.price)}</span>`:''}</div></div>`;
-}
-
-function es(msg,src){return`<div class="es">${msg}<br><span style="font-size:9px;color:var(--text-dim)">${src||''}</span></div>`;}
-function openAddr(a){if(!a||a==='undefined')return;window.open('https://hypurrscan.io/address/'+a,'_blank');}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// LIGHTWEIGHT CHARTS — AF LIVE + PRICE + BURN
-// Key fix: _lcBase() is a FUNCTION, never a top-level const.
-// LightweightCharts.CrosshairMode is only referenced inside function calls,
-// never at module parse time (which caused "LightweightCharts is not defined").
-// ═══════════════════════════════════════════════════════════════════════════
-
-function _lcBase(extra) {
-  return Object.assign({
-    layout: {
-      background: { color: '#060a0e' },
-      textColor: '#4a6678',
-      fontFamily: "'IBM Plex Mono', monospace",
-      fontSize: 10,
-    },
-    grid: {
-      vertLines: { color: 'rgba(26,36,48,0.65)' },
-      horzLines: { color: 'rgba(26,36,48,0.65)' },
-    },
-    crosshair: {
-      mode: LightweightCharts.CrosshairMode.Normal,
-      vertLine: { color: 'rgba(0,212,255,0.4)', labelBackgroundColor: '#0c1219', width: 1 },
-      horzLine: { color: 'rgba(0,212,255,0.4)', labelBackgroundColor: '#0c1219', width: 1 },
-    },
-    rightPriceScale: { borderColor: '#1a2430', textColor: '#4a6678' },
-    timeScale: { borderColor: '#1a2430', textColor: '#4a6678', timeVisible: true, secondsVisible: true },
-    handleScroll: true,
-    handleScale: true,
-    autoSize: false,
-  }, extra || {});
-}
-
-function _wrapSize(id) {
-  const el = document.getElementById(id);
-  return el ? { w: Math.max(el.clientWidth, 200), h: el.clientHeight || 280 } : { w: 800, h: 280 };
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// 1. LIVE AF MONITOR CHART
-//    3 line series on shared time axis, updated every 5 seconds:
-//      - HYPE spot price (cyan, left scale)
-//      - AF open bid price (red dashed, left scale)
-//      - AF USDC balance (orange, right scale)
-// ─────────────────────────────────────────────────────────────────────────
-let _afChart = null;
-let _afPriceSeries = null;
-let _afBidSeries = null;
-let _afUsdcSeries = null;
-let _afLiveTimer = null;
-let _afSessionStart = Date.now();
-let _afFeesAtStart = null;  // fees total at session start
-let _afPoints = [];          // { time, price, bid, usdc }
-
-function _initAfChart() {
-  const wrap = document.getElementById('afWrap');
-  if (!wrap) return;
-  if (_afChart) { try { _afChart.remove(); } catch(e){} _afChart = null; }
-  wrap.innerHTML = '';
-
-  const { w, h } = _wrapSize('afWrap');
-
-  _afChart = LightweightCharts.createChart(wrap, _lcBase({
-    width: w, height: h,
-    rightPriceScale: { borderColor: '#1a2430', textColor: '#4a6678',
-      scaleMargins: { top: 0.05, bottom: 0.05 } },
-    leftPriceScale: { visible: false },
-    timeScale: { borderColor: '#1a2430', textColor: '#4a6678', timeVisible: true, secondsVisible: true, rightOffset: 4 },
-  }));
-
-  // HYPE price — cyan solid line
-  _afPriceSeries = _afChart.addLineSeries({
-    color: '#00d4ff',
-    lineWidth: 2,
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'HYPE',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 4,
-    crosshairMarkerBackgroundColor: '#00d4ff',
-  });
-
-  // AF bid price — red dashed line
-  _afBidSeries = _afChart.addLineSeries({
-    color: '#ff3d50',
-    lineWidth: 1,
-    lineStyle: LightweightCharts.LineStyle.Dashed,
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'AF Bid',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 3,
-    crosshairMarkerBackgroundColor: '#ff3d50',
-  });
-
-  // AF USDC balance — orange, right scale
-  _afUsdcSeries = _afChart.addLineSeries({
-    color: '#ff9a3c',
-    lineWidth: 1.5,
-    priceScaleId: 'usdc',
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'USDC',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 3,
-    crosshairMarkerBackgroundColor: '#ff9a3c',
-  });
-  _afChart.priceScale('usdc').applyOptions({
-    scaleMargins: { top: 0.7, bottom: 0 },
-    visible: true,
-    borderColor: '#1a2430',
-    textColor: '#4a6678',
-  });
-
-  // Crosshair tooltip
-  _afChart.subscribeCrosshairMove(param => {
-    if (!param.time) return;
-    const px  = param.seriesData.get(_afPriceSeries);
-    const bid = param.seriesData.get(_afBidSeries);
-    const usd = param.seriesData.get(_afUsdcSeries);
-    if (px)  set('afLivePrice', '$' + F.f2(px.value));
-    if (bid) set('afLiveBid',  '$' + F.f2(bid.value));
-    if (usd) set('afLiveUsdc', F.c(usd.value) + ' USDC');
-    if (px && bid) {
-      const spread = ((px.value - bid.value) / px.value * 100).toFixed(3);
-      const el = $('afLiveSpread');
-      if (el) { el.textContent = spread + '%'; el.style.color = parseFloat(spread) < 0.5 ? 'var(--green)' : 'var(--yellow)'; }
-    }
-  });
-
-  _redrawAfSeries();
-}
-
-function _redrawAfSeries() {
-  if (!_afChart || !_afPoints.length) return;
-  try {
-    const dedup = (arr) => {
-      const seen = new Set(), out = [];
-      for (const p of arr) { if (!seen.has(p.time)) { seen.add(p.time); out.push(p); } }
-      return out;
+    return {
+      af: {
+        burns: burns.map((b) => ({
+          ts: b.ts ?? b.time ?? Date.now(),
+          amount: Number(b.amount ?? b.size ?? 0),
+        })),
+        txs: txs.map((t) => ({
+          hash: t.hash ?? t.id ?? "",
+          amount: Number(t.amount ?? t.size ?? 0),
+          side: t.side ?? t.type ?? "",
+          ts: t.ts ?? t.time ?? Date.now(),
+        })),
+      },
+      unstaking: {
+        queue: queue.map((q) => ({
+          wallet: q.wallet ?? q.address ?? "",
+          amount: Number(q.amount ?? q.size ?? 0),
+        })),
+      },
     };
-    _afPriceSeries.setData(dedup(_afPoints.filter(p => p.price != null).map(p => ({ time: p.time, value: p.price }))));
-    _afBidSeries.setData(dedup(_afPoints.filter(p => p.bid != null).map(p => ({ time: p.time, value: p.bid }))));
-    _afUsdcSeries.setData(dedup(_afPoints.filter(p => p.usdc != null).map(p => ({ time: p.time, value: p.usdc }))));
-    _afChart.timeScale().fitContent();
-  } catch(e) { console.warn('af draw', e); }
-}
+  }
 
-async function _afLiveTick() {
-  try {
-    // Fetch price
-    const mids = await hl({ type: 'allMids' });
-    const px = parseFloat(mids['@107'] || mids['HYPE'] || 0);
+  // ----------------------------------------------------------------------------
+  // RENDER – OVERVIEW
+  // ----------------------------------------------------------------------------
+  function renderOverview() {
+    if (!dashboardData) return;
+    const burns = dashboardData.af.burns;
+    const queue = dashboardData.unstaking.queue;
 
-    // Fetch AF state (USDC balance from spotClearinghouseState)
-    let usdc = null;
-    try {
-      const st = await hl({ type: 'spotClearinghouseState', user: AF });
-      if (st?.balances) {
-        const u = st.balances.find(b => b.coin === 'USDC');
-        if (u) usdc = parseFloat(u.total || u.hold || 0);
-      }
-    } catch(e) {}
+    // Simple metrics
+    const totalBurn = burns.reduce((s, b) => s + b.amount, 0);
+    const totalQueue = queue.reduce((s, q) => s + q.amount, 0);
+    const countBurns = burns.length;
+    const countWallets = new Set(queue.map((q) => q.wallet)).size;
 
-    // Fetch AF open bid
-    let bid = null, bidSz = null;
-    try {
-      const orders = await hl({ type: 'openOrders', user: AF });
-      if (Array.isArray(orders) && orders.length) {
-        const buyOrders = orders.filter(o => o.side === 'B').sort((a,b) => parseFloat(b.limitPx||0) - parseFloat(a.limitPx||0));
-        if (buyOrders[0]) {
-          bid = parseFloat(buyOrders[0].limitPx || buyOrders[0].px || 0);
-          bidSz = parseFloat(buyOrders[0].sz || 0);
-        }
-      }
-    } catch(e) {}
+    const html = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div>
+          <div class="muted">Total burned (sample window)</div>
+          <div class="v" style="font-size:1.2rem;">${formatNum(totalBurn)}</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div class="muted">Burn events</div>
+            <div class="v">${countBurns}</div>
+          </div>
+          <div>
+            <div class="muted">Unstaking queue size</div>
+            <div class="v">${formatNum(totalQueue)}</div>
+          </div>
+          <div>
+            <div class="muted">Wallets in queue</div>
+            <div class="v">${countWallets}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById("overviewMetrics").innerHTML = html;
+  }
 
-    // Record point
-    const t = Math.floor(Date.now() / 1000);
-    _afPoints.push({ time: t, price: px || null, bid: bid || null, usdc: usdc || null });
-    // Keep max 2h of 5s ticks = 1440 points
-    if (_afPoints.length > 1440) _afPoints = _afPoints.slice(-1440);
+  // ----------------------------------------------------------------------------
+  // RENDER – AF FEEDS
+  // ----------------------------------------------------------------------------
+  function renderAfFeeds() {
+    if (!dashboardData) return;
+    const { burns, txs } = dashboardData.af;
 
-    // Update stats
-    if (px) { D.price = px; set('afLivePrice', '$' + F.f2(px)); set('topPrice', '$' + F.f2(px)); }
-    if (bid) { set('afLiveBid', '$' + F.f2(bid)); }
-    if (bidSz) { set('afLiveSz', F.c(bidSz) + ' HYPE ($' + F.f2(bidSz * (bid||px||1)) + ')'); }
-    if (usdc != null) { set('afLiveUsdc', F.c(usdc) + ' USDC'); }
-    if (px && bid) {
-      const spread = ((px - bid) / px * 100).toFixed(3);
-      const el = $('afLiveSpread');
-      if (el) { el.textContent = spread + '%'; el.style.color = parseFloat(spread) < 0.5 ? 'var(--green)' : 'var(--yellow)'; }
-    }
+    // Sort by time desc
+    const burnsSorted = [...burns].sort((a, b) => b.ts - a.ts).slice(0, 80);
+    const txsSorted = [...txs].sort((a, b) => b.ts - a.ts).slice(0, 80);
 
-    // Session fees (from feesRecent, update lazily)
-    if (D.fees24 != null) {
-      if (_afFeesAtStart == null) _afFeesAtStart = D.fees24;
-      const sessionFees = Math.max(0, D.fees24 - _afFeesAtStart);
-      set('afLiveFees', '$' + F.f2(sessionFees));
-    }
+    const burnHtml = burnsSorted
+      .map((b) => {
+        return `
+        <div class="feed-item">
+          <div>
+            <div class="feed-main v">${formatNum(b.amount)}</div>
+            <div class="feed-sub">${new Date(b.ts).toLocaleString()}</div>
+          </div>
+        </div>`;
+      })
+      .join("");
 
-    set('afChartMeta', 'Live · Updated ' + new Date().toLocaleTimeString() + ' · ' + _afPoints.length + ' pts');
-    _redrawAfSeries();
-  } catch(e) { console.warn('af tick', e); }
-}
+    const afHtml = txsSorted
+      .map((t) => {
+        return `
+        <div class="feed-item">
+          <div>
+            <div class="feed-main v">
+              ${formatNum(t.amount)} <span class="muted">${t.side || ""}</span>
+            </div>
+            <div class="feed-sub">${shortHash(t.hash)} • ${new Date(t.ts).toLocaleString()}</div>
+          </div>
+        </div>`;
+      })
+      .join("");
 
-function _startAfLive() {
-  if (_afLiveTimer) clearInterval(_afLiveTimer);
-  _afLiveTick(); // immediate first tick
-  _afLiveTimer = setInterval(_afLiveTick, 5000);
-}
+    document.getElementById("burnFeedList").innerHTML =
+      burnHtml || "<div class='muted'>No burns</div>";
+    document.getElementById("afTxList").innerHTML =
+      afHtml || "<div class='muted'>No transactions</div>";
+  }
 
-function _stopAfLive() {
-  if (_afLiveTimer) { clearInterval(_afLiveTimer); _afLiveTimer = null; }
-}
+  // ----------------------------------------------------------------------------
+  // RENDER – UNSTAKING
+  // ----------------------------------------------------------------------------
+  function renderQueue() {
+    if (!dashboardData) return;
+    const queue = dashboardData.unstaking.queue;
 
-// ─────────────────────────────────────────────────────────────────────────
-// 2. PRICE CANDLESTICK CHART
-// ─────────────────────────────────────────────────────────────────────────
-let _priceChart = null;
-let _priceCandleSeries = null;
-let _priceAreaSeries = null;
-let _priceVolSeries = null;
-let _priceCandleData = [];
-let _priceTf = 60;
-let _priceType = 'candle';
+    const total = queue.reduce((s, q) => s + q.amount, 0);
+    const wallets = new Set(queue.map((q) => q.wallet)).size;
 
-function _initPriceChart() {
-  const wrap = document.getElementById('priceWrap');
-  if (!wrap) return;
-  if (_priceChart) { try { _priceChart.remove(); } catch(e){} _priceChart = null; }
-  _priceCandleSeries = null; _priceAreaSeries = null; _priceVolSeries = null;
-  wrap.innerHTML = '';
+    document.getElementById("queueMeta").textContent =
+      `${wallets} wallets • ${formatNum(total)} total`;
 
-  const { w, h } = _wrapSize('priceWrap');
-  _priceChart = LightweightCharts.createChart(wrap, _lcBase({ width: w, height: h }));
+    const rows = [...queue]
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 120)
+      .map((q, idx) => {
+        return `
+        <div class="feed-item">
+          <div>
+            <div class="feed-main v">#${idx + 1} • ${formatNum(q.amount)}</div>
+            <div class="feed-sub">${shortWallet(q.wallet)}</div>
+          </div>
+        </div>`;
+      })
+      .join("");
 
-  if (_priceType === 'area') {
-    _priceAreaSeries = _priceChart.addAreaSeries({
-      lineColor: '#00d4ff', topColor: 'rgba(0,212,255,0.2)', bottomColor: 'rgba(0,212,255,0.01)',
-      lineWidth: 2, priceLineVisible: true, priceLineColor: 'rgba(0,212,255,0.3)',
-      crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
+    document.getElementById("queueTable").innerHTML =
+      rows || "<div class='muted'>Queue empty</div>";
+
+    renderQueueDistribution(queue);
+  }
+
+  // ----------------------------------------------------------------------------
+  // CHART – cumulative burns (Overview)
+  // ----------------------------------------------------------------------------
+  function renderBurnCumulative() {
+    if (!dashboardData) return;
+    const burns = [...dashboardData.af.burns].sort((a, b) => a.ts - b.ts);
+    if (!burns.length) return;
+
+    const labels = [];
+    const cumulative = [];
+    let running = 0;
+
+    burns.forEach((b) => {
+      running += b.amount;
+      labels.push(new Date(b.ts).toLocaleTimeString());
+      cumulative.push(running);
     });
-  } else {
-    _priceCandleSeries = _priceChart.addCandlestickSeries({
-      upColor: '#00e676', downColor: '#ff3d50',
-      borderUpColor: '#00e676', borderDownColor: '#ff3d50',
-      wickUpColor: 'rgba(0,230,118,0.7)', wickDownColor: 'rgba(255,61,80,0.7)',
-      priceLineVisible: true, priceLineColor: 'rgba(0,212,255,0.3)',
+
+    const ctx = document.getElementById("burnCumulativeChart").getContext("2d");
+    if (burnCumulativeChart) burnCumulativeChart.destroy();
+    burnCumulativeChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Cumulative Burn",
+            data: cumulative,
+            fill: true,
+            borderColor: "rgba(34,197,94,1)",
+            backgroundColor: "rgba(34,197,94,0.16)",
+            borderWidth: 2,
+            tension: 0.25,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              color: "#9ca3af",
+              maxTicksLimit: 6,
+            },
+            grid: {
+              color: "rgba(31,41,55,0.6)",
+            },
+          },
+          y: {
+            ticks: {
+              color: "#9ca3af",
+              callback: (v) => formatNum(v),
+            },
+            grid: {
+              color: "rgba(31,41,55,0.6)",
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+      },
     });
   }
 
-  _priceVolSeries = _priceChart.addHistogramSeries({
-    color: 'rgba(0,212,255,0.1)', priceFormat: { type: 'volume' },
-    priceScaleId: 'vol', lastValueVisible: false, priceLineVisible: false,
-  });
-  _priceChart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 }, visible: false });
+  // ----------------------------------------------------------------------------
+  // CHART – live burns per interval (AF tab, NEW)
+  // ----------------------------------------------------------------------------
+  function renderBurnLive() {
+    if (!dashboardData) return;
+    const burns = dashboardData.af.burns;
+    if (!burns.length) return;
 
-  const activeSeries = () => _priceType === 'area' ? _priceAreaSeries : _priceCandleSeries;
-  _priceChart.subscribeCrosshairMove(param => {
-    const s = activeSeries(); if (!s || !param.time) return;
-    const d = param.seriesData.get(s); if (!d) return;
-    if (_priceType === 'candle') {
-      const chg = d.close - d.open, pct = (chg / d.open * 100).toFixed(2);
-      set('csO','$'+F.f2(d.open)); set('csH','$'+F.f2(d.high));
-      set('csL','$'+F.f2(d.low));  set('csC','$'+F.f2(d.close));
-      const el=$('csChg'); if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}
-    } else { set('csC','$'+F.f2(d.value||0)); }
-    const vd = param.seriesData.get(_priceVolSeries); if(vd) set('csVol',F.c(vd.value));
-  });
+    // Bin into 15-minute buckets by default
+    const intervalMs = 15 * 60 * 1000;
+    const now = Date.now();
+    const oldest = now - 24 * 60 * 60 * 1000; // last 24h
+    const bins = new Map();
 
-  if (_priceCandleData.length) _drawPriceSeries();
-}
-
-function _drawPriceSeries() {
-  if (!_priceChart || !_priceCandleData.length) return;
-  try {
-    if (_priceType==='area'&&_priceAreaSeries) {
-      _priceAreaSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.close})));
-    } else if (_priceCandleSeries) {
-      _priceCandleSeries.setData(_priceCandleData);
+    for (const b of burns) {
+      if (b.ts < oldest) continue;
+      const bucket = Math.floor(b.ts / intervalMs) * intervalMs;
+      bins.set(bucket, (bins.get(bucket) || 0) + b.amount);
     }
-    if (_priceVolSeries) {
-      _priceVolSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?'rgba(0,230,118,0.13)':'rgba(255,61,80,0.13)'})));
-    }
-    const last = _priceCandleData[_priceCandleData.length-1];
-    if (last) {
-      const chg=last.close-last.open,pct=(chg/last.open*100).toFixed(2);
-      set('csO','$'+F.f2(last.open));set('csH','$'+F.f2(last.high));
-      set('csL','$'+F.f2(last.low)); set('csC','$'+F.f2(last.close));
-      const el=$('csChg');if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}
-      set('csVol',F.c(last.volume));
-    }
-    _priceChart.timeScale().fitContent();
-  } catch(e) { console.warn('price draw',e); }
-}
 
-async function _fetchCandles(tf) {
-  const im={60:'1h',240:'4h',1440:'1D',10080:'1W'};
-  const interval=im[tf]||'1h';
-  const endTime=Date.now(), startTime=endTime-tf*60*1000*200;
-  try {
-    const d=await hl({type:'candleSnapshot',req:{coin:'@107',interval,startTime,endTime}});
-    if(Array.isArray(d)&&d.length){
-      _priceCandleData=d.map(c=>({time:Math.floor(c.t/1000),open:parseFloat(c.o),high:parseFloat(c.h),low:parseFloat(c.l),close:parseFloat(c.c),volume:parseFloat(c.v)})).sort((a,b)=>a.time-b.time);
-      return true;
-    }
-  } catch(e){console.warn('candle fetch',e);}
-  return false;
-}
+    const sortedKeys = Array.from(bins.keys()).sort((a, b) => a - b);
+    const labels = sortedKeys.map((t) => new Date(t).toLocaleTimeString());
+    const values = sortedKeys.map((k) => bins.get(k));
 
-async function loadPriceChart(tf,btn) {
-  _priceTf=tf;
-  document.querySelectorAll('[data-ptf]').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  set('priceChartMeta','Loading candles…');
-  const ok=await _fetchCandles(tf);
-  if(ok){_drawPriceSeries();set('priceChartMeta',_priceCandleData.length+' candles · HYPE @107');}
-  else set('priceChartMeta','No data returned');
-}
-
-function setPriceType(type) {
-  _priceType=type;
-  $('btnCandle').classList.toggle('active',type==='candle');
-  $('btnArea').classList.toggle('active',type==='area');
-  _initPriceChart();
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// 3. CUMULATIVE BURN CHART
-// ─────────────────────────────────────────────────────────────────────────
-let _burnChart=null, _burnAreaSeries=null, _burnHours=24;
-
-function _initBurnChart() {
-  const wrap=document.getElementById('burnWrap');
-  if(!wrap)return;
-  if(_burnChart){try{_burnChart.remove();}catch(e){}_burnChart=null;_burnAreaSeries=null;}
-  wrap.innerHTML='';
-  const {w,h}=_wrapSize('burnWrap');
-  _burnChart=LightweightCharts.createChart(wrap,_lcBase({width:w,height:h,rightPriceScale:{borderColor:'#1a2430',textColor:'#4a6678',scaleMargins:{top:0.1,bottom:0.05}}}));
-  _burnAreaSeries=_burnChart.addAreaSeries({
-    lineColor:'#ff5e1a',topColor:'rgba(255,94,26,0.25)',bottomColor:'rgba(255,94,26,0.01)',
-    lineWidth:2,priceLineVisible:false,crosshairMarkerVisible:true,crosshairMarkerRadius:4,
-    priceFormat:{type:'custom',formatter:v=>F.c(v)+' HYPE'},
-  });
-  _burnChart.subscribeCrosshairMove(param=>{
-    if(!param.time||!_burnAreaSeries)return;
-    const d=param.seriesData.get(_burnAreaSeries);
-    if(d){set('bsPeriod',F.c(d.value)+' HYPE');if(D.price)set('bsUsd',F.usd(d.value*D.price));}
-  });
-  _drawBurnSeries();
-}
-
-function _drawBurnSeries() {
-  if(!_burnAreaSeries)return;
-  const sorted=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
-  if(!sorted.length)return;
-  const cutoff=_burnHours>0?Date.now()-_burnHours*3600000:0;
-  const filtered=sorted.filter(p=>+(p.time||p.timestamp||0)>cutoff);
-  if(filtered.length<2)return;
-  const px=D.price||1;
-  let cum=0;
-  const pts=[],seen=new Set();
-  for(const p of filtered){
-    cum+=parseFloat(p.total||p.fees||p.amount||0)/px;
-    const t=Math.floor(+(p.time||p.timestamp||0)/1000);
-    if(!seen.has(t)){seen.add(t);pts.push({time:t,value:cum});}
+    const ctx = document.getElementById("burnLiveChart").getContext("2d");
+    if (burnLiveChart) burnLiveChart.destroy();
+    burnLiveChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Burn per 15 min",
+            data: values,
+            backgroundColor: "rgba(34,197,94,0.7)",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: { color: "#9ca3af", maxTicksLimit: 6 },
+            grid: { color: "rgba(31,41,55,0.55)" },
+          },
+          y: {
+            ticks: {
+              color: "#9ca3af",
+              callback: (v) => formatNum(v),
+            },
+            grid: { color: "rgba(31,41,55,0.55)" },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
   }
-  if(pts.length<2)return;
-  try {
-    _burnAreaSeries.setData(pts);
-    set('bsTotal',F.c(D.burned||cum)+' HYPE');
-    set('bsPeriod',F.c(cum)+' HYPE');
-    if(D.price)set('bsUsd',F.usd(cum*D.price));
-    const tspan=(+(filtered[filtered.length-1].time||filtered[filtered.length-1].timestamp||0)-+(filtered[0].time||filtered[0].timestamp||0))/3600000;
-    if(tspan>0)set('bsRate',F.c(cum/tspan)+'/hr');
-    _burnChart.timeScale().fitContent();
-  } catch(e){console.warn('burn draw',e);}
-}
 
-function setBurnWindow(hours,btn) {
-  _burnHours=hours;
-  document.querySelectorAll('[data-btf]').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  _drawBurnSeries();
-  if(_burnChart)_burnChart.timeScale().fitContent();
-}
+  // ----------------------------------------------------------------------------
+  // CHART – wallet distribution bar (Top 10 vs Rest, NEW)
+  // ----------------------------------------------------------------------------
+  function renderQueueDistribution(queue) {
+    const canvas = document.getElementById("queueDistChart");
+    if (!canvas || !queue) return;
 
-// ─────────────────────────────────────────────────────────────────────────
-// RESIZE — always explicit, never auto
-// ─────────────────────────────────────────────────────────────────────────
-function _resizeCharts() {
-  if(_afChart){const{w,h}=_wrapSize('afWrap');_afChart.applyOptions({width:w,height:h});}
-  if(_priceChart){const{w,h}=_wrapSize('priceWrap');_priceChart.applyOptions({width:w,height:h});}
-  if(_burnChart){const{w,h}=_wrapSize('burnWrap');_burnChart.applyOptions({width:w,height:h});}
-}
-window.addEventListener('resize',_resizeCharts);
+    const sorted = [...queue].sort((a, b) => b.amount - a.amount);
+    const top10 = sorted.slice(0, 10);
+    const rest = sorted.slice(10);
 
-// ─────────────────────────────────────────────────────────────────────────
-// INIT CHARTS TAB
-// ─────────────────────────────────────────────────────────────────────────
-let _chartsInited=false;
-async function _initChartsTab() {
-  if(_chartsInited){setTimeout(_resizeCharts,20);return;}
-  _chartsInited=true;
-  _initAfChart();
-  _initPriceChart();
-  _initBurnChart();
-  _startAfLive(); // begin 5s polling
-  await loadPriceChart(_priceTf,document.querySelector('[data-ptf="60"]'));
-  setTimeout(_resizeCharts,50);
-}
+    const topSum = top10.reduce((s, q) => s + q.amount, 0);
+    const restSum = rest.reduce((s, q) => s + q.amount, 0);
 
+    if (queueDistChart) queueDistChart.destroy();
+    const ctx = canvas.getContext("2d");
+    queueDistChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Top 10 wallets", "Rest of queue"],
+        datasets: [
+          {
+            label: "Amount in queue",
+            data: [topSum, restSum],
+            backgroundColor: [
+              "rgba(56,189,248,0.8)",
+              "rgba(148,163,184,0.8)",
+            ],
+          },
+        ],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              color: "#9ca3af",
+              callback: (v) => formatNum(v),
+            },
+            grid: { color: "rgba(31,41,55,0.55)" },
+          },
+          y: {
+            ticks: { color: "#9ca3af" },
+            grid: { display: false },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
 
-// ─── TABS ──────────────────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tp').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    const p = $('tab-' + t.dataset.tab); if (p) p.classList.add('active');
-    if (t.dataset.tab === 'charts') {
-      setTimeout(_initChartsTab, 30);
-    } else {
-      // Stop the 5s AF polling when not on charts tab to save API calls
-      _stopAfLive();
+  // ----------------------------------------------------------------------------
+  // RENDER ALL
+  // ----------------------------------------------------------------------------
+  function renderAll() {
+    if (!dashboardData) return;
+    renderOverview();
+    renderAfFeeds();
+    renderQueue();
+    renderBurnCumulative();
+    renderBurnLive();
+  }
+
+  // ----------------------------------------------------------------------------
+  // UTIL
+  // ----------------------------------------------------------------------------
+  function formatNum(x) {
+    if (!isFinite(x)) return "0";
+    if (Math.abs(x) >= 1_000_000_000) return (x / 1_000_000_000).toFixed(2) + "B";
+    if (Math.abs(x) >= 1_000_000) return (x / 1_000_000).toFixed(2) + "M";
+    if (Math.abs(x) >= 1_000) return (x / 1_000).toFixed(2) + "K";
+    if (Math.abs(x) >= 1) return x.toFixed(2);
+    return x.toFixed(4);
+  }
+
+  function shortHash(h) {
+    if (!h) return "";
+    if (h.length <= 10) return h;
+    return h.slice(0, 6) + "…" + h.slice(-4);
+  }
+
+  function shortWallet(w) {
+    if (!w) return "";
+    if (w.length <= 12) return w;
+    return w.slice(0, 6) + "…" + w.slice(-4);
+  }
+
+  // ----------------------------------------------------------------------------
+  // BUTTON WIRES
+  // ----------------------------------------------------------------------------
+  document.getElementById("refreshAfBtn").addEventListener("click", async () => {
+    const s = document.getElementById("afStatus");
+    s.textContent = "Refreshing…";
+    s.className = "status-text";
+    try {
+      await fetchDashboard();
+      s.textContent = "AF data refreshed";
+      s.classList.add("ok");
+    } catch (e) {
+      s.textContent = "Error refreshing AF data";
+      s.classList.add("err");
     }
   });
-});
 
-// ─── AUTO REFRESH ──────────────────────────────────────────────────────────
-setInterval(async () => {
-  await Promise.allSettled([fPrice(), fSpot()]);
-  if (D.price) {
-    set('topPrice', '$' + F.f2(D.price));
-    set('sbPrice', '$' + F.f2(D.price));
-    set('tsUpdated', new Date().toLocaleTimeString());
-  }
-}, 15000);
-setInterval(loadAll, 90000);
+  document
+    .getElementById("refreshQueueBtn")
+    .addEventListener("click", async () => {
+      const s = document.getElementById("queueStatus");
+      s.textContent = "Refreshing…";
+      s.className = "status-text";
+      try {
+        await fetchDashboard();
+        s.textContent = "Queue refreshed";
+        s.classList.add("ok");
+      } catch (e) {
+        s.textContent = "Error refreshing queue";
+        s.classList.add("err");
+      }
+    });
 
-// ─── INIT ──────────────────────────────────────────────────────────────────
-loadAll();
+  // ----------------------------------------------------------------------------
+  // INIT
+  // ----------------------------------------------------------------------------
+  fetchDashboard();
+  // Optionally, refresh every N seconds:
+  // setInterval(fetchDashboard, 60_000);
 </script>
 </body>
 </html>
