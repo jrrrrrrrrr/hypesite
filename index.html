@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HYPE Intelligence</title>
+<title>HYPE Intelligence Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -41,6 +41,7 @@
   .topbar{height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;position:relative;z-index:10;flex-shrink:0}
   .logo{font-size:14px;font-weight:600;letter-spacing:.12em;color:var(--accent);white-space:nowrap}
   .logo em{color:var(--text-dim);font-style:normal;font-weight:300}
+  .logo .ver{font-size:8px;color:var(--accent2);vertical-align:super;margin-left:3px;letter-spacing:.05em}
   .divider{width:1px;height:24px;background:var(--border)}
   .live-badge{display:flex;align-items:center;gap:5px;font-size:10px;letter-spacing:.1em;color:var(--text-dim)}
   .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite}
@@ -80,8 +81,11 @@
   .tab{padding:9px 13px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap}
   .tab:hover{color:var(--text)}
   .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab.new-tab{color:var(--accent2)}
+  .tab.new-tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
   .tbadge{background:var(--accent-dim);color:var(--accent);border-radius:2px;padding:0 4px;font-size:9px;min-width:14px;text-align:center}
   .tbadge.r{background:var(--red-dim);color:var(--red)}
+  .tbadge.new{background:var(--accent2-dim);color:var(--accent2)}
   .content{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
 
   /* PANELS */
@@ -94,14 +98,29 @@
   /* KPIs */
   .kgrid{display:grid;gap:10px}
   .kg3{grid-template-columns:repeat(3,1fr)}
+  .kg4{grid-template-columns:repeat(4,1fr)}
   .kg2{grid-template-columns:repeat(2,1fr)}
   .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-top:2px solid transparent;border-radius:3px;padding:11px 13px}
+  .threecol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-top:2px solid transparent;border-radius:3px;padding:11px 13px;position:relative}
   .kpi.ca{border-top-color:var(--accent)}.kpi.cb{border-top-color:var(--accent2)}.kpi.cg{border-top-color:var(--green)}.kpi.cr{border-top-color:var(--red)}.kpi.cy{border-top-color:var(--yellow)}.kpi.cp{border-top-color:var(--purple)}
-  .kl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px}
+  .kl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;display:flex;align-items:center;gap:4px}
   .kv{font-size:20px;font-weight:600;color:var(--text-bright);font-variant-numeric:tabular-nums;line-height:1.2}
   .ks{font-size:10px;color:var(--text-dim);margin-top:3px;font-family:var(--sans)}
   .ks.g{color:var(--green)}.ks.r{color:var(--red)}
+
+  /* TOOLTIP / INFO ICON */
+  .info-ico{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border);color:var(--text-dim);font-size:8px;font-weight:700;cursor:help;font-style:normal;flex-shrink:0;transition:all .15s}
+  .info-ico:hover{background:var(--accent);color:var(--bg)}
+  .tooltip-wrap{position:relative}
+  .tooltip-content{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:100;width:280px;padding:10px 12px;background:var(--surface2);border:1px solid var(--accent);border-radius:4px;font-size:10px;color:var(--text);line-height:1.6;font-family:var(--sans);font-weight:300;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  .tooltip-content::before{content:'';position:absolute;top:-5px;left:12px;width:10px;height:10px;background:var(--surface2);border-left:1px solid var(--accent);border-top:1px solid var(--accent);transform:rotate(45deg)}
+  .tooltip-content .tt-title{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;font-family:var(--mono)}
+  .tooltip-content .tt-what{color:var(--text-bright);margin-bottom:4px}
+  .tooltip-content .tt-why{color:var(--text);margin-bottom:4px}
+  .tooltip-content .tt-high{color:var(--green)}
+  .tooltip-content .tt-low{color:var(--red)}
+  .info-ico:hover + .tooltip-content,.tooltip-content:hover{display:block}
 
   /* FEED */
   .fi{display:grid;grid-template-columns:88px 1fr auto;gap:9px;align-items:start;padding:7px 13px;border-bottom:1px solid rgba(26,36,48,.7);transition:background .1s}
@@ -187,7 +206,6 @@
   .tp{display:none}.tp.active{display:flex;flex-direction:column;gap:12px}
 
   /* ── CHARTS ── */
-  /* Critical: fixed heights prevent the infinite-grow bug */
   .chart-outer{background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden;display:flex;flex-direction:column}
   .chart-toolbar{display:flex;align-items:center;gap:0;padding:0 12px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;height:32px}
   .ct-btn{background:none;border:none;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--text-dim);cursor:pointer;padding:6px 9px;text-transform:uppercase;border-bottom:2px solid transparent;height:32px;transition:color .12s,border-color .12s}
@@ -201,12 +219,10 @@
   .cst-item{display:flex;flex-direction:column;gap:1px}
   .cst-lbl{font-size:8px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em}
   .cst-val{font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-bright)}
-  /* The key fix: explicit pixel height, no auto-sizing */
   .chart-canvas-wrap{position:relative;width:100%;height:280px;flex-shrink:0}
   .chart-canvas-wrap.short{height:200px}
   /* AF LIVE MONITOR */
   .af-live-stats{display:flex;gap:20px;padding:8px 13px;border-bottom:1px solid var(--border);background:rgba(0,212,255,0.03);flex-wrap:wrap;flex-shrink:0}
-
 
   /* KPIs with sparklines */
   .kpi-sparkline{width:100%;height:36px;margin-top:6px;opacity:0.7}
@@ -231,6 +247,47 @@
   /* Overview grid with sparklines */
   .kpi .kpi-canvas{display:block;width:100%;height:32px;margin-top:5px;opacity:.6}
 
+  /* ── WALLET INTELLIGENCE ── */
+  .wallet-input-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .wallet-input{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);color:var(--text-bright);font-family:var(--mono);font-size:12px;padding:8px 12px;border-radius:3px;outline:none;transition:border-color .15s}
+  .wallet-input:focus{border-color:var(--accent)}
+  .wallet-input::placeholder{color:var(--text-dim)}
+  .wallet-btn{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;border-radius:3px;font-weight:600;text-transform:uppercase;transition:all .15s}
+  .wallet-btn:hover{background:var(--accent);color:var(--bg)}
+  .wallet-btn.busy{opacity:.5;pointer-events:none}
+  .wallet-saved{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .wallet-tag{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:9px;padding:3px 8px;border-radius:2px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s}
+  .wallet-tag:hover{border-color:var(--accent);color:var(--accent)}
+  .wallet-tag .tag-x{color:var(--text-dim);font-size:8px;cursor:pointer}
+  .wallet-tag .tag-x:hover{color:var(--red)}
+
+  /* POSITION ROW */
+  .pos-row{display:grid;grid-template-columns:80px 1fr auto auto auto;gap:12px;align-items:center;padding:8px 13px;border-bottom:1px solid rgba(26,36,48,.7)}
+  .pos-row:last-child{border-bottom:none}
+  .pos-row:hover{background:var(--surface2)}
+  .pos-coin{font-weight:600;color:var(--text-bright);font-size:12px}
+  .pos-side{font-size:9px;font-weight:700;letter-spacing:.08em}
+  .pos-long{color:var(--green)}.pos-short{color:var(--red)}
+  .pos-val{font-size:11px;font-variant-numeric:tabular-nums;text-align:right}
+
+  /* MARKET EXPLORER */
+  .mkt-row{display:grid;grid-template-columns:100px repeat(6,1fr);gap:8px;align-items:center;padding:8px 13px;border-bottom:1px solid rgba(26,36,48,.7);font-size:11px;font-variant-numeric:tabular-nums}
+  .mkt-row:hover{background:var(--surface2)}
+  .mkt-row.hdr{background:var(--surface2);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border)}
+  .mkt-coin{font-weight:600;color:var(--text-bright);display:flex;align-items:center;gap:4px}
+  .mkt-funding{font-weight:600}
+  .mkt-funding.pos{color:var(--green)}.mkt-funding.neg{color:var(--red)}
+
+  /* GLOBAL STATS GRID */
+  .gs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+
+  /* LEARNING CARD */
+  .learn-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px;margin-bottom:8px}
+  .learn-card h3{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+  .learn-card p{font-size:11px;font-family:var(--sans);color:var(--text);line-height:1.7;margin-bottom:6px}
+  .learn-card .example{background:var(--surface2);border-left:2px solid var(--accent2);padding:8px 12px;margin:6px 0;font-size:10px;line-height:1.6;color:var(--text);font-family:var(--sans)}
+  .learn-card .hl{color:var(--green)}.learn-card .rl{color:var(--red)}
+
   /* EMPTY */
   .es{padding:20px;text-align:center;color:var(--text-dim);font-size:11px;font-family:var(--sans)}
   .es a{color:var(--accent);text-decoration:none}
@@ -249,7 +306,7 @@
 <body>
 
 <header class="topbar">
-  <div class="logo">HYPE<em>/</em>INTEL</div>
+  <div class="logo">HYPE<em>/</em>INTEL<span class="ver">v2</span></div>
   <div class="divider"></div>
   <div class="live-badge">
     <div class="live-dot" id="liveDot"></div>
@@ -305,6 +362,11 @@
       <div class="sb-row"><span class="sb-k">FDV</span><span class="sb-v" id="sbFdv">—</span></div>
     </div>
     <div class="sb-sec">
+      <div class="sb-lbl"><div class="dot" style="background:var(--purple)"></div>Platform</div>
+      <div class="sb-row"><span class="sb-k">Total OI</span><span class="sb-v" id="sbTotalOI">—</span></div>
+      <div class="sb-row"><span class="sb-k">24h Vol (Perps)</span><span class="sb-v" id="sbPerpVol">—</span></div>
+    </div>
+    <div class="sb-sec">
       <div class="sb-lbl"><div class="dot" style="background:var(--purple)"></div>Signal</div>
       <div id="signalBox"><div class="sig-box" style="background:var(--surface2)"><div class="sig-lbl" style="color:var(--text-dim)">—</div><div class="sig-sub">Loading...</div></div></div>
     </div>
@@ -315,6 +377,9 @@
     <nav class="tabs">
       <div class="tab active" data-tab="overview">Overview</div>
       <div class="tab" data-tab="charts">Charts</div>
+      <div class="tab" data-tab="globalstats" data-new="1">Global Stats <span class="tbadge new">NEW</span></div>
+      <div class="tab" data-tab="markets" data-new="1">Markets <span class="tbadge new">NEW</span></div>
+      <div class="tab" data-tab="wallet" data-new="1">Wallet Intel <span class="tbadge new">NEW</span></div>
       <div class="tab" data-tab="unstaking">Unstaking <span class="tbadge r" id="tbUQ">0</span></div>
       <div class="tab" data-tab="staking">Staking Flows</div>
       <div class="tab" data-tab="af">AF &amp; Burns</div>
@@ -327,9 +392,9 @@
       <!-- OVERVIEW -->
       <div class="tp active" id="tab-overview">
         <div class="kgrid kg3">
-          <div class="kpi ca"><div class="kl">Total Staked</div><div class="kv" id="kStaked">—</div><div class="ks" id="kStakedS">—</div><canvas class="kpi-canvas" id="sparkStaked" height="32"></canvas></div>
-          <div class="kpi cb"><div class="kl">Total Burned</div><div class="kv" id="kBurned">—</div><div class="ks" id="kBurnedS">—</div><canvas class="kpi-canvas" id="sparkBurned" height="32"></canvas></div>
-          <div class="kpi cr"><div class="kl">Pending Unstake</div><div class="kv" id="kQueue">—</div><div class="ks" id="kQueueS">—</div><canvas class="kpi-canvas" id="sparkQueue" height="32"></canvas></div>
+          <div class="kpi ca"><div class="kl">Total Staked <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Total Staked</div><div class="tt-what">HYPE tokens locked in validator staking contracts.</div><div class="tt-why">Reduces circulating supply. Higher staking = less sell pressure, more network security.</div><div class="tt-high">▲ High (>35%): Strong conviction, limited float.</div><div class="tt-low">▼ Low (<15%): Weak lockup, higher sell pressure risk.</div></div></span></div><div class="kv" id="kStaked">—</div><div class="ks" id="kStakedS">—</div><canvas class="kpi-canvas" id="sparkStaked" height="32"></canvas></div>
+          <div class="kpi cb"><div class="kl">Total Burned <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Total Burned</div><div class="tt-what">HYPE permanently removed via fee-funded buybacks sent to dead address.</div><div class="tt-why">Deflationary mechanism. Higher burn = less supply over time = upward price pressure.</div><div class="tt-high">▲ Rising: Protocol generating fees, active usage.</div><div class="tt-low">▼ Flat: Low platform activity or low HYPE price.</div></div></span></div><div class="kv" id="kBurned">—</div><div class="ks" id="kBurnedS">—</div><canvas class="kpi-canvas" id="sparkBurned" height="32"></canvas></div>
+          <div class="kpi cr"><div class="kl">Pending Unstake <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Pending Unstake Queue</div><div class="tt-what">HYPE currently in 8-day unlock cooldown period.</div><div class="tt-why">Leading indicator of potential sell pressure. Large queues suggest validators or whales preparing to exit.</div><div class="tt-high">▲ Large (>500K): Significant upcoming sell pressure.</div><div class="tt-low">▼ Small (<50K): Minimal exit pressure, bullish signal.</div></div></span></div><div class="kv" id="kQueue">—</div><div class="ks" id="kQueueS">—</div><canvas class="kpi-canvas" id="sparkQueue" height="32"></canvas></div>
         </div>
         <div class="twocol">
           <div class="insight" id="insightPanel"><div class="insight-ttl">📡 Trading Intelligence</div><div class="insight-body" id="insightBody">Loading...</div></div>
@@ -340,7 +405,6 @@
 
       <!-- CHARTS TAB -->
       <div class="tp" id="tab-charts">
-
         <!-- LIVE AF MONITOR CHART -->
         <div class="chart-outer">
           <div class="ph">
@@ -404,7 +468,109 @@
           </div>
           <div class="chart-canvas-wrap short" id="burnWrap"></div>
         </div>
+      </div>
 
+      <!-- ═══ NEW: GLOBAL STATS ═══ -->
+      <div class="tp" id="tab-globalstats">
+        <div class="kgrid kg4">
+          <div class="kpi ca"><div class="kl">24h Platform Volume <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">24h Platform Volume</div><div class="tt-what">Total notional trading volume across all perpetual markets in 24 hours.</div><div class="tt-why">Measures platform activity and liquidity. Fee revenue is directly proportional to volume.</div><div class="tt-high">▲ High: Active trading, high fee generation for burns.</div><div class="tt-low">▼ Low: Reduced activity, lower burn rate.</div></div></span></div><div class="kv" id="gsVol24">—</div><div class="ks" id="gsVol24S">Across all perp markets</div></div>
+          <div class="kpi cg"><div class="kl">Total Open Interest <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Total Open Interest</div><div class="tt-what">Sum of all outstanding perpetual futures positions (both long and short).</div><div class="tt-why">Measures capital deployed. Rising OI + rising price = new money entering longs (bullish). Rising OI + falling price = new shorts opening.</div><div class="tt-high">▲ High OI: Heavy positioning, potential for volatility.</div><div class="tt-low">▼ Low OI: Less leveraged exposure, calmer market.</div></div></span></div><div class="kv" id="gsTotalOI">—</div><div class="ks" id="gsTotalOIS">All perpetual markets</div></div>
+          <div class="kpi cy"><div class="kl">Active Markets</div><div class="kv" id="gsMarkets">—</div><div class="ks">Perpetual pairs listed</div></div>
+          <div class="kpi cp"><div class="kl">Insurance Fund <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Insurance Fund</div><div class="tt-what">Backstop fund that absorbs losses from liquidations that exceed account equity.</div><div class="tt-why">Prevents socialized losses. Larger fund = safer exchange. Depleting fund = systemic risk signal.</div></div></span></div><div class="kv" id="gsInsurance">—</div><div class="ks">Platform safety backstop</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>Top Markets by Open Interest</div><div class="pmeta" id="gsTopOIMeta">Hyperliquid perp markets</div></div>
+          <div id="gsTopOIList"><div class="es"><span class="skel" style="width:200px"></span></div></div>
+        </div>
+
+        <div class="twocol">
+          <div class="panel">
+            <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--green)"></div>Top Markets by 24h Volume</div><div class="pmeta">Sorted by notional volume</div></div>
+            <div id="gsTopVolList"><div class="es"><span class="skel" style="width:180px"></span></div></div>
+          </div>
+          <div class="panel">
+            <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--yellow)"></div>Funding Rate Snapshot <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Funding Rates</div><div class="tt-what">Periodic payments between long and short traders. Positive = longs pay shorts. Negative = shorts pay longs.</div><div class="tt-why">Reflects market sentiment. Persistently high positive funding = overcrowded longs, often precedes mean reversion down. Persistently negative = shorts paying, squeeze potential.</div><div class="tt-high">▲ Positive: Bullish sentiment, longs paying premium.</div><div class="tt-low">▼ Negative: Bearish sentiment, shorts paying premium.</div></div></span></div><div class="pmeta">Current 8h rates · top markets</div></div>
+            <div id="gsFundingList"><div class="es"><span class="skel" style="width:180px"></span></div></div>
+          </div>
+        </div>
+
+        <div class="insight" style="border-color:rgba(187,134,252,.2);background:rgba(187,134,252,.03)">
+          <div class="insight-ttl" style="color:var(--purple)">📊 Platform Analytics Summary</div>
+          <div class="insight-body" id="gsSummary">Loading global stats...</div>
+        </div>
+      </div>
+
+      <!-- ═══ NEW: MARKET EXPLORER ═══ -->
+      <div class="tp" id="tab-markets">
+        <div class="panel">
+          <div class="ph">
+            <div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>Perpetual Markets Explorer</div>
+            <div class="pmeta">All active perp markets · Sorted by OI</div>
+          </div>
+          <div id="mktExplorer">
+            <div class="mkt-row hdr">
+              <div>Market</div><div style="text-align:right">Price</div><div style="text-align:right">24h Change</div>
+              <div style="text-align:right">Open Interest</div><div style="text-align:right">24h Volume</div>
+              <div style="text-align:right">Funding (8h)</div><div style="text-align:right">Premium</div>
+            </div>
+            <div class="es"><span class="skel" style="width:300px"></span></div>
+          </div>
+        </div>
+
+        <div class="panel" id="mktDetailPanel" style="display:none">
+          <div class="ph">
+            <div class="ptitle"><div class="pdot" style="background:var(--yellow)"></div><span id="mktDetailTitle">Market Detail</span></div>
+            <div class="pmeta"><button class="btn" onclick="closeMktDetail()">✕ Close</button></div>
+          </div>
+          <div class="kgrid kg3" style="padding:12px">
+            <div class="kpi ca"><div class="kl">Open Interest</div><div class="kv" id="mdOI">—</div></div>
+            <div class="kpi cg"><div class="kl">24h Volume</div><div class="kv" id="mdVol">—</div></div>
+            <div class="kpi cy"><div class="kl">Funding Rate</div><div class="kv" id="mdFunding">—</div></div>
+          </div>
+          <div class="chart-canvas-wrap" id="mktDetailChartWrap" style="height:220px"></div>
+        </div>
+      </div>
+
+      <!-- ═══ NEW: WALLET INTELLIGENCE ═══ -->
+      <div class="tp" id="tab-wallet">
+        <div class="panel">
+          <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent)"></div>Wallet Intelligence <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Wallet Intelligence</div><div class="tt-what">Lookup any Hyperliquid address to view their positions, PnL, and trading activity.</div><div class="tt-why">Track whale activity, analyze strategies, and monitor high-conviction traders. Uses Hyperliquid's clearinghouse API.</div></div></span></div><div class="pmeta">Enter any Hyperliquid address</div></div>
+          <div style="padding:12px">
+            <div class="wallet-input-wrap">
+              <input type="text" class="wallet-input" id="walletAddr" placeholder="0x... paste any Hyperliquid address" spellcheck="false">
+              <button class="wallet-btn" id="walletLookupBtn" onclick="lookupWallet()">🔍 LOOKUP</button>
+              <button class="wallet-btn" style="background:var(--accent2-dim);border-color:var(--accent2);color:var(--accent2)" onclick="saveWatchAddr()">★ SAVE</button>
+              <a class="wallet-btn" id="walletImpLink" href="#" target="_blank" style="display:none;text-decoration:none;background:var(--purple-dim);border-color:var(--purple);color:var(--purple)">↗ VIEW ON HL</a>
+            </div>
+            <div class="wallet-saved" id="whaleWatchList"></div>
+          </div>
+        </div>
+
+        <div id="walletResults" style="display:none">
+          <div class="kgrid kg4">
+            <div class="kpi ca"><div class="kl">Account Value</div><div class="kv" id="wAccVal">—</div><div class="ks" id="wAccValS">Perps + Spot</div></div>
+            <div class="kpi cg"><div class="kl">Total PnL <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Total PnL</div><div class="tt-what">Unrealized profit/loss across all open perpetual positions.</div><div class="tt-why">Shows current portfolio performance. Extreme unrealized PnL often precedes position closing.</div></div></span></div><div class="kv" id="wPnl">—</div><div class="ks" id="wPnlS">Unrealized P&L</div></div>
+            <div class="kpi cy"><div class="kl">Margin Used</div><div class="kv" id="wMargin">—</div><div class="ks" id="wMarginS">Cross margin</div></div>
+            <div class="kpi cp"><div class="kl">Open Positions</div><div class="kv" id="wPosCount">—</div><div class="ks">Active perp trades</div></div>
+          </div>
+
+          <div class="twocol">
+            <div class="panel">
+              <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--green)"></div>Open Positions</div><div class="pmeta" id="wPosMeta">Perpetual positions</div></div>
+              <div id="wPositions"><div class="es">No positions</div></div>
+            </div>
+            <div class="panel">
+              <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--yellow)"></div>Spot Holdings</div><div class="pmeta">Token balances</div></div>
+              <div id="wSpotHoldings"><div class="es">No spot holdings</div></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--purple)"></div>Open Orders</div><div class="pmeta" id="wOrdersMeta">Resting orders</div></div>
+            <div id="wOpenOrders"><div class="es">No open orders</div></div>
+          </div>
+        </div>
       </div>
 
 
@@ -451,7 +617,7 @@
         <div class="kgrid kg3">
           <div class="kpi cp"><div class="kl">Fees All Time</div><div class="kv" id="kFeeAll">—</div><div class="ks">Cumulative protocol revenue</div></div>
           <div class="kpi cg"><div class="kl">Fees Last 24h</div><div class="kv" id="kFee24">—</div><div class="ks">→ converted to HYPE burns</div></div>
-          <div class="kpi cb"><div class="kl">Implied Burn Rate</div><div class="kv" id="kFeeRate">—</div><div class="ks">HYPE/day at current price</div></div>
+          <div class="kpi cb"><div class="kl">Implied Burn Rate <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Implied Burn Rate</div><div class="tt-what">Estimated HYPE tokens burned per day based on current fee revenue and HYPE price.</div><div class="tt-why">Burn rate = 24h fees / HYPE price. Higher price means fewer HYPE burned per dollar of fees. Lower price means more HYPE burned.</div></div></span></div><div class="kv" id="kFeeRate">—</div><div class="ks">HYPE/day at current price</div></div>
         </div>
         <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--purple)"></div>48h Fee History</div><div class="pmeta">api.hypurrscan.io/feesRecent</div></div><div class="fee-canvas-wrap"><canvas id="feeChartCanvas" height="160"></canvas></div></div>
         <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent2)"></div>Fee History — Bar View</div><div class="pmeta">Last 20 periods</div></div><div class="fee-chart" id="feeChart48h"><div class="es"><span class="skel" style="width:200px"></span></div></div></div>
@@ -474,6 +640,15 @@
     <div class="sr-sec"><div class="sr-ttl">🏆 Top HYPE Holders</div><div id="topHolders"><div class="es"><span class="skel" style="width:130px"></span></div></div></div>
     <div class="sr-sec"><div class="sr-ttl">📊 Fee Trend (48h)</div><canvas id="feeSparkline" width="224" height="56"></canvas></div>
     <div class="sr-sec">
+      <div class="sr-ttl">📈 Platform Snapshot</div>
+      <div id="rightPlatformStats" style="font-size:10px">
+        <div class="sb-row"><span class="sb-k">Perp Vol 24h</span><span class="sb-v" id="rsPerpVol">—</span></div>
+        <div class="sb-row"><span class="sb-k">Total OI</span><span class="sb-v" id="rsTotalOI">—</span></div>
+        <div class="sb-row"><span class="sb-k">Top Funding</span><span class="sb-v" id="rsTopFunding">—</span></div>
+        <div class="sb-row"><span class="sb-k">Markets</span><span class="sb-v" id="rsMarkets">—</span></div>
+      </div>
+    </div>
+    <div class="sr-sec">
       <div class="sr-ttl">🔗 Quick Links</div>
       <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px">
         <a href="https://www.hypeburn.fun/" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">HypeBurn.fun ↗</a>
@@ -482,6 +657,16 @@
         <a href="https://app.hyperliquid.xyz/trade/HYPE" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">Trade HYPE ↗</a>
         <a href="https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees" target="_blank" style="color:var(--accent);font-size:10px;text-decoration:none">Fees Documentation ↗</a>
         <a href="https://api.hypurrscan.io/ui" target="_blank" style="color:var(--text-dim);font-size:10px;text-decoration:none">HypurrScan API Docs ↗</a>
+      </div>
+    </div>
+    <div class="sr-sec">
+      <div class="sr-ttl">📡 Data Sources</div>
+      <div style="font-size:9px;color:var(--text-dim);font-family:var(--sans);line-height:1.7">
+        <div>• Hyperliquid Info API (POST)</div>
+        <div>• HypurrScan REST API</div>
+        <div>• All data fetched client-side</div>
+        <div>• Auto-refresh: 15s price, 90s full</div>
+        <div style="margin-top:4px;color:var(--text)">Rate limits: ~120 req/min (HL), ~60 req/min (HS)</div>
       </div>
     </div>
   </aside>
@@ -504,13 +689,18 @@ const D = {
   transfers:[], feesRecent:[], feesAll:null,
   fees24:null, afBal:null, afUsdc:null, afOrders:[],
   holders:{}, burned:null,
+  // NEW: Global stats
+  perpMeta:null, perpCtxs:[], allMids:{},
+  totalOI:null, totalPerpVol:null, markets:[],
 };
 
 // ─── FORMAT ────────────────────────────────────────────────────────────────
 const F = {
   c:   n => { if(n==null)return'—'; n=+n; if(n>=1e9)return(n/1e9).toFixed(2)+'B'; if(n>=1e6)return(n/1e6).toFixed(2)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n.toFixed(2); },
   f2:  n => n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
+  f4:  n => n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}),
   pct: n => n==null?'—':(n>=0?'+':'')+Number(n).toFixed(2)+'%',
+  pct4:n => n==null?'—':(n>=0?'+':'')+Number(n).toFixed(4)+'%',
   addr:a => a?`${a.slice(0,6)}…${a.slice(-4)}`:'—',
   usd: n => n==null?'—':'$'+F.c(n),
   t:   ts => { if(!ts)return'—'; const d=new Date(+ts); return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}); },
@@ -535,6 +725,7 @@ async function hs(path) {
 // ─── FETCHERS ──────────────────────────────────────────────────────────────
 async function fPrice() {
   const m = await hl({type:'allMids'});
+  D.allMids = m;
   const px = m['@107']||m['HYPE'];
   if(px) D.price = parseFloat(px);
 }
@@ -553,17 +744,14 @@ async function fStaking() {
   try {
     const d=await hl({type:'stakingSummary'});
     if(d){
-      // Try all possible field names
       const staked=d.totalStaked||d.total_staked||d.stakedAmount||d.staked||d.totalDelegated;
       if(staked) D.staked=parseFloat(staked);
       const apr=d.stakingApr||d.apr||d.annualizedReturn||d.yield;
       if(apr!=null) D.apr=parseFloat(apr);
-      // Also grab burned if available
       if(d.totalBurned||d.burnedSupply) D.burned=parseFloat(d.totalBurned||d.burnedSupply);
       console.log('[staking]',JSON.stringify(d).slice(0,300));
     }
   } catch(e){}
-  // Fallback: compute staked from validators
   if(!D.staked && D.validators.length) {
     const tot=D.validators.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||v.stakedAmount||0),0);
     if(tot>0) D.staked=tot;
@@ -586,7 +774,6 @@ async function fAfBal() {
       if(h) D.afBal=parseFloat(h.hold||h.total||h.available||0);
       const u=d.balances.find(b=>b.coin==='USDC');
       if(u) D.afUsdc=parseFloat(u.total||u.hold||u.available||0);
-      console.log('[afBal balances]',JSON.stringify(d.balances).slice(0,300));
     }
   } catch(e){}
 }
@@ -595,27 +782,16 @@ async function fAfOrders() {
 }
 async function fDelegations() {
   const d=await hs('/delegations');
-  if(Array.isArray(d)&&d.length) {
-    D.delegations=d;
-    console.log('[delegation sample]',JSON.stringify(d[0]).slice(0,400));
-  }
+  if(Array.isArray(d)&&d.length) { D.delegations=d; }
 }
 async function fQueue() {
   let d=await hs('/fullUnstakingQueue');
   if(d){
     const arr=Array.isArray(d)?d:(d.queue||d.data||d.entries||[]);
-    if(arr.length){
-      D.queue=arr;
-      console.log('[queue sample]',JSON.stringify(arr[0]).slice(0,400));
-      return;
-    }
+    if(arr.length){ D.queue=arr; return; }
   }
   d=await hs('/unstakingQueue');
-  if(d){
-    const arr=Array.isArray(d)?d:(d.queue||d.data||[]);
-    D.queue=arr;
-    if(arr.length) console.log('[queue2 sample]',JSON.stringify(arr[0]).slice(0,400));
-  }
+  if(d){ const arr=Array.isArray(d)?d:(d.queue||d.data||[]); D.queue=arr; }
 }
 async function fTransfers() {
   let d=await hs('/aLotOfTransfers'); if(Array.isArray(d)&&d.length){D.transfers=d;return;}
@@ -625,21 +801,13 @@ async function fFees() {
   const [recent,all]=await Promise.all([hs('/feesRecent'),hs('/fees')]);
   if(Array.isArray(recent)&&recent.length){
     D.feesRecent=recent;
-    console.log('[feesRecent sample]',JSON.stringify(recent[0]).slice(0,400));
     const cut=Date.now()-86400000;
     const pts=recent.filter(p=>+(p.time||p.timestamp||0)>cut);
-    // Try many possible field names for fee amount
     const feeVal=(p)=>parseFloat(p.total||p.fees||p.amount||p.value||p.fee||p.usd||p.usdcVolume||p.totalFees||p.totalUsd||p.revenue||0);
     if(pts.length) D.fees24=pts.reduce((s,p)=>s+feeVal(p),0);
-    // If still 0, try to find non-zero field
-    if(!D.fees24&&recent[0]){
-      const r=recent[0];
-      console.log('[feesRecent keys]',Object.keys(r));
-    }
   }
   if(all){
     if(typeof all==='object'&&!Array.isArray(all)){
-      console.log('[fees all]',JSON.stringify(all).slice(0,400));
       if(all.totalFees||all.total||all.cumulative) D.feesAll=parseFloat(all.totalFees||all.total||all.cumulative||0)||null;
       if(all.totalBurned||all.burned) D.burned=parseFloat(all.totalBurned||all.burned);
     }
@@ -653,15 +821,47 @@ async function fHolders() {
   const d=await hs('/holdersWithLimit/HYPE/20'); if(d?.addresses) D.holders=d.addresses;
 }
 
+// ─── NEW: GLOBAL PERP STATS FETCHER ──────────────────────────────────────
+async function fPerpStats() {
+  try {
+    const d = await hl({type:'metaAndAssetCtxs'});
+    if(Array.isArray(d)&&d.length>=2) {
+      D.perpMeta = d[0]; // { universe: [...] }
+      D.perpCtxs = d[1]; // array of asset contexts
+      // Build enriched markets array
+      const universe = D.perpMeta?.universe || [];
+      let totalOI = 0, totalVol = 0;
+      D.markets = universe.map((u,i) => {
+        const ctx = D.perpCtxs[i] || {};
+        const name = u.name || u.coin || ('Asset-'+i);
+        const mid = parseFloat(ctx.midPx || ctx.markPx || D.allMids[name] || 0);
+        const oi = parseFloat(ctx.openInterest || 0);
+        const oiUsd = oi * mid;
+        const vol = parseFloat(ctx.dayNtlVlm || 0);
+        const funding = parseFloat(ctx.funding || 0);
+        const premium = parseFloat(ctx.premium || 0);
+        const prevPx = parseFloat(ctx.prevDayPx || 0);
+        const chg = prevPx > 0 ? ((mid - prevPx) / prevPx * 100) : 0;
+        totalOI += oiUsd;
+        totalVol += vol;
+        return { name, mid, oi, oiUsd, vol, funding, premium, chg, szDecimals: u.szDecimals };
+      }).filter(m => m.mid > 0);
+      D.totalOI = totalOI;
+      D.totalPerpVol = totalVol;
+      D.markets.sort((a,b) => b.oiUsd - a.oiUsd);
+      console.log('[perp markets]', D.markets.length, 'total OI:', F.usd(totalOI));
+    }
+  } catch(e) { console.warn('fPerpStats', e); }
+}
+
 // ─── MASTER LOAD ───────────────────────────────────────────────────────────
 async function loadAll() {
   const btn=document.getElementById('refreshBtn');
   btn.textContent='⟳ ...'; btn.classList.add('busy');
   setStatus('FETCHING','yellow');
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders()]);
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders(),fPerpStats()]);
   setStatus('LIVE','green');
   renderAll();
-  // Refresh charts if currently visible
   if(document.getElementById('tab-charts').classList.contains('active')) {
     if(_priceChart && _priceCandleData.length) _drawPriceSeries();
     if(_burnChart) _drawBurnSeries();
@@ -685,7 +885,6 @@ function getQAmt(e){return parseFloat(e.amount||e.hype||e.nHype||e.value||e.unst
 function renderAll() {
   const qt=D.queue.reduce((s,e)=>s+getQAmt(e),0);
 
-  // Fallback: compute staked from validators total if not available from stakingSummary
   if(!D.staked && D.validators.length) {
     const tot=D.validators.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||v.stakedAmount||v.amount||0),0);
     if(tot>0) D.staked=tot;
@@ -714,6 +913,16 @@ function renderAll() {
   if(D.price) set('sbFdv',F.usd(D.price*MAX_S));
   if(D.price&&D.circSupply) set('sbMcap',F.usd(D.price*D.circSupply));
 
+  // Platform stats in sidebar
+  if(D.totalOI) { set('sbTotalOI',F.usd(D.totalOI)); set('rsTotalOI',F.usd(D.totalOI)); }
+  if(D.totalPerpVol) { set('sbPerpVol',F.usd(D.totalPerpVol)); set('rsPerpVol',F.usd(D.totalPerpVol)); }
+  if(D.markets.length) set('rsMarkets',D.markets.length);
+  // Top funding
+  if(D.markets.length) {
+    const topF = [...D.markets].sort((a,b)=>Math.abs(b.funding)-Math.abs(a.funding))[0];
+    if(topF) set('rsTopFunding', topF.name+' '+(topF.funding*100).toFixed(4)+'%');
+  }
+
   const sp=D.staked?(D.staked/MAX_S)*100:0;
   let bull=0,bear=0;
   if(sp>35)bull++; if(sp<15)bear++;
@@ -739,6 +948,7 @@ function renderAll() {
   if(D.fees24&&D.price) lines.push(`🔥 Today's fees (~${F.usd(D.fees24)}) imply <strong>${F.c(D.fees24/D.price)} HYPE</strong> burned at current prices.`);
   if(D.afOrders.length){const tot=D.afOrders.reduce((s,o)=>s+parseFloat(o.sz||0),0);const avg=D.afOrders.reduce((s,o)=>s+parseFloat(o.limitPx||o.px||0),0)/D.afOrders.length;lines.push(`📡 AF has <strong>${D.afOrders.length} open buy bid${D.afOrders.length>1?'s':''}</strong> (~${F.c(tot)} HYPE, avg $${F.f2(avg)}) — protocol backstop active.`)}
   if(D.priceChg!=null) lines.push(`${D.priceChg>=0?'↑':'↓'} Price <strong>${F.pct(D.priceChg)}</strong> in 24h @ $${F.f2(D.price)}.`);
+  if(D.totalPerpVol) lines.push(`📊 Platform 24h perp volume: <strong>${F.usd(D.totalPerpVol)}</strong> across ${D.markets.length} markets.`);
   if(!lines.length) lines.push('Fetching live data from Hyperliquid API + HypurrScan...');
   htm('insightBody',lines.join('<br><br>'));
 
@@ -750,6 +960,11 @@ function renderAll() {
   if(D.fees24>2e6) alerts.push({i:'🔥',t:`High fee day: ${F.usd(D.fees24)} in 24h`});
   else if(D.fees24) alerts.push({i:'💰',t:`24h fees: ${F.usd(D.fees24)} → AF → HYPE burns`});
   if(D.priceChg!=null&&D.priceChg<-8) alerts.push({i:'📉',t:`Price down ${F.pct(D.priceChg)} — watch AF bids + staking`});
+  // Funding alerts
+  if(D.markets.length) {
+    const extreme = D.markets.filter(m=>Math.abs(m.funding)>0.001).sort((a,b)=>Math.abs(b.funding)-Math.abs(a.funding))[0];
+    if(extreme) alerts.push({i:'📈',t:`${extreme.name} funding ${(extreme.funding*100).toFixed(3)}% — ${extreme.funding>0?'longs paying shorts':'shorts paying longs'}`});
+  }
   if(!alerts.length) alerts.push({i:'✅',t:'No critical alerts. Monitoring all feeds.'});
   htm('alertsPanel',alerts.map(a=>`<div class="alert-row"><span class="alert-ico">${a.i}</span><span>${a.t}</span></div>`).join(''));
 
@@ -764,7 +979,9 @@ function renderAll() {
   renderUnstakingHistogram();
   drawFeeCanvasChart();
   drawValDonut();
-  // Draw KPI sparklines from feesRecent as proxy for activity
+  renderGlobalStats();
+  renderMarketExplorer();
+
   setTimeout(()=>{
     const feeVal=(p)=>parseFloat(p.total||p.fees||p.amount||p.value||p.fee||p.usd||p.usdcVolume||p.totalFees||0);
     const fv=D.feesRecent.map(feeVal).filter(v=>v>0);
@@ -775,6 +992,7 @@ function renderAll() {
   set('tbUQ',D.queue.length||'0');
 }
 
+// ─── EXISTING RENDER FUNCTIONS ────────────────────────────────────────────
 function renderOverviewFeed() {
   const all=[...D.delegations.slice(0,10).map(e=>({...e,_t:'delegation'})),...D.transfers.slice(0,10).map(e=>({...e,_t:'transfer'}))].sort((a,b)=>+(b.time||b.timestamp||0)-(+(a.time||a.timestamp||0))).slice(0,20);
   htm('overviewFeed',all.length?all.map(e=>feedRow(e)).join(''):es('No events yet','Will populate from /delegations + /aLotOfTransfers'));
@@ -790,7 +1008,6 @@ function renderQueueList(qt) {
       const unlockTs=e.unlockTime||e.unlock_time||e.completionTime||e.finishTime||e.unlockAt;
       const cd=unlockTs?F.cd(unlockTs):{txt:'Unknown',urgent:false,pct:50};
       const val=e.validator||e.validatorAddress||e.validatorAddr||e.from||e.dest||'';
-      // Try to get validator name from loaded validators
       const valInfo=val?D.validators.find(v=>(v.validator||v.address||'').toLowerCase()===val.toLowerCase()):null;
       const valName=valInfo?(valInfo.name||valInfo.moniker||F.addr(val)):val?F.addr(val):'—';
       return `<div class="qi"><div><div class="qi-addr" onclick="openAddr('${addr}')">${F.addr(addr)}</div><div class="qi-sub">Validator: <span style="color:var(--text-dim)">${valName}</span></div><div class="prog"><div class="prog-fill" style="width:${cd.pct||0}%"></div></div></div><div><div class="qi-amt">−${amt>0?F.c(amt):'?'} HYPE</div><div class="qi-usd">${D.price&&amt?F.usd(amt*D.price):'—'}</div></div><div><div class="qi-cd" style="color:${cd.urgent?'var(--red)':'var(--text-dim)'}">${cd.txt}</div><div class="qi-pct">${qt>0&&amt?(amt/qt*100).toFixed(1)+'% of Q':'—'}</div></div></div>`;
@@ -824,7 +1041,6 @@ function renderFees() {
   if(D.feesAll) set('kFeeAll',F.usd(D.feesAll));
   if(D.fees24){ set('kFee24',F.usd(D.fees24)); set('feeMetaLabel',F.usd(D.fees24)); }
   if(D.fees24&&D.price) set('kFeeRate',F.c(D.fees24/D.price)+' HYPE/day');
-  const feeVal=(p)=>parseFloat(p.total||p.fees||p.amount||p.value||p.fee||p.usd||p.usdcVolume||p.totalFees||0);
   const recent24=[...D.feesRecent].filter(p=>+(p.time||p.timestamp||0)>Date.now()-86400000).sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
   renderFeeBarChart('feeChart24h',recent24.slice(-12),'h');
   const all48=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
@@ -891,10 +1107,7 @@ function renderFeeSparkline() {
 function feedRow(e,forceType) {
   const ts=e.time||e.timestamp||e.createdAt||e.blockTime;
   const addr=e.user||e.address||e.from||e.delegator||e.wallet||e.sender;
-  // Validator: check nested action object too
-  const valRaw=e.validator||e.validatorAddress||e.validatorAddr||e.to||
-    e.action?.validator||e.action?.validatorAddress||e.dest||'';
-  // Try to resolve validator name from loaded data
+  const valRaw=e.validator||e.validatorAddress||e.validatorAddr||e.to||e.action?.validator||e.action?.validatorAddress||e.dest||'';
   const valInfo=valRaw?D.validators.find(v=>(v.validator||v.address||'').toLowerCase()===(valRaw||'').toLowerCase()):null;
   const to=valInfo?(valInfo.name||valInfo.moniker||F.addr(valRaw)):valRaw?F.addr(valRaw):'—';
   const amt=getQAmt(e)||parseFloat(e.sz||0);
@@ -921,7 +1134,7 @@ function feedRow(e,forceType) {
 function es(msg,src){return`<div class="es">${msg}<br><span style="font-size:9px;color:var(--text-dim)">${src||''}</span></div>`;}
 function openAddr(a){if(!a||a==='undefined')return;window.open('https://hypurrscan.io/address/'+a,'_blank');}
 
-// ─── MINI SPARKLINE for KPI cards ─────────────────────────────────────────
+// ─── SPARKLINE ────────────────────────────────────────────────────────────
 function drawSparkline(canvasId, values, color, fill) {
   const cv=document.getElementById(canvasId); if(!cv||values.length<2)return;
   const W=cv.parentElement.clientWidth||200, H=32;
@@ -941,7 +1154,6 @@ function drawSparkline(canvasId, values, color, fill) {
   ctx.beginPath();
   values.forEach((v,i)=>{const x=P+i*step,y=H-P-((v-min)/range)*(H-P*2);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
   ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
-  // Draw last point dot
   const lx=P+(values.length-1)*step, ly=H-P-((values[values.length-1]-min)/range)*(H-P*2);
   ctx.beginPath(); ctx.arc(lx,ly,2.5,0,Math.PI*2);
   ctx.fillStyle=color; ctx.fill();
@@ -955,18 +1167,14 @@ function drawFeeCanvasChart() {
   cv.width=W; cv.height=H;
   const ctx=cv.getContext('2d');
   ctx.clearRect(0,0,W,H);
-
   const sorted=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));
   const feeVal=(p)=>parseFloat(p.total||p.fees||p.amount||p.value||p.fee||p.usd||p.usdcVolume||p.totalFees||0);
   const pts=sorted.slice(-48);
   if(pts.length<2){ctx.fillStyle='#4a6678';ctx.font='11px IBM Plex Mono,monospace';ctx.textAlign='center';ctx.fillText('Fee data loading...',W/2,H/2);return;}
-
   const vals=pts.map(feeVal);
   const max=Math.max(...vals)||1;
   const P=30, PB=20, barW=Math.max(3,(W-P-10)/pts.length-1);
   const barArea=H-P-PB;
-
-  // Grid lines
   ctx.strokeStyle='rgba(26,36,48,0.8)'; ctx.lineWidth=1;
   [0.25,0.5,0.75,1].forEach(f=>{
     const y=P+barArea*(1-f);
@@ -974,8 +1182,6 @@ function drawFeeCanvasChart() {
     ctx.fillStyle='#4a6678'; ctx.font='8px IBM Plex Mono,monospace'; ctx.textAlign='right';
     ctx.fillText('$'+F.c(max*f),P-3,y+3);
   });
-
-  // Bars
   pts.forEach((p,i)=>{
     const v=feeVal(p);
     const bh=Math.max(1,(v/max)*barArea);
@@ -985,15 +1191,12 @@ function drawFeeCanvasChart() {
     grad.addColorStop(0,'rgba(187,134,252,0.9)'); grad.addColorStop(1,'rgba(187,134,252,0.2)');
     ctx.fillStyle=grad;
     ctx.fillRect(x,y,barW,bh);
-    // Time label every 8 bars
     if(i%8===0||(i===pts.length-1)){
       const ts=+(p.time||p.timestamp||0);
       ctx.fillStyle='#4a6678'; ctx.font='8px IBM Plex Mono,monospace'; ctx.textAlign='center';
       ctx.fillText(ts?new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',hour12:false}):'—',x+barW/2,H-4);
     }
   });
-
-  // Most recent value highlight
   const last=vals[vals.length-1];
   ctx.fillStyle='rgba(187,134,252,0.9)'; ctx.font='bold 10px IBM Plex Mono,monospace'; ctx.textAlign='left';
   ctx.fillText('Latest: $'+F.f2(last), P, P-6);
@@ -1006,38 +1209,25 @@ function drawValDonut() {
   const ctx=cv.getContext('2d');
   const W=120, H=120, R=50, r=28;
   ctx.clearRect(0,0,W,H);
-
   const valsWithStake=D.validators.filter(v=>parseFloat(v.stake||v.totalStake||v.stakedAmount||0)>0);
   const total=valsWithStake.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||v.stakedAmount||0),0);
   if(!total)return;
-
   const top=valsWithStake.slice(0,9);
   const otherStake=valsWithStake.slice(9).reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||v.stakedAmount||0),0);
   const slices=[...top.map((v,i)=>({name:v.name||v.moniker||F.addr(v.validator||v.address||''),stake:parseFloat(v.stake||v.totalStake||v.stakedAmount||0),color:DONUT_COLORS[i]}))];
   if(otherStake>0) slices.push({name:'Others',stake:otherStake,color:'#263545'});
-
   let startAngle=-Math.PI/2;
   slices.forEach(s=>{
     const angle=(s.stake/total)*Math.PI*2;
-    ctx.beginPath();
-    ctx.moveTo(W/2,H/2);
-    ctx.arc(W/2,H/2,R,startAngle,startAngle+angle);
-    ctx.closePath();
+    ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.arc(W/2,H/2,R,startAngle,startAngle+angle); ctx.closePath();
     ctx.fillStyle=s.color; ctx.fill();
     startAngle+=angle;
   });
-
-  // Inner hole
-  ctx.beginPath(); ctx.arc(W/2,H/2,r,0,Math.PI*2);
-  ctx.fillStyle='#060a0e'; ctx.fill();
-
-  // Center text
+  ctx.beginPath(); ctx.arc(W/2,H/2,r,0,Math.PI*2); ctx.fillStyle='#060a0e'; ctx.fill();
   ctx.fillStyle='#b8ccd8'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.textAlign='center';
   ctx.fillText(slices.length+' vals',W/2,H/2-2);
   ctx.fillStyle='#4a6678'; ctx.font='8px IBM Plex Mono,monospace';
   ctx.fillText(F.c(total),W/2,H/2+10);
-
-  // Legend
   const leg=document.getElementById('valLegend'); if(!leg)return;
   leg.innerHTML=slices.slice(0,8).map(s=>`<div class="val-legend-row"><div class="val-legend-name"><div class="val-legend-dot" style="background:${s.color}"></div>${s.name.length>18?s.name.slice(0,16)+'…':s.name}</div><div class="val-legend-pct">${(s.stake/total*100).toFixed(1)}%</div></div>`).join('');
 }
@@ -1045,13 +1235,12 @@ function drawValDonut() {
 // ─── UNSTAKING HISTOGRAM ──────────────────────────────────────────────────
 function renderUnstakingHistogram() {
   if(!D.queue.length){ htm('unstakeHistogram',`<div class="es">Load unstaking data first</div>`); return; }
-  // Bucket by day (0-8 days from now)
   const buckets=Array.from({length:9},(_,i)=>({label:i===0?'<24h':`Day ${i+1}`,hype:0,count:0}));
   const now=Date.now();
   D.queue.forEach(e=>{
     const amt=getQAmt(e);
     const unlockTs=+(e.unlockTime||e.unlock_time||e.completionTime||e.finishTime||e.unlockAt||0);
-    const daysLeft=unlockTs>0?Math.floor((unlockTs-now)/86400000):4; // default mid
+    const daysLeft=unlockTs>0?Math.floor((unlockTs-now)/86400000):4;
     const idx=Math.max(0,Math.min(8,daysLeft));
     buckets[idx].hype+=amt; buckets[idx].count++;
   });
@@ -1067,24 +1256,261 @@ function renderUnstakingHistogram() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// NEW: GLOBAL STATS RENDERER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderGlobalStats() {
+  if(!D.markets.length) return;
+
+  set('gsVol24', F.usd(D.totalPerpVol));
+  set('gsVol24S', D.markets.length + ' active markets');
+  set('gsTotalOI', F.usd(D.totalOI));
+  set('gsTotalOIS', 'Across ' + D.markets.length + ' perp pairs');
+  set('gsMarkets', D.markets.length);
+
+  // Top markets by OI
+  const topOI = D.markets.slice(0, 15);
+  const maxOI = topOI[0]?.oiUsd || 1;
+  htm('gsTopOIList', topOI.map(m => {
+    const w = (m.oiUsd / maxOI * 100).toFixed(1);
+    const fundClr = m.funding >= 0 ? 'var(--green)' : 'var(--red)';
+    return `<div class="fbrow" style="padding:4px 13px"><div class="fblabel" style="width:70px;font-size:10px;color:var(--text-bright);font-weight:500">${m.name}</div><div class="fbout" style="height:18px"><div class="fbin" style="width:${w}%;background:linear-gradient(90deg,var(--accent) 0%,rgba(0,212,255,.3) 100%)"></div><div class="fbval">${F.usd(m.oiUsd)} · <span style="color:${fundClr}">${(m.funding*100).toFixed(4)}%</span></div></div></div>`;
+  }).join(''));
+  set('gsTopOIMeta', `Top ${topOI.length} markets by open interest`);
+
+  // Top markets by volume
+  const topVol = [...D.markets].sort((a,b) => b.vol - a.vol).slice(0, 10);
+  const maxVol = topVol[0]?.vol || 1;
+  htm('gsTopVolList', topVol.map(m => {
+    const w = (m.vol / maxVol * 100).toFixed(1);
+    return `<div class="fbrow" style="padding:4px 13px"><div class="fblabel" style="width:70px;font-size:10px;color:var(--text-bright);font-weight:500">${m.name}</div><div class="fbout" style="height:18px"><div class="fbin" style="width:${w}%;background:linear-gradient(90deg,var(--green) 0%,rgba(0,230,118,.3) 100%)"></div><div class="fbval">${F.usd(m.vol)}</div></div></div>`;
+  }).join(''));
+
+  // Funding snapshot
+  const fundingSorted = [...D.markets].filter(m => m.funding !== 0).sort((a,b) => Math.abs(b.funding) - Math.abs(a.funding)).slice(0, 12);
+  htm('gsFundingList', fundingSorted.map(m => {
+    const pct = (m.funding * 100).toFixed(4);
+    const clr = m.funding >= 0 ? 'var(--green)' : 'var(--red)';
+    const dir = m.funding >= 0 ? 'Longs → Shorts' : 'Shorts → Longs';
+    const annual = (m.funding * 100 * 3 * 365).toFixed(1);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 13px;border-bottom:1px solid rgba(26,36,48,.5);font-size:10px"><span style="color:var(--text-bright);font-weight:500;width:70px">${m.name}</span><span style="color:${clr};font-weight:700;font-variant-numeric:tabular-nums">${pct}%</span><span style="color:var(--text-dim);font-size:9px">${dir}</span><span style="color:var(--text-dim);font-size:9px">${annual}% APR</span></div>`;
+  }).join(''));
+
+  // Summary insight
+  const topByFunding = fundingSorted[0];
+  const summaryLines = [];
+  summaryLines.push(`Platform is running <strong>${D.markets.length} perpetual markets</strong> with <strong>${F.usd(D.totalOI)}</strong> total open interest.`);
+  summaryLines.push(`24h trading volume: <strong>${F.usd(D.totalPerpVol)}</strong>.`);
+  if(topByFunding) {
+    const fDir = topByFunding.funding > 0 ? 'positive' : 'negative';
+    summaryLines.push(`Most extreme funding: <strong>${topByFunding.name}</strong> at <strong>${(topByFunding.funding*100).toFixed(4)}%</strong> (${fDir}) — ${topByFunding.funding > 0 ? 'overcrowded longs, mean-reversion risk' : 'crowded shorts, squeeze potential'}.`);
+  }
+  if(D.fees24 && D.totalPerpVol) {
+    const feeRate = (D.fees24 / D.totalPerpVol * 100).toFixed(4);
+    summaryLines.push(`Effective fee rate: ~${feeRate}% of volume → all flows to HYPE buyback + burn.`);
+  }
+  htm('gsSummary', summaryLines.join('<br><br>'));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NEW: MARKET EXPLORER RENDERER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderMarketExplorer() {
+  if(!D.markets.length) return;
+  const container = $('mktExplorer');
+  const hdr = `<div class="mkt-row hdr"><div>Market</div><div style="text-align:right">Price</div><div style="text-align:right">24h Chg</div><div style="text-align:right">Open Interest</div><div style="text-align:right">24h Volume</div><div style="text-align:right">Funding (8h)</div><div style="text-align:right">Premium</div></div>`;
+
+  const rows = D.markets.slice(0, 50).map(m => {
+    const chgClr = m.chg >= 0 ? 'var(--green)' : 'var(--red)';
+    const fundClr = m.funding >= 0 ? 'pos' : 'neg';
+    return `<div class="mkt-row" onclick="showMktDetail('${m.name}')" style="cursor:pointer">
+      <div class="mkt-coin">${m.name}</div>
+      <div style="text-align:right;color:var(--text-bright)">$${m.mid < 1 ? F.f4(m.mid) : F.f2(m.mid)}</div>
+      <div style="text-align:right;color:${chgClr}">${F.pct(m.chg)}</div>
+      <div style="text-align:right">${F.usd(m.oiUsd)}</div>
+      <div style="text-align:right">${F.usd(m.vol)}</div>
+      <div style="text-align:right" class="mkt-funding ${fundClr}">${(m.funding*100).toFixed(4)}%</div>
+      <div style="text-align:right;color:var(--text-dim)">${(m.premium*100).toFixed(4)}%</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = hdr + rows;
+}
+
+let _mktDetailChart = null;
+async function showMktDetail(coin) {
+  const m = D.markets.find(x => x.name === coin);
+  if(!m) return;
+  const panel = $('mktDetailPanel');
+  panel.style.display = 'block';
+  set('mktDetailTitle', coin + ' / USD — Detail');
+  set('mdOI', F.usd(m.oiUsd));
+  set('mdVol', F.usd(m.vol));
+  set('mdFunding', (m.funding*100).toFixed(4) + '%');
+
+  // Fetch funding history chart
+  const wrap = $('mktDetailChartWrap');
+  if(_mktDetailChart) { try{_mktDetailChart.remove();}catch(e){} _mktDetailChart=null; }
+  wrap.innerHTML = '';
+  const {w,h} = {w: Math.max(wrap.clientWidth, 200), h: wrap.clientHeight || 220};
+
+  try {
+    const endTime = Date.now(), startTime = endTime - 7*86400000;
+    const candles = await hl({type:'candleSnapshot', req:{coin, interval:'1h', startTime, endTime}});
+    if(Array.isArray(candles) && candles.length > 2) {
+      _mktDetailChart = LightweightCharts.createChart(wrap, _lcBase({width:w, height:h}));
+      const series = _mktDetailChart.addCandlestickSeries({
+        upColor:'#00e676', downColor:'#ff3d50',
+        borderUpColor:'#00e676', borderDownColor:'#ff3d50',
+        wickUpColor:'rgba(0,230,118,0.7)', wickDownColor:'rgba(255,61,80,0.7)',
+      });
+      series.setData(candles.map(c=>({time:Math.floor(c.t/1000),open:+c.o,high:+c.h,low:+c.l,close:+c.c})).sort((a,b)=>a.time-b.time));
+      _mktDetailChart.timeScale().fitContent();
+    }
+  } catch(e) { wrap.innerHTML = '<div class="es">Could not load chart for '+coin+'</div>'; }
+}
+function closeMktDetail() { $('mktDetailPanel').style.display='none'; if(_mktDetailChart){try{_mktDetailChart.remove();}catch(e){}_mktDetailChart=null;} }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NEW: WALLET INTELLIGENCE
+// ═══════════════════════════════════════════════════════════════════════════
+let _whaleWatch = JSON.parse(localStorage.getItem('hl_whalewatch') || '[]');
+renderWhaleWatch();
+
+function renderWhaleWatch() {
+  const el = $('whaleWatchList');
+  if(!el) return;
+  el.innerHTML = _whaleWatch.map((addr,i) => `<div class="wallet-tag" onclick="document.getElementById('walletAddr').value='${addr}';lookupWallet()"><span>${F.addr(addr)}</span><span class="tag-x" onclick="event.stopPropagation();removeWatch(${i})">✕</span></div>`).join('');
+}
+function saveWatchAddr() {
+  const addr = $('walletAddr').value.trim();
+  if(!addr || !addr.startsWith('0x')) return;
+  if(!_whaleWatch.includes(addr)) { _whaleWatch.push(addr); localStorage.setItem('hl_whalewatch', JSON.stringify(_whaleWatch)); renderWhaleWatch(); }
+}
+function removeWatch(i) { _whaleWatch.splice(i,1); localStorage.setItem('hl_whalewatch', JSON.stringify(_whaleWatch)); renderWhaleWatch(); }
+
+async function lookupWallet() {
+  const addr = $('walletAddr').value.trim();
+  if(!addr || !addr.startsWith('0x')) { alert('Enter a valid 0x address'); return; }
+
+  const btn = $('walletLookupBtn');
+  btn.textContent = '⏳ LOADING...'; btn.classList.add('busy');
+  $('walletResults').style.display = 'none';
+
+  // Generate impersonation link
+  const impLink = $('walletImpLink');
+  impLink.href = `https://app.hyperliquid.xyz/trade/HYPE/USDC?hloa=${addr}`;
+  impLink.style.display = 'inline-flex';
+
+  try {
+    // Fetch perp clearinghouse state
+    const [perpState, spotState, orders] = await Promise.allSettled([
+      hl({type:'clearinghouseState', user: addr}),
+      hl({type:'spotClearinghouseState', user: addr}),
+      hl({type:'openOrders', user: addr}),
+    ]);
+
+    const perp = perpState.status === 'fulfilled' ? perpState.value : null;
+    const spot = spotState.status === 'fulfilled' ? spotState.value : null;
+    const ords = orders.status === 'fulfilled' ? orders.value : [];
+
+    $('walletResults').style.display = 'block';
+
+    // Account summary
+    if(perp) {
+      const mv = parseFloat(perp.marginSummary?.accountValue || perp.accountValue || 0);
+      const pnl = parseFloat(perp.marginSummary?.totalNtlPos || 0);
+      const mu = parseFloat(perp.marginSummary?.totalMarginUsed || 0);
+      const positions = perp.assetPositions || [];
+      const openPos = positions.filter(p => {
+        const pos = p.position || p;
+        return parseFloat(pos.szi || pos.size || 0) !== 0;
+      });
+
+      set('wAccVal', F.usd(mv));
+      set('wAccValS', 'Margin account equity');
+
+      // PnL
+      let totalUpnl = 0;
+      openPos.forEach(p => { const pos = p.position || p; totalUpnl += parseFloat(pos.unrealizedPnl || 0); });
+      set('wPnl', (totalUpnl>=0?'+':'') + '$' + F.f2(Math.abs(totalUpnl)));
+      const pnlEl = $('wPnl');
+      if(pnlEl) pnlEl.style.color = totalUpnl >= 0 ? 'var(--green)' : 'var(--red)';
+      set('wPnlS', openPos.length + ' open positions');
+
+      set('wMargin', F.usd(mu));
+      set('wMarginS', mv > 0 ? (mu/mv*100).toFixed(1) + '% utilized' : '—');
+      set('wPosCount', openPos.length);
+
+      // Positions list
+      if(openPos.length) {
+        htm('wPositions', openPos.map(p => {
+          const pos = p.position || p;
+          const coin = pos.coin || p.coin || '?';
+          const sz = parseFloat(pos.szi || pos.size || 0);
+          const side = sz > 0 ? 'LONG' : 'SHORT';
+          const entry = parseFloat(pos.entryPx || 0);
+          const mark = parseFloat(pos.markPx || pos.lastPrice || D.allMids[coin] || 0);
+          const upnl = parseFloat(pos.unrealizedPnl || 0);
+          const lev = parseFloat(pos.leverage?.value || pos.leverage || 0);
+          const notional = Math.abs(sz) * mark;
+          return `<div class="pos-row">
+            <div><div class="pos-coin">${coin}</div><div class="pos-side ${sz>0?'pos-long':'pos-short'}">${side} ${lev?lev+'x':''}</div></div>
+            <div style="font-size:11px"><div style="color:var(--text-dim);font-size:8px">SIZE</div>${F.c(Math.abs(sz))}</div>
+            <div class="pos-val"><div style="color:var(--text-dim);font-size:8px">ENTRY</div>$${F.f2(entry)}</div>
+            <div class="pos-val"><div style="color:var(--text-dim);font-size:8px">MARK</div>$${mark<1?F.f4(mark):F.f2(mark)}</div>
+            <div class="pos-val"><div style="color:var(--text-dim);font-size:8px">UPNL</div><span style="color:${upnl>=0?'var(--green)':'var(--red)'}">${upnl>=0?'+':''}$${F.f2(Math.abs(upnl))}</span></div>
+          </div>`;
+        }).join(''));
+        set('wPosMeta', openPos.length + ' positions · ' + F.usd(openPos.reduce((s,p)=>{const pos=p.position||p;return s+Math.abs(parseFloat(pos.szi||0))*parseFloat(pos.markPx||0);},0)) + ' notional');
+      } else {
+        htm('wPositions', '<div class="es">No open perpetual positions</div>');
+      }
+    }
+
+    // Spot holdings
+    if(spot?.balances?.length) {
+      const bals = spot.balances.filter(b => parseFloat(b.total || b.hold || 0) > 0);
+      htm('wSpotHoldings', bals.length ? bals.map(b => {
+        const coin = b.coin;
+        const total = parseFloat(b.total || b.hold || 0);
+        const mid = parseFloat(D.allMids[coin] || D.allMids['@107'] || 0);
+        return `<div style="display:flex;justify-content:space-between;padding:6px 13px;border-bottom:1px solid rgba(26,36,48,.5);font-size:11px"><span style="color:var(--text-bright);font-weight:500">${coin}</span><span style="font-variant-numeric:tabular-nums">${F.c(total)}${mid?' · '+F.usd(total*mid):''}</span></div>`;
+      }).join('') : '<div class="es">No spot holdings</div>');
+    }
+
+    // Open orders
+    if(Array.isArray(ords) && ords.length) {
+      htm('wOpenOrders', ords.slice(0,20).map(o => {
+        const side = o.side === 'B' ? 'BUY' : 'SELL';
+        const sideClr = o.side === 'B' ? 'var(--green)' : 'var(--red)';
+        return `<div style="display:flex;justify-content:space-between;padding:5px 13px;border-bottom:1px solid rgba(26,36,48,.5);font-size:10px"><span style="color:${sideClr};font-weight:700;width:40px">${side}</span><span style="color:var(--text-bright)">${o.coin||'?'}</span><span>${F.c(o.sz||0)}</span><span>@ $${F.f2(o.limitPx||0)}</span><span style="color:var(--text-dim)">${o.orderType||''}</span></div>`;
+      }).join(''));
+      set('wOrdersMeta', ords.length + ' resting orders');
+    } else {
+      htm('wOpenOrders', '<div class="es">No open orders</div>');
+    }
+
+  } catch(e) {
+    console.error('wallet lookup', e);
+    $('walletResults').style.display = 'block';
+    htm('wPositions', `<div class="es">Error fetching data: ${e.message}</div>`);
+  }
+
+  btn.textContent = '🔍 LOOKUP'; btn.classList.remove('busy');
+}
+
+// Enter key on wallet input
+$('walletAddr')?.addEventListener('keydown', e => { if(e.key === 'Enter') lookupWallet(); });
+
+
+// ═══════════════════════════════════════════════════════════════════════════
 // LIGHTWEIGHT CHARTS — AF LIVE + PRICE + BURN
-// Key fix: _lcBase() is a FUNCTION, never a top-level const.
-// LightweightCharts.CrosshairMode is only referenced inside function calls,
-// never at module parse time (which caused "LightweightCharts is not defined").
 // ═══════════════════════════════════════════════════════════════════════════
 
 function _lcBase(extra) {
   return Object.assign({
-    layout: {
-      background: { color: '#060a0e' },
-      textColor: '#4a6678',
-      fontFamily: "'IBM Plex Mono', monospace",
-      fontSize: 10,
-    },
-    grid: {
-      vertLines: { color: 'rgba(26,36,48,0.65)' },
-      horzLines: { color: 'rgba(26,36,48,0.65)' },
-    },
+    layout: { background: { color: '#060a0e' }, textColor: '#4a6678', fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, },
+    grid: { vertLines: { color: 'rgba(26,36,48,0.65)' }, horzLines: { color: 'rgba(26,36,48,0.65)' }, },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
       vertLine: { color: 'rgba(0,212,255,0.4)', labelBackgroundColor: '#0c1219', width: 1 },
@@ -1092,9 +1518,7 @@ function _lcBase(extra) {
     },
     rightPriceScale: { borderColor: '#1a2430', textColor: '#4a6678' },
     timeScale: { borderColor: '#1a2430', textColor: '#4a6678', timeVisible: true, secondsVisible: true },
-    handleScroll: true,
-    handleScale: true,
-    autoSize: false,
+    handleScroll: true, handleScale: true, autoSize: false,
   }, extra || {});
 }
 
@@ -1103,276 +1527,114 @@ function _wrapSize(id) {
   return el ? { w: Math.max(el.clientWidth, 200), h: el.clientHeight || 280 } : { w: 800, h: 280 };
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// 1. LIVE AF MONITOR CHART
-//    3 line series on shared time axis, updated every 5 seconds:
-//      - HYPE spot price (cyan, left scale)
-//      - AF open bid price (red dashed, left scale)
-//      - AF USDC balance (orange, right scale)
-// ─────────────────────────────────────────────────────────────────────────
-let _afChart = null;
-let _afPriceSeries = null;
-let _afBidSeries = null;
-let _afUsdcSeries = null;
-let _afLiveTimer = null;
-let _afSessionStart = Date.now();
-let _afFeesAtStart = null;  // fees total at session start
-let _afPoints = [];          // { time, price, bid, usdc }
+// ─── AF LIVE MONITOR ───────────────────────────────────────────────────────
+let _afChart=null, _afPriceSeries=null, _afBidSeries=null, _afUsdcSeries=null, _afLiveTimer=null, _afSessionStart=Date.now(), _afFeesAtStart=null, _afPoints=[];
 
 function _initAfChart() {
-  const wrap = document.getElementById('afWrap');
-  if (!wrap) return;
-  if (_afChart) { try { _afChart.remove(); } catch(e){} _afChart = null; }
-  wrap.innerHTML = '';
-
-  const { w, h } = _wrapSize('afWrap');
-
-  _afChart = LightweightCharts.createChart(wrap, _lcBase({
-    width: w, height: h,
-    rightPriceScale: { borderColor: '#1a2430', textColor: '#4a6678',
-      scaleMargins: { top: 0.05, bottom: 0.05 } },
-    leftPriceScale: { visible: false },
-    timeScale: { borderColor: '#1a2430', textColor: '#4a6678', timeVisible: true, secondsVisible: true, rightOffset: 4 },
-  }));
-
-  // HYPE price — cyan solid line
-  _afPriceSeries = _afChart.addLineSeries({
-    color: '#00d4ff',
-    lineWidth: 2,
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'HYPE',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 4,
-    crosshairMarkerBackgroundColor: '#00d4ff',
+  const wrap=$('afWrap'); if(!wrap)return;
+  if(_afChart){try{_afChart.remove();}catch(e){}_afChart=null;}
+  wrap.innerHTML='';
+  const{w,h}=_wrapSize('afWrap');
+  _afChart=LightweightCharts.createChart(wrap,_lcBase({width:w,height:h,rightPriceScale:{borderColor:'#1a2430',textColor:'#4a6678',scaleMargins:{top:0.05,bottom:0.05}},leftPriceScale:{visible:false},timeScale:{borderColor:'#1a2430',textColor:'#4a6678',timeVisible:true,secondsVisible:true,rightOffset:4}}));
+  _afPriceSeries=_afChart.addLineSeries({color:'#00d4ff',lineWidth:2,priceLineVisible:false,lastValueVisible:true,title:'HYPE',crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBackgroundColor:'#00d4ff'});
+  _afBidSeries=_afChart.addLineSeries({color:'#ff3d50',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:true,title:'AF Bid',crosshairMarkerVisible:true,crosshairMarkerRadius:3,crosshairMarkerBackgroundColor:'#ff3d50'});
+  _afUsdcSeries=_afChart.addLineSeries({color:'#ff9a3c',lineWidth:1.5,priceScaleId:'usdc',priceLineVisible:false,lastValueVisible:true,title:'USDC',crosshairMarkerVisible:true,crosshairMarkerRadius:3,crosshairMarkerBackgroundColor:'#ff9a3c'});
+  _afChart.priceScale('usdc').applyOptions({scaleMargins:{top:0.7,bottom:0},visible:true,borderColor:'#1a2430',textColor:'#4a6678'});
+  _afChart.subscribeCrosshairMove(param=>{
+    if(!param.time)return;
+    const px=param.seriesData.get(_afPriceSeries),bid=param.seriesData.get(_afBidSeries),usd=param.seriesData.get(_afUsdcSeries);
+    if(px)set('afLivePrice','$'+F.f2(px.value));
+    if(bid)set('afLiveBid','$'+F.f2(bid.value));
+    if(usd)set('afLiveUsdc',F.c(usd.value)+' USDC');
+    if(px&&bid){const spread=((px.value-bid.value)/px.value*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)';}}
   });
-
-  // AF bid price — red dashed line
-  _afBidSeries = _afChart.addLineSeries({
-    color: '#ff3d50',
-    lineWidth: 1,
-    lineStyle: LightweightCharts.LineStyle.Dashed,
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'AF Bid',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 3,
-    crosshairMarkerBackgroundColor: '#ff3d50',
-  });
-
-  // AF USDC balance — orange, right scale
-  _afUsdcSeries = _afChart.addLineSeries({
-    color: '#ff9a3c',
-    lineWidth: 1.5,
-    priceScaleId: 'usdc',
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'USDC',
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 3,
-    crosshairMarkerBackgroundColor: '#ff9a3c',
-  });
-  _afChart.priceScale('usdc').applyOptions({
-    scaleMargins: { top: 0.7, bottom: 0 },
-    visible: true,
-    borderColor: '#1a2430',
-    textColor: '#4a6678',
-  });
-
-  // Crosshair tooltip
-  _afChart.subscribeCrosshairMove(param => {
-    if (!param.time) return;
-    const px  = param.seriesData.get(_afPriceSeries);
-    const bid = param.seriesData.get(_afBidSeries);
-    const usd = param.seriesData.get(_afUsdcSeries);
-    if (px)  set('afLivePrice', '$' + F.f2(px.value));
-    if (bid) set('afLiveBid',  '$' + F.f2(bid.value));
-    if (usd) set('afLiveUsdc', F.c(usd.value) + ' USDC');
-    if (px && bid) {
-      const spread = ((px.value - bid.value) / px.value * 100).toFixed(3);
-      const el = $('afLiveSpread');
-      if (el) { el.textContent = spread + '%'; el.style.color = parseFloat(spread) < 0.5 ? 'var(--green)' : 'var(--yellow)'; }
-    }
-  });
-
   _redrawAfSeries();
 }
 
 function _redrawAfSeries() {
-  if (!_afChart || !_afPoints.length) return;
-  try {
-    const dedup = (arr) => {
-      const seen = new Set(), out = [];
-      for (const p of arr) { if (!seen.has(p.time)) { seen.add(p.time); out.push(p); } }
-      return out;
-    };
-    _afPriceSeries.setData(dedup(_afPoints.filter(p => p.price != null).map(p => ({ time: p.time, value: p.price }))));
-    _afBidSeries.setData(dedup(_afPoints.filter(p => p.bid != null).map(p => ({ time: p.time, value: p.bid }))));
-    _afUsdcSeries.setData(dedup(_afPoints.filter(p => p.usdc != null).map(p => ({ time: p.time, value: p.usdc }))));
+  if(!_afChart||!_afPoints.length)return;
+  try{
+    const dedup=(arr)=>{const seen=new Set(),out=[];for(const p of arr){if(!seen.has(p.time)){seen.add(p.time);out.push(p);}}return out;};
+    _afPriceSeries.setData(dedup(_afPoints.filter(p=>p.price!=null).map(p=>({time:p.time,value:p.price}))));
+    _afBidSeries.setData(dedup(_afPoints.filter(p=>p.bid!=null).map(p=>({time:p.time,value:p.bid}))));
+    _afUsdcSeries.setData(dedup(_afPoints.filter(p=>p.usdc!=null).map(p=>({time:p.time,value:p.usdc}))));
     _afChart.timeScale().fitContent();
-  } catch(e) { console.warn('af draw', e); }
+  }catch(e){console.warn('af draw',e);}
 }
 
 async function _afLiveTick() {
-  try {
-    // Fetch price
-    const mids = await hl({ type: 'allMids' });
-    const px = parseFloat(mids['@107'] || mids['HYPE'] || 0);
-
-    // Fetch AF state (USDC balance from spotClearinghouseState)
-    let usdc = null;
-    try {
-      const st = await hl({ type: 'spotClearinghouseState', user: AF });
-      if (st?.balances) {
-        const u = st.balances.find(b => b.coin === 'USDC');
-        if (u) usdc = parseFloat(u.total || u.hold || 0);
-      }
-    } catch(e) {}
-
-    // Fetch AF open bid
-    let bid = null, bidSz = null;
-    try {
-      const orders = await hl({ type: 'openOrders', user: AF });
-      if (Array.isArray(orders) && orders.length) {
-        const buyOrders = orders.filter(o => o.side === 'B').sort((a,b) => parseFloat(b.limitPx||0) - parseFloat(a.limitPx||0));
-        if (buyOrders[0]) {
-          bid = parseFloat(buyOrders[0].limitPx || buyOrders[0].px || 0);
-          bidSz = parseFloat(buyOrders[0].sz || 0);
-        }
-      }
-    } catch(e) {}
-
-    // Record point
-    const t = Math.floor(Date.now() / 1000);
-    _afPoints.push({ time: t, price: px || null, bid: bid || null, usdc: usdc || null });
-    // Keep max 2h of 5s ticks = 1440 points
-    if (_afPoints.length > 1440) _afPoints = _afPoints.slice(-1440);
-
-    // Update stats
-    if (px) { D.price = px; set('afLivePrice', '$' + F.f2(px)); set('topPrice', '$' + F.f2(px)); }
-    if (bid) { set('afLiveBid', '$' + F.f2(bid)); }
-    if (bidSz) { set('afLiveSz', F.c(bidSz) + ' HYPE ($' + F.f2(bidSz * (bid||px||1)) + ')'); }
-    if (usdc != null) { set('afLiveUsdc', F.c(usdc) + ' USDC'); }
-    if (px && bid) {
-      const spread = ((px - bid) / px * 100).toFixed(3);
-      const el = $('afLiveSpread');
-      if (el) { el.textContent = spread + '%'; el.style.color = parseFloat(spread) < 0.5 ? 'var(--green)' : 'var(--yellow)'; }
-    }
-
-    // Session fees (from feesRecent, update lazily)
-    if (D.fees24 != null) {
-      if (_afFeesAtStart == null) _afFeesAtStart = D.fees24;
-      const sessionFees = Math.max(0, D.fees24 - _afFeesAtStart);
-      set('afLiveFees', '$' + F.f2(sessionFees));
-    }
-
-    set('afChartMeta', 'Live · Updated ' + new Date().toLocaleTimeString() + ' · ' + _afPoints.length + ' pts');
+  try{
+    const mids=await hl({type:'allMids'}); const px=parseFloat(mids['@107']||mids['HYPE']||0);
+    let usdc=null;
+    try{const st=await hl({type:'spotClearinghouseState',user:AF});if(st?.balances){const u=st.balances.find(b=>b.coin==='USDC');if(u)usdc=parseFloat(u.total||u.hold||0);}}catch(e){}
+    let bid=null,bidSz=null;
+    try{const orders=await hl({type:'openOrders',user:AF});if(Array.isArray(orders)&&orders.length){const buyOrders=orders.filter(o=>o.side==='B').sort((a,b)=>parseFloat(b.limitPx||0)-parseFloat(a.limitPx||0));if(buyOrders[0]){bid=parseFloat(buyOrders[0].limitPx||buyOrders[0].px||0);bidSz=parseFloat(buyOrders[0].sz||0);}}}catch(e){}
+    const t=Math.floor(Date.now()/1000);
+    _afPoints.push({time:t,price:px||null,bid:bid||null,usdc:usdc||null});
+    if(_afPoints.length>1440)_afPoints=_afPoints.slice(-1440);
+    if(px){D.price=px;set('afLivePrice','$'+F.f2(px));set('topPrice','$'+F.f2(px));}
+    if(bid)set('afLiveBid','$'+F.f2(bid));
+    if(bidSz)set('afLiveSz',F.c(bidSz)+' HYPE ($'+F.f2(bidSz*(bid||px||1))+')');
+    if(usdc!=null)set('afLiveUsdc',F.c(usdc)+' USDC');
+    if(px&&bid){const spread=((px-bid)/px*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)';}}
+    if(D.fees24!=null){if(_afFeesAtStart==null)_afFeesAtStart=D.fees24;set('afLiveFees','$'+F.f2(Math.max(0,D.fees24-_afFeesAtStart)));}
+    set('afChartMeta','Live · Updated '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
     _redrawAfSeries();
-  } catch(e) { console.warn('af tick', e); }
+  }catch(e){console.warn('af tick',e);}
 }
+function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000);}
+function _stopAfLive(){if(_afLiveTimer){clearInterval(_afLiveTimer);_afLiveTimer=null;}}
 
-function _startAfLive() {
-  if (_afLiveTimer) clearInterval(_afLiveTimer);
-  _afLiveTick(); // immediate first tick
-  _afLiveTimer = setInterval(_afLiveTick, 5000);
-}
-
-function _stopAfLive() {
-  if (_afLiveTimer) { clearInterval(_afLiveTimer); _afLiveTimer = null; }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// 2. PRICE CANDLESTICK CHART
-// ─────────────────────────────────────────────────────────────────────────
-let _priceChart = null;
-let _priceCandleSeries = null;
-let _priceAreaSeries = null;
-let _priceVolSeries = null;
-let _priceCandleData = [];
-let _priceTf = 60;
-let _priceType = 'candle';
+// ─── PRICE CHART ───────────────────────────────────────────────────────────
+let _priceChart=null,_priceCandleSeries=null,_priceAreaSeries=null,_priceVolSeries=null,_priceCandleData=[],_priceTf=60,_priceType='candle';
 
 function _initPriceChart() {
-  const wrap = document.getElementById('priceWrap');
-  if (!wrap) return;
-  if (_priceChart) { try { _priceChart.remove(); } catch(e){} _priceChart = null; }
-  _priceCandleSeries = null; _priceAreaSeries = null; _priceVolSeries = null;
-  wrap.innerHTML = '';
-
-  const { w, h } = _wrapSize('priceWrap');
-  _priceChart = LightweightCharts.createChart(wrap, _lcBase({ width: w, height: h }));
-
-  if (_priceType === 'area') {
-    _priceAreaSeries = _priceChart.addAreaSeries({
-      lineColor: '#00d4ff', topColor: 'rgba(0,212,255,0.2)', bottomColor: 'rgba(0,212,255,0.01)',
-      lineWidth: 2, priceLineVisible: true, priceLineColor: 'rgba(0,212,255,0.3)',
-      crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
-    });
-  } else {
-    _priceCandleSeries = _priceChart.addCandlestickSeries({
-      upColor: '#00e676', downColor: '#ff3d50',
-      borderUpColor: '#00e676', borderDownColor: '#ff3d50',
-      wickUpColor: 'rgba(0,230,118,0.7)', wickDownColor: 'rgba(255,61,80,0.7)',
-      priceLineVisible: true, priceLineColor: 'rgba(0,212,255,0.3)',
-    });
+  const wrap=$('priceWrap'); if(!wrap)return;
+  if(_priceChart){try{_priceChart.remove();}catch(e){}_priceChart=null;}
+  _priceCandleSeries=null;_priceAreaSeries=null;_priceVolSeries=null;
+  wrap.innerHTML='';
+  const{w,h}=_wrapSize('priceWrap');
+  _priceChart=LightweightCharts.createChart(wrap,_lcBase({width:w,height:h}));
+  if(_priceType==='area'){
+    _priceAreaSeries=_priceChart.addAreaSeries({lineColor:'#00d4ff',topColor:'rgba(0,212,255,0.2)',bottomColor:'rgba(0,212,255,0.01)',lineWidth:2,priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.3)',crosshairMarkerVisible:true,crosshairMarkerRadius:4});
+  }else{
+    _priceCandleSeries=_priceChart.addCandlestickSeries({upColor:'#00e676',downColor:'#ff3d50',borderUpColor:'#00e676',borderDownColor:'#ff3d50',wickUpColor:'rgba(0,230,118,0.7)',wickDownColor:'rgba(255,61,80,0.7)',priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.3)'});
   }
-
-  _priceVolSeries = _priceChart.addHistogramSeries({
-    color: 'rgba(0,212,255,0.1)', priceFormat: { type: 'volume' },
-    priceScaleId: 'vol', lastValueVisible: false, priceLineVisible: false,
+  _priceVolSeries=_priceChart.addHistogramSeries({color:'rgba(0,212,255,0.1)',priceFormat:{type:'volume'},priceScaleId:'vol',lastValueVisible:false,priceLineVisible:false});
+  _priceChart.priceScale('vol').applyOptions({scaleMargins:{top:0.85,bottom:0},visible:false});
+  const activeSeries=()=>_priceType==='area'?_priceAreaSeries:_priceCandleSeries;
+  _priceChart.subscribeCrosshairMove(param=>{
+    const s=activeSeries();if(!s||!param.time)return;
+    const d=param.seriesData.get(s);if(!d)return;
+    if(_priceType==='candle'){const chg=d.close-d.open,pct=(chg/d.open*100).toFixed(2);set('csO','$'+F.f2(d.open));set('csH','$'+F.f2(d.high));set('csL','$'+F.f2(d.low));set('csC','$'+F.f2(d.close));const el=$('csChg');if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}}else{set('csC','$'+F.f2(d.value||0));}
+    const vd=param.seriesData.get(_priceVolSeries);if(vd)set('csVol',F.c(vd.value));
   });
-  _priceChart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 }, visible: false });
-
-  const activeSeries = () => _priceType === 'area' ? _priceAreaSeries : _priceCandleSeries;
-  _priceChart.subscribeCrosshairMove(param => {
-    const s = activeSeries(); if (!s || !param.time) return;
-    const d = param.seriesData.get(s); if (!d) return;
-    if (_priceType === 'candle') {
-      const chg = d.close - d.open, pct = (chg / d.open * 100).toFixed(2);
-      set('csO','$'+F.f2(d.open)); set('csH','$'+F.f2(d.high));
-      set('csL','$'+F.f2(d.low));  set('csC','$'+F.f2(d.close));
-      const el=$('csChg'); if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}
-    } else { set('csC','$'+F.f2(d.value||0)); }
-    const vd = param.seriesData.get(_priceVolSeries); if(vd) set('csVol',F.c(vd.value));
-  });
-
-  if (_priceCandleData.length) _drawPriceSeries();
+  if(_priceCandleData.length)_drawPriceSeries();
 }
 
 function _drawPriceSeries() {
-  if (!_priceChart || !_priceCandleData.length) return;
-  try {
-    if (_priceType==='area'&&_priceAreaSeries) {
-      _priceAreaSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.close})));
-    } else if (_priceCandleSeries) {
-      _priceCandleSeries.setData(_priceCandleData);
-    }
-    if (_priceVolSeries) {
-      _priceVolSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?'rgba(0,230,118,0.13)':'rgba(255,61,80,0.13)'})));
-    }
-    const last = _priceCandleData[_priceCandleData.length-1];
-    if (last) {
-      const chg=last.close-last.open,pct=(chg/last.open*100).toFixed(2);
-      set('csO','$'+F.f2(last.open));set('csH','$'+F.f2(last.high));
-      set('csL','$'+F.f2(last.low)); set('csC','$'+F.f2(last.close));
-      const el=$('csChg');if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}
-      set('csVol',F.c(last.volume));
-    }
+  if(!_priceChart||!_priceCandleData.length)return;
+  try{
+    if(_priceType==='area'&&_priceAreaSeries){_priceAreaSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.close})));}
+    else if(_priceCandleSeries){_priceCandleSeries.setData(_priceCandleData);}
+    if(_priceVolSeries){_priceVolSeries.setData(_priceCandleData.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?'rgba(0,230,118,0.13)':'rgba(255,61,80,0.13)'})));}
+    const last=_priceCandleData[_priceCandleData.length-1];
+    if(last){const chg=last.close-last.open,pct=(chg/last.open*100).toFixed(2);set('csO','$'+F.f2(last.open));set('csH','$'+F.f2(last.high));set('csL','$'+F.f2(last.low));set('csC','$'+F.f2(last.close));const el=$('csChg');if(el){el.textContent=(chg>=0?'+':'')+F.f2(chg)+' ('+pct+'%)';el.style.color=chg>=0?'var(--green)':'var(--red)';}set('csVol',F.c(last.volume));}
     _priceChart.timeScale().fitContent();
-  } catch(e) { console.warn('price draw',e); }
+  }catch(e){console.warn('price draw',e);}
 }
 
 async function _fetchCandles(tf) {
   const im={60:'1h',240:'4h',1440:'1D',10080:'1W'};
   const interval=im[tf]||'1h';
-  const endTime=Date.now(), startTime=endTime-tf*60*1000*200;
-  try {
+  const endTime=Date.now(),startTime=endTime-tf*60*1000*200;
+  try{
     const d=await hl({type:'candleSnapshot',req:{coin:'@107',interval,startTime,endTime}});
     if(Array.isArray(d)&&d.length){
       _priceCandleData=d.map(c=>({time:Math.floor(c.t/1000),open:parseFloat(c.o),high:parseFloat(c.h),low:parseFloat(c.l),close:parseFloat(c.c),volume:parseFloat(c.v)})).sort((a,b)=>a.time-b.time);
       return true;
     }
-  } catch(e){console.warn('candle fetch',e);}
+  }catch(e){console.warn('candle fetch',e);}
   return false;
 }
 
@@ -1393,23 +1655,16 @@ function setPriceType(type) {
   _initPriceChart();
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// 3. CUMULATIVE BURN CHART
-// ─────────────────────────────────────────────────────────────────────────
+// ─── BURN CHART ────────────────────────────────────────────────────────────
 let _burnChart=null, _burnAreaSeries=null, _burnHours=24;
 
 function _initBurnChart() {
-  const wrap=document.getElementById('burnWrap');
-  if(!wrap)return;
+  const wrap=$('burnWrap'); if(!wrap)return;
   if(_burnChart){try{_burnChart.remove();}catch(e){}_burnChart=null;_burnAreaSeries=null;}
   wrap.innerHTML='';
-  const {w,h}=_wrapSize('burnWrap');
+  const{w,h}=_wrapSize('burnWrap');
   _burnChart=LightweightCharts.createChart(wrap,_lcBase({width:w,height:h,rightPriceScale:{borderColor:'#1a2430',textColor:'#4a6678',scaleMargins:{top:0.1,bottom:0.05}}}));
-  _burnAreaSeries=_burnChart.addAreaSeries({
-    lineColor:'#ff5e1a',topColor:'rgba(255,94,26,0.25)',bottomColor:'rgba(255,94,26,0.01)',
-    lineWidth:2,priceLineVisible:false,crosshairMarkerVisible:true,crosshairMarkerRadius:4,
-    priceFormat:{type:'custom',formatter:v=>F.c(v)+' HYPE'},
-  });
+  _burnAreaSeries=_burnChart.addAreaSeries({lineColor:'#ff5e1a',topColor:'rgba(255,94,26,0.25)',bottomColor:'rgba(255,94,26,0.01)',lineWidth:2,priceLineVisible:false,crosshairMarkerVisible:true,crosshairMarkerRadius:4,priceFormat:{type:'custom',formatter:v=>F.c(v)+' HYPE'}});
   _burnChart.subscribeCrosshairMove(param=>{
     if(!param.time||!_burnAreaSeries)return;
     const d=param.seriesData.get(_burnAreaSeries);
@@ -1434,7 +1689,7 @@ function _drawBurnSeries() {
     if(!seen.has(t)){seen.add(t);pts.push({time:t,value:cum});}
   }
   if(pts.length<2)return;
-  try {
+  try{
     _burnAreaSeries.setData(pts);
     set('bsTotal',F.c(D.burned||cum)+' HYPE');
     set('bsPeriod',F.c(cum)+' HYPE');
@@ -1442,7 +1697,7 @@ function _drawBurnSeries() {
     const tspan=(+(filtered[filtered.length-1].time||filtered[filtered.length-1].timestamp||0)-+(filtered[0].time||filtered[0].timestamp||0))/3600000;
     if(tspan>0)set('bsRate',F.c(cum/tspan)+'/hr');
     _burnChart.timeScale().fitContent();
-  } catch(e){console.warn('burn draw',e);}
+  }catch(e){console.warn('burn draw',e);}
 }
 
 function setBurnWindow(hours,btn) {
@@ -1453,19 +1708,16 @@ function setBurnWindow(hours,btn) {
   if(_burnChart)_burnChart.timeScale().fitContent();
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// RESIZE — always explicit, never auto
-// ─────────────────────────────────────────────────────────────────────────
+// ─── RESIZE ────────────────────────────────────────────────────────────────
 function _resizeCharts() {
   if(_afChart){const{w,h}=_wrapSize('afWrap');_afChart.applyOptions({width:w,height:h});}
   if(_priceChart){const{w,h}=_wrapSize('priceWrap');_priceChart.applyOptions({width:w,height:h});}
   if(_burnChart){const{w,h}=_wrapSize('burnWrap');_burnChart.applyOptions({width:w,height:h});}
+  if(_mktDetailChart){const wrap=$('mktDetailChartWrap');if(wrap){const w=Math.max(wrap.clientWidth,200);_mktDetailChart.applyOptions({width:w,height:220});}}
 }
 window.addEventListener('resize',_resizeCharts);
 
-// ─────────────────────────────────────────────────────────────────────────
-// INIT CHARTS TAB
-// ─────────────────────────────────────────────────────────────────────────
+// ─── INIT CHARTS TAB ───────────────────────────────────────────────────────
 let _chartsInited=false;
 async function _initChartsTab() {
   if(_chartsInited){setTimeout(_resizeCharts,20);return;}
@@ -1473,11 +1725,10 @@ async function _initChartsTab() {
   _initAfChart();
   _initPriceChart();
   _initBurnChart();
-  _startAfLive(); // begin 5s polling
+  _startAfLive();
   await loadPriceChart(_priceTf,document.querySelector('[data-ptf="60"]'));
   setTimeout(_resizeCharts,50);
 }
-
 
 // ─── TABS ──────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t => {
@@ -1490,10 +1741,11 @@ document.querySelectorAll('.tab').forEach(t => {
       setTimeout(_initChartsTab, 30);
     } else {
       _stopAfLive();
-      // Trigger visual redraws for other tabs
       if (t.dataset.tab === 'fees') setTimeout(()=>{drawFeeCanvasChart();}, 50);
       if (t.dataset.tab === 'staking') setTimeout(()=>{drawValDonut();}, 50);
       if (t.dataset.tab === 'unstaking') setTimeout(()=>{renderUnstakingHistogram();}, 50);
+      if (t.dataset.tab === 'globalstats') setTimeout(()=>{renderGlobalStats();}, 50);
+      if (t.dataset.tab === 'markets') setTimeout(()=>{renderMarketExplorer();}, 50);
     }
   });
 });
