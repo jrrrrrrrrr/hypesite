@@ -288,6 +288,48 @@
   .learn-card .example{background:var(--surface2);border-left:2px solid var(--accent2);padding:8px 12px;margin:6px 0;font-size:10px;line-height:1.6;color:var(--text);font-family:var(--sans)}
   .learn-card .hl{color:var(--green)}.learn-card .rl{color:var(--red)}
 
+  /* ── LIVE TRADE TICKER ── */
+  .live-ticker{max-height:160px;overflow-y:auto}
+  .tick-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:9px;font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(26,36,48,.3);animation:tickIn .3s ease}
+  .tick-row:last-child{border-bottom:none}
+  @keyframes tickIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+  .tick-buy{color:var(--green)}.tick-sell{color:var(--red)}
+  .tick-coin{color:var(--text-bright);font-weight:500;width:42px}
+  .tick-time{color:var(--text-dim);font-size:8px}
+  .ws-badge{display:flex;align-items:center;gap:4px;font-size:9px;letter-spacing:.08em;color:var(--text-dim)}
+  .ws-dot{width:5px;height:5px;border-radius:50%;background:var(--text-dim);transition:all .3s}
+  .ws-dot.connected{background:var(--accent);box-shadow:0 0 4px var(--accent)}
+  .ws-dot.error{background:var(--red);box-shadow:0 0 4px var(--red)}
+
+  /* ── ORDER BOOK DEPTH ── */
+  .ob-wrap{display:grid;grid-template-columns:1fr 1fr;gap:0;font-size:10px;font-variant-numeric:tabular-nums}
+  .ob-side{display:flex;flex-direction:column}
+  .ob-hdr{display:flex;justify-content:space-between;padding:4px 10px;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border)}
+  .ob-row{display:flex;align-items:center;padding:2px 10px;position:relative;height:20px}
+  .ob-row .ob-bg{position:absolute;top:0;bottom:0;height:100%}
+  .ob-bids .ob-bg{right:0;background:rgba(0,230,118,.08)}
+  .ob-asks .ob-bg{left:0;background:rgba(255,61,80,.08)}
+  .ob-px{flex:1;z-index:1;font-weight:500}
+  .ob-sz{flex:1;text-align:right;z-index:1;color:var(--text-dim)}
+  .ob-bids .ob-px{color:var(--green)}.ob-asks .ob-px{color:var(--red)}
+  .ob-spread{text-align:center;padding:4px;font-size:9px;color:var(--text-dim);background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+
+  /* ── FUNDING CHART ── */
+  .funding-chart-wrap{position:relative;width:100%;height:180px;flex-shrink:0}
+
+  /* ── WALLET TABS ── */
+  .wtabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+  .wtab{padding:7px 12px;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
+  .wtab:hover{color:var(--text)}
+  .wtab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .wtp{display:none}.wtp.active{display:block}
+  .fill-row{display:grid;grid-template-columns:50px 70px 1fr 1fr 1fr auto;gap:6px;align-items:center;padding:5px 13px;border-bottom:1px solid rgba(26,36,48,.5);font-size:10px;font-variant-numeric:tabular-nums}
+  .fill-row:hover{background:var(--surface2)}
+  .fill-row.fhdr{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);background:var(--surface2)}
+  .fund-row{display:grid;grid-template-columns:70px 1fr 1fr 1fr;gap:8px;align-items:center;padding:5px 13px;border-bottom:1px solid rgba(26,36,48,.5);font-size:10px;font-variant-numeric:tabular-nums}
+  .fund-row:hover{background:var(--surface2)}
+  .fund-row.fhdr{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);background:var(--surface2)}
+
   /* EMPTY */
   .es{padding:20px;text-align:center;color:var(--text-dim);font-size:11px;font-family:var(--sans)}
   .es a{color:var(--accent);text-decoration:none}
@@ -311,6 +353,11 @@
   <div class="live-badge">
     <div class="live-dot" id="liveDot"></div>
     <span id="liveText">CONNECTING</span>
+  </div>
+  <div class="divider"></div>
+  <div class="ws-badge">
+    <div class="ws-dot" id="wsDot"></div>
+    <span id="wsText">WS</span>
   </div>
   <div class="divider"></div>
   <div class="price-hero">
@@ -529,6 +576,20 @@
             <div class="kpi cy"><div class="kl">Funding Rate</div><div class="kv" id="mdFunding">—</div></div>
           </div>
           <div class="chart-canvas-wrap" id="mktDetailChartWrap" style="height:220px"></div>
+
+          <!-- Funding History Chart -->
+          <div class="ph" style="margin-top:-1px">
+            <div class="ptitle"><div class="pdot" style="background:var(--purple)"></div>Funding Rate History (7d) <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">Funding Rate History</div><div class="tt-what">Shows how funding rates have changed over time for this market.</div><div class="tt-why">Persistently positive funding means longs are overcrowded and paying a premium. Extreme spikes often precede mean-reversion moves. Negative funding indicates short crowding.</div></div></span></div>
+            <div class="pmeta" id="mdFundingMeta">fundingHistory API</div>
+          </div>
+          <div class="funding-chart-wrap" id="mdFundingChartWrap"></div>
+
+          <!-- L2 Order Book Depth -->
+          <div class="ph" style="margin-top:-1px">
+            <div class="ptitle"><div class="pdot" style="background:var(--green)"></div>Order Book Depth (L2) <span class="tooltip-wrap"><i class="info-ico">?</i><div class="tooltip-content"><div class="tt-title">L2 Order Book</div><div class="tt-what">Real-time bid/ask depth showing resting limit orders at each price level.</div><div class="tt-why">Thick bids = strong support. Thin asks = low resistance. Imbalances can predict short-term price direction.</div></div></span></div>
+            <div class="pmeta" id="mdBookMeta">20 levels per side</div>
+          </div>
+          <div id="mdOrderBook"><div class="es">Click a market to load order book</div></div>
         </div>
       </div>
 
@@ -569,6 +630,20 @@
           <div class="panel">
             <div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--purple)"></div>Open Orders</div><div class="pmeta" id="wOrdersMeta">Resting orders</div></div>
             <div id="wOpenOrders"><div class="es">No open orders</div></div>
+          </div>
+
+          <!-- Trade Fills & Funding History -->
+          <div class="panel">
+            <div class="wtabs">
+              <div class="wtab active" onclick="switchWalletTab(this,'wtp-fills')">Recent Fills</div>
+              <div class="wtab" onclick="switchWalletTab(this,'wtp-funding')">Funding Payments</div>
+            </div>
+            <div class="wtp active" id="wtp-fills">
+              <div id="wFillsList"><div class="es">Lookup an address to see trade fills</div></div>
+            </div>
+            <div class="wtp" id="wtp-funding">
+              <div id="wFundingList"><div class="es">Lookup an address to see funding payments</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -636,6 +711,7 @@
 
   <!-- RIGHT SIDEBAR -->
   <aside class="sb-right">
+    <div class="sr-sec"><div class="sr-ttl">⚡ Live Trades</div><div class="live-ticker" id="liveTrades"><div style="font-size:9px;color:var(--text-dim)">Connecting WebSocket...</div></div></div>
     <div class="sr-sec"><div class="sr-ttl">🚨 Live Alerts</div><div id="alertsPanel"><div class="alert-row"><span class="alert-ico">⏳</span> Loading...</div></div></div>
     <div class="sr-sec"><div class="sr-ttl">🏆 Top HYPE Holders</div><div id="topHolders"><div class="es"><span class="skel" style="width:130px"></span></div></div></div>
     <div class="sr-sec"><div class="sr-ttl">📊 Fee Trend (48h)</div><canvas id="feeSparkline" width="224" height="56"></canvas></div>
@@ -663,10 +739,12 @@
       <div class="sr-ttl">📡 Data Sources</div>
       <div style="font-size:9px;color:var(--text-dim);font-family:var(--sans);line-height:1.7">
         <div>• Hyperliquid Info API (POST)</div>
+        <div>• Hyperliquid WebSocket (wss://)</div>
         <div>• HypurrScan REST API</div>
         <div>• All data fetched client-side</div>
-        <div>• Auto-refresh: 15s price, 90s full</div>
-        <div style="margin-top:4px;color:var(--text)">Rate limits: ~120 req/min (HL), ~60 req/min (HS)</div>
+        <div>• WS: live allMids + trades</div>
+        <div>• REST: 15s price, 90s full refresh</div>
+        <div style="margin-top:4px;color:var(--text)">Endpoints: allMids, metaAndAssetCtxs, l2Book, fundingHistory, userFills, userFunding, candleSnapshot, clearinghouseState, openOrders, stakingSummary, validatorSummaries</div>
       </div>
     </div>
   </aside>
@@ -721,6 +799,92 @@ async function hl(body) {
 async function hs(path) {
   try { const r=await fetch(HS+path); if(!r.ok)return null; return r.json(); } catch(e){return null;}
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WEBSOCKET LIVE FEED — allMids + trades streams
+// ═══════════════════════════════════════════════════════════════════════════
+const WS_URL = 'wss://api.hyperliquid.xyz/ws';
+let _ws = null, _wsRetries = 0, _wsReconnTimer = null;
+let _liveTrades = []; // last N trades
+const MAX_LIVE_TRADES = 30;
+const _wsSubscribedCoins = ['BTC','ETH','HYPE','SOL','DOGE']; // top coins for trade feed
+
+function _wsConnect() {
+  if(_ws && (_ws.readyState === WebSocket.OPEN || _ws.readyState === WebSocket.CONNECTING)) return;
+  try {
+    _ws = new WebSocket(WS_URL);
+    _ws.onopen = () => {
+      _wsRetries = 0;
+      _wsSetStatus('connected');
+      // Subscribe to allMids for real-time price
+      _ws.send(JSON.stringify({method:'subscribe', subscription:{type:'allMids'}}));
+      // Subscribe to trades for top coins
+      _wsSubscribedCoins.forEach(coin => {
+        _ws.send(JSON.stringify({method:'subscribe', subscription:{type:'trades', coin}}));
+      });
+    };
+    _ws.onmessage = (evt) => {
+      try {
+        const msg = JSON.parse(evt.data);
+        if(msg.channel === 'allMids' && msg.data?.mids) {
+          // Real-time price update
+          const px = parseFloat(msg.data.mids['@107'] || msg.data.mids['HYPE'] || 0);
+          if(px) {
+            D.price = px;
+            set('topPrice', '$' + F.f2(px));
+            set('sbPrice', '$' + F.f2(px));
+            set('tsUpdated', new Date().toLocaleTimeString());
+          }
+          D.allMids = msg.data.mids;
+        } else if(msg.channel === 'trades' && Array.isArray(msg.data)) {
+          // Live trade events
+          msg.data.forEach(t => {
+            _liveTrades.unshift({
+              coin: t.coin || '?',
+              side: t.side || '?',
+              px: parseFloat(t.px || 0),
+              sz: parseFloat(t.sz || 0),
+              time: t.time || Date.now(),
+              hash: t.hash || ''
+            });
+          });
+          if(_liveTrades.length > MAX_LIVE_TRADES) _liveTrades = _liveTrades.slice(0, MAX_LIVE_TRADES);
+          _renderLiveTrades();
+        }
+      } catch(e) {}
+    };
+    _ws.onclose = () => { _wsSetStatus('disconnected'); _wsScheduleReconnect(); };
+    _ws.onerror = () => { _wsSetStatus('error'); };
+  } catch(e) { _wsSetStatus('error'); _wsScheduleReconnect(); }
+}
+
+function _wsScheduleReconnect() {
+  if(_wsReconnTimer) clearTimeout(_wsReconnTimer);
+  const delay = Math.min(30000, 1000 * Math.pow(2, _wsRetries));
+  _wsRetries++;
+  _wsReconnTimer = setTimeout(_wsConnect, delay);
+}
+
+function _wsSetStatus(state) {
+  const dot = $('wsDot'), txt = $('wsText');
+  if(!dot||!txt) return;
+  dot.className = 'ws-dot ' + (state === 'connected' ? 'connected' : state === 'error' ? 'error' : '');
+  txt.textContent = state === 'connected' ? 'WS LIVE' : state === 'error' ? 'WS ERR' : 'WS OFF';
+}
+
+function _renderLiveTrades() {
+  const el = $('liveTrades');
+  if(!el) return;
+  if(!_liveTrades.length) { el.innerHTML = '<div style="font-size:9px;color:var(--text-dim)">Waiting for trades...</div>'; return; }
+  el.innerHTML = _liveTrades.slice(0, 15).map(t => {
+    const clr = t.side === 'B' ? 'tick-buy' : 'tick-sell';
+    const dir = t.side === 'B' ? '▲' : '▼';
+    return `<div class="tick-row"><span class="tick-coin">${t.coin}</span><span class="${clr}">${dir} $${t.px < 1 ? F.f4(t.px) : F.f2(t.px)}</span><span style="color:var(--text-dim)">${F.c(t.sz)}</span><span class="tick-time">${F.t(t.time)}</span></div>`;
+  }).join('');
+}
+
+// Start WebSocket on page load
+setTimeout(_wsConnect, 500);
 
 // ─── FETCHERS ──────────────────────────────────────────────────────────────
 async function fPrice() {
@@ -1347,7 +1511,7 @@ async function showMktDetail(coin) {
   set('mdVol', F.usd(m.vol));
   set('mdFunding', (m.funding*100).toFixed(4) + '%');
 
-  // Fetch funding history chart
+  // ── Price candlestick chart ──
   const wrap = $('mktDetailChartWrap');
   if(_mktDetailChart) { try{_mktDetailChart.remove();}catch(e){} _mktDetailChart=null; }
   wrap.innerHTML = '';
@@ -1367,8 +1531,149 @@ async function showMktDetail(coin) {
       _mktDetailChart.timeScale().fitContent();
     }
   } catch(e) { wrap.innerHTML = '<div class="es">Could not load chart for '+coin+'</div>'; }
+
+  // ── Funding Rate History (7 days) ──
+  _loadFundingHistory(coin);
+
+  // ── L2 Order Book Depth ──
+  _loadL2Book(coin);
 }
-function closeMktDetail() { $('mktDetailPanel').style.display='none'; if(_mktDetailChart){try{_mktDetailChart.remove();}catch(e){}_mktDetailChart=null;} }
+
+// Funding History Chart — uses fundingHistory endpoint
+let _fundingChart = null;
+async function _loadFundingHistory(coin) {
+  const wrap = $('mdFundingChartWrap');
+  if(!wrap) return;
+  if(_fundingChart) { try{_fundingChart.remove();}catch(e){} _fundingChart=null; }
+  wrap.innerHTML = '<div class="es">Loading funding history...</div>';
+
+  try {
+    const endTime = Date.now(), startTime = endTime - 7*86400000;
+    const data = await hl({type:'fundingHistory', coin, startTime});
+    if(!Array.isArray(data) || data.length < 2) {
+      wrap.innerHTML = '<div class="es">Insufficient funding data for '+coin+'</div>';
+      return;
+    }
+
+    wrap.innerHTML = '';
+    const {w: cw} = {w: Math.max(wrap.clientWidth, 200)};
+    _fundingChart = LightweightCharts.createChart(wrap, _lcBase({width: cw, height: 180}));
+
+    // Histogram series — green for positive, red for negative
+    const histSeries = _fundingChart.addHistogramSeries({
+      base: 0,
+      priceFormat: { type: 'custom', formatter: v => (v*100).toFixed(4) + '%' },
+      priceScaleId: 'right',
+    });
+
+    // Line series overlay for trend
+    const lineSeries = _fundingChart.addLineSeries({
+      color: 'rgba(187,134,252,0.7)',
+      lineWidth: 1,
+      priceFormat: { type: 'custom', formatter: v => (v*100).toFixed(4) + '%' },
+      priceScaleId: 'right',
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+    });
+
+    const sorted = data.sort((a,b) => a.time - b.time);
+    const histData = sorted.map(d => ({
+      time: Math.floor(d.time / 1000),
+      value: parseFloat(d.fundingRate),
+      color: parseFloat(d.fundingRate) >= 0 ? 'rgba(0,230,118,0.5)' : 'rgba(255,61,80,0.5)',
+    }));
+    const lineData = sorted.map(d => ({
+      time: Math.floor(d.time / 1000),
+      value: parseFloat(d.fundingRate),
+    }));
+
+    histSeries.setData(histData);
+    lineSeries.setData(lineData);
+    _fundingChart.timeScale().fitContent();
+
+    // Meta stats
+    const rates = sorted.map(d => parseFloat(d.fundingRate));
+    const avg = rates.reduce((s,v)=>s+v,0) / rates.length;
+    const max = Math.max(...rates), min = Math.min(...rates);
+    const annualized = avg * 3 * 365 * 100; // 8h intervals * 3/day * 365
+    set('mdFundingMeta', `Avg: ${(avg*100).toFixed(4)}% · Ann: ${annualized.toFixed(1)}% · ${data.length} datapoints`);
+
+  } catch(e) {
+    console.error('funding history', e);
+    wrap.innerHTML = '<div class="es">Could not load funding history: '+e.message+'</div>';
+  }
+}
+
+// L2 Order Book Depth — uses l2Book endpoint
+async function _loadL2Book(coin) {
+  const wrap = $('mdOrderBook');
+  if(!wrap) return;
+  wrap.innerHTML = '<div class="es">Loading order book...</div>';
+
+  try {
+    const book = await hl({type:'l2Book', coin});
+    const levels = Array.isArray(book?.levels) ? book.levels : (Array.isArray(book) ? book : null);
+    if(!levels || levels.length < 2) {
+      wrap.innerHTML = '<div class="es">No order book data for '+coin+'</div>';
+      return;
+    }
+
+    const bids = (levels[0] || []).slice(0, 12);
+    const asks = (levels[1] || []).slice(0, 12);
+
+    const maxBidSz = Math.max(...bids.map(b => parseFloat(b.sz || 0)), 0.001);
+    const maxAskSz = Math.max(...asks.map(a => parseFloat(a.sz || 0)), 0.001);
+
+    const bestBid = parseFloat(bids[0]?.px || 0);
+    const bestAsk = parseFloat(asks[0]?.px || 0);
+    const spread = bestAsk - bestBid;
+    const spreadPct = bestAsk > 0 ? (spread / bestAsk * 100) : 0;
+
+    // Bid/ask imbalance
+    const totalBidSz = bids.reduce((s,b) => s + parseFloat(b.sz || 0), 0);
+    const totalAskSz = asks.reduce((s,a) => s + parseFloat(a.sz || 0), 0);
+    const imbalance = totalBidSz + totalAskSz > 0 ? ((totalBidSz - totalAskSz) / (totalBidSz + totalAskSz) * 100) : 0;
+
+    set('mdBookMeta', `Spread: $${spread < 0.01 ? spread.toFixed(6) : F.f2(spread)} (${spreadPct.toFixed(3)}%) · Imbalance: ${imbalance > 0 ? '+' : ''}${imbalance.toFixed(1)}% ${imbalance > 10 ? '🟢 bid heavy' : imbalance < -10 ? '🔴 ask heavy' : '⚪ balanced'}`);
+
+    let html = '<div class="ob-wrap">';
+
+    // Bids (left)
+    html += '<div class="ob-side ob-bids">';
+    html += '<div class="ob-hdr"><span>Price (Bid)</span><span>Size</span></div>';
+    bids.forEach(b => {
+      const px = parseFloat(b.px || 0), sz = parseFloat(b.sz || 0);
+      const pct = (sz / maxBidSz * 100).toFixed(0);
+      html += `<div class="ob-row"><div class="ob-bg" style="width:${pct}%"></div><span class="ob-px">${px < 1 ? F.f4(px) : F.f2(px)}</span><span class="ob-sz">${F.c(sz)}</span></div>`;
+    });
+    html += '</div>';
+
+    // Asks (right)
+    html += '<div class="ob-side ob-asks">';
+    html += '<div class="ob-hdr"><span>Price (Ask)</span><span>Size</span></div>';
+    asks.forEach(a => {
+      const px = parseFloat(a.px || 0), sz = parseFloat(a.sz || 0);
+      const pct = (sz / maxAskSz * 100).toFixed(0);
+      html += `<div class="ob-row"><div class="ob-bg" style="width:${pct}%"></div><span class="ob-px">${px < 1 ? F.f4(px) : F.f2(px)}</span><span class="ob-sz">${F.c(sz)}</span></div>`;
+    });
+    html += '</div>';
+
+    html += '</div>';
+    html += `<div class="ob-spread">Spread: $${spread < 0.01 ? spread.toFixed(6) : F.f2(spread)} (${spreadPct.toFixed(3)}%) · Total Bid: ${F.c(totalBidSz)} · Total Ask: ${F.c(totalAskSz)}</div>`;
+
+    wrap.innerHTML = html;
+
+  } catch(e) {
+    console.error('l2book', e);
+    wrap.innerHTML = '<div class="es">Could not load order book: '+e.message+'</div>';
+  }
+}
+
+function closeMktDetail() {
+  $('mktDetailPanel').style.display='none';
+  if(_mktDetailChart){try{_mktDetailChart.remove();}catch(e){}_mktDetailChart=null;}
+  if(_fundingChart){try{_fundingChart.remove();}catch(e){}_fundingChart=null;}
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NEW: WALLET INTELLIGENCE
@@ -1388,6 +1693,15 @@ function saveWatchAddr() {
 }
 function removeWatch(i) { _whaleWatch.splice(i,1); localStorage.setItem('hl_whalewatch', JSON.stringify(_whaleWatch)); renderWhaleWatch(); }
 
+// Wallet tab switching
+function switchWalletTab(el, tpId) {
+  el.parentElement.querySelectorAll('.wtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.wtp').forEach(p => p.classList.remove('active'));
+  const tp = $(tpId);
+  if(tp) tp.classList.add('active');
+}
+
 async function lookupWallet() {
   const addr = $('walletAddr').value.trim();
   if(!addr || !addr.startsWith('0x')) { alert('Enter a valid 0x address'); return; }
@@ -1402,16 +1716,20 @@ async function lookupWallet() {
   impLink.style.display = 'inline-flex';
 
   try {
-    // Fetch perp clearinghouse state
-    const [perpState, spotState, orders] = await Promise.allSettled([
+    // Fetch perp clearinghouse state + fills + funding
+    const [perpState, spotState, orders, fills, funding] = await Promise.allSettled([
       hl({type:'clearinghouseState', user: addr}),
       hl({type:'spotClearinghouseState', user: addr}),
       hl({type:'openOrders', user: addr}),
+      hl({type:'userFills', user: addr}),
+      hl({type:'userFunding', user: addr, startTime: Date.now() - 7*86400000}),
     ]);
 
     const perp = perpState.status === 'fulfilled' ? perpState.value : null;
     const spot = spotState.status === 'fulfilled' ? spotState.value : null;
     const ords = orders.status === 'fulfilled' ? orders.value : [];
+    const userFills = fills.status === 'fulfilled' ? fills.value : [];
+    const userFunding = funding.status === 'fulfilled' ? funding.value : [];
 
     $('walletResults').style.display = 'block';
 
@@ -1488,6 +1806,59 @@ async function lookupWallet() {
       set('wOrdersMeta', ords.length + ' resting orders');
     } else {
       htm('wOpenOrders', '<div class="es">No open orders</div>');
+    }
+
+    // ── Recent Trade Fills ──
+    if(Array.isArray(userFills) && userFills.length) {
+      const sorted = userFills.sort((a,b) => (b.time || 0) - (a.time || 0)).slice(0, 50);
+      let totalVol = 0, totalFee = 0, wins = 0, losses = 0;
+      sorted.forEach(f => {
+        const notional = parseFloat(f.px || 0) * parseFloat(f.sz || 0);
+        totalVol += notional;
+        totalFee += parseFloat(f.fee || 0);
+        const cpnl = parseFloat(f.closedPnl || 0);
+        if(cpnl > 0) wins++;
+        else if(cpnl < 0) losses++;
+      });
+
+      let fhtml = `<div style="padding:6px 13px;font-size:9px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border)">Last ${sorted.length} fills · Vol: ${F.usd(totalVol)} · Fees: $${F.f2(totalFee)} · W/L: <span style="color:var(--green)">${wins}W</span>/<span style="color:var(--red)">${losses}L</span></div>`;
+      fhtml += '<div class="fill-row fhdr"><div>Time</div><div>Market</div><div>Side</div><div style="text-align:right">Price</div><div style="text-align:right">Size</div><div style="text-align:right">Closed PnL</div></div>';
+      fhtml += sorted.map(f => {
+        const side = f.side === 'B' ? 'BUY' : 'SELL';
+        const sideClr = f.side === 'B' ? 'var(--green)' : 'var(--red)';
+        const cpnl = parseFloat(f.closedPnl || 0);
+        const pnlClr = cpnl > 0 ? 'var(--green)' : cpnl < 0 ? 'var(--red)' : 'var(--text-dim)';
+        const dt = new Date(f.time);
+        const ts = dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+        return `<div class="fill-row"><div style="color:var(--text-dim)">${ts}</div><div style="color:var(--text-bright);font-weight:500">${f.coin||'?'}</div><div style="color:${sideClr};font-weight:600">${side}</div><div style="text-align:right">$${parseFloat(f.px)<1?F.f4(f.px):F.f2(f.px)}</div><div style="text-align:right">${F.c(f.sz)}</div><div style="text-align:right;color:${pnlClr}">${cpnl!==0?(cpnl>0?'+':'')+('$'+F.f2(Math.abs(cpnl))):'—'}</div></div>`;
+      }).join('');
+      htm('wFillsList', '<div style="max-height:280px;overflow-y:auto">' + fhtml + '</div>');
+    } else {
+      htm('wFillsList', '<div class="es">No recent trade fills found</div>');
+    }
+
+    // ── Funding Payments ──
+    if(Array.isArray(userFunding) && userFunding.length) {
+      const sorted = userFunding.sort((a,b) => (b.time || 0) - (a.time || 0)).slice(0, 50);
+      let totalPaid = 0, totalReceived = 0;
+      sorted.forEach(f => {
+        const amt = parseFloat(f.usdc || f.payment || 0);
+        if(amt > 0) totalReceived += amt; else totalPaid += Math.abs(amt);
+      });
+
+      let fuhtml = `<div style="padding:6px 13px;font-size:9px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border)">7d funding: Received <span style="color:var(--green)">+$${F.f2(totalReceived)}</span> · Paid <span style="color:var(--red)">-$${F.f2(totalPaid)}</span> · Net: <span style="color:${totalReceived-totalPaid>=0?'var(--green)':'var(--red)'}">${totalReceived-totalPaid>=0?'+':''}$${F.f2(Math.abs(totalReceived-totalPaid))}</span></div>`;
+      fuhtml += '<div class="fund-row fhdr"><div>Time</div><div>Market</div><div style="text-align:right">Rate</div><div style="text-align:right">Payment</div></div>';
+      fuhtml += sorted.map(f => {
+        const amt = parseFloat(f.usdc || f.payment || 0);
+        const rate = parseFloat(f.fundingRate || 0);
+        const clr = amt >= 0 ? 'var(--green)' : 'var(--red)';
+        const dt = new Date(f.time);
+        const ts = dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+        return `<div class="fund-row"><div style="color:var(--text-dim)">${ts}</div><div style="color:var(--text-bright);font-weight:500">${f.coin||'?'}</div><div style="text-align:right">${(rate*100).toFixed(4)}%</div><div style="text-align:right;color:${clr}">${amt>=0?'+':''}$${F.f2(Math.abs(amt))}</div></div>`;
+      }).join('');
+      htm('wFundingList', '<div style="max-height:280px;overflow-y:auto">' + fuhtml + '</div>');
+    } else {
+      htm('wFundingList', '<div class="es">No funding payments in last 7 days</div>');
     }
 
   } catch(e) {
