@@ -271,7 +271,7 @@ const F={
 
 const $=id=>document.getElementById(id), set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
 
-function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');if(id==='charts')setTimeout(()=>{if(!_priceChart){_initPriceChart();_fetchCandles(_priceTf)}if(!_burnChart)_initBurnChart()},50)}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');if(id==='charts')setTimeout(async()=>{if(!_priceChart){_initPriceChart();set('priceChartMeta','Loading…');const ok=await _fetchCandles(_pTf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}else if(_pData.length){_drawPS()}if(!_burnChart){_initBurnChart()}else{_drawBurnSeries()}},80)}
 
 // ═══════════════════════════════════════════════════════════════
 //  API
@@ -365,7 +365,9 @@ function renderAll(){
   set('skQueue',F.c(qt)+' HYPE');set('skQueueSub',D.queue.length+' wallets');
 
   renderValidators();renderQueue();renderHolders();
+  // Redraw charts if they exist
   if(_burnChart&&D.feesRecent.length)_drawBurnSeries();
+  if(_priceChart&&_pData.length)_drawPS();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -425,6 +427,34 @@ function _drawBurnSeries(){if(!_burnAS)return;const sorted=[...D.feesRecent].sor
 function setBurnWindow(h,btn){_burnH=h;document.querySelectorAll('[data-btf]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');_drawBurnSeries();if(_burnChart)_burnChart.timeScale().fitContent()}
 
 window.addEventListener('resize',()=>{if(_priceChart){const s=_ws2('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}if(_burnChart){const s=_ws2('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}});
+
+// ═══════════════════════════════════════════════════════════════
+//  AF USDC LIVE POLLING (every 5s)
+// ═══════════════════════════════════════════════════════════════
+let _afLiveTimer=null;
+async function _afLiveTick(){
+  try{
+    const[p,s]=await Promise.all([
+      hl({type:'clearinghouseState',user:AF}),
+      hl({type:'spotClearinghouseState',user:AF})
+    ]);
+    if(p?.marginSummary){
+      D.afUsdc=parseFloat(p.marginSummary.accountValue||0);
+      set('afUsdc','$'+F.c(D.afUsdc));
+    }
+    if(s?.balances){
+      const h=s.balances.find(b=>b.coin==='HYPE'||b.token===150);
+      if(h){D.afBal=parseFloat(h.total||0);set('afHype',F.c(D.afBal)+' HYPE')}
+    }
+    // Also refresh AF orders count
+    try{
+      const o=await hl({type:'frontendOpenOrders',user:AF});
+      if(Array.isArray(o)){D.afOrders=o.filter(x=>(x.coin||'').includes('HYPE')||(x.coin||'').includes('@107'));set('afBids',D.afOrders.length||'0')}
+    }catch(e){}
+  }catch(e){console.warn('AF live tick error',e)}
+}
+function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000)}
+_startAfLive();
 
 loadAll();
 setInterval(loadAll,30000);
