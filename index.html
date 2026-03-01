@@ -117,7 +117,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="logo"><span class="fire">🔥</span><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('overview',this)">Overview</button>
-      <button class="nav-tab" onclick="showPage('charts',this)">Charts</button>
       <button class="nav-tab" onclick="showPage('staking',this)">Staking</button>
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
     </div>
@@ -200,13 +199,8 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
   </div>
 
-  <div class="section-title">🐋 Top Holders</div>
-  <div class="data-table" id="holdersTable" style="max-height:280px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
-</div>
-
-<!-- ══ CHARTS ══════════════════════════════════════════════════ -->
-<div class="page" id="page-charts">
-  <div class="chart-box">
+  <!-- HYPE/USDC Price Chart on Overview -->
+  <div class="chart-box" style="margin-top:20px">
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">HYPE / USDC</span><span class="chart-meta" id="priceChartMeta">—</span></div>
       <div style="display:flex;gap:6px">
@@ -218,6 +212,8 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="chart-ohlc"><span>O: <span class="v" id="csO">—</span></span><span>H: <span class="v" id="csH">—</span></span><span>L: <span class="v" id="csL">—</span></span><span>C: <span class="v" id="csC">—</span></span><span>Vol: <span class="v" id="csVol">—</span></span><span id="csChg" style="font-weight:600"></span></div>
   </div>
 </div>
+
+<!-- Charts page removed - price chart now on Overview -->
 
 <!-- ══ STAKING ═════════════════════════════════════════════════ -->
 <div class="page" id="page-staking">
@@ -275,7 +271,7 @@ const F={
 
 const $=id=>document.getElementById(id),set=(id,v)=>{const e=$(id);if(e)e.textContent=v},htm=(id,v)=>{const e=$(id);if(e)e.innerHTML=v};
 
-function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');if(id==='charts'&&typeof LightweightCharts!=='undefined')setTimeout(async()=>{if(!_priceChart){_initPriceChart();set('priceChartMeta','Loading…');const ok=await _fetchCandles(_pTf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}else if(_pData.length){_drawPS()}},80)}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active')}
 
 // ═══════════════════════════════════════════════════════════════
 //  API
@@ -309,8 +305,21 @@ async function fPrice(){const m=await hl({type:'allMids'});const px=parseFloat(m
 
 async function fSpot(){try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(!Array.isArray(d)||d.length<2)return;const ctxs=d[1]||[];const c=ctxs.find(x=>x.coin==='@107'||x.coin==='HYPE/USDC')||ctxs[107];if(c){if(c.dayNtlVlm)D.vol24=parseFloat(c.dayNtlVlm);if(c.prevDayPx&&D.price)D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;if(c.circulatingSupply)D.circSupply=parseFloat(c.circulatingSupply);if(c.totalSupply){const ts=parseFloat(c.totalSupply);if(ts>0&&ts<MAX_S){D.feesBurned=MAX_S-ts;console.log('[fSpot] ✅ feesBurned='+D.feesBurned)}}}}catch(e){}}
 
-async function fStaking(){try{const d=await hl({type:'stakingSummary'});if(d?.totalStaked)D.staked=parseFloat(d.totalStaked);if(d?.apr)D.apr=parseFloat(d.apr)}catch(e){}}
-async function fValidators(){const d=await hs('/validators');if(Array.isArray(d))D.validators=d}
+async function fStaking(){
+  try{
+    // Use the correct Hyperliquid native API endpoint
+    const d=await hl({type:'validatorSummaries'});
+    if(Array.isArray(d)&&d.length){
+      D.validators=d;
+      let totalStake=0;
+      d.forEach(v=>{totalStake+=parseFloat(v.stake||0)});
+      if(totalStake>0)D.staked=totalStake;
+      console.log('[fStaking] ✅ '+d.length+' validators, totalStaked='+totalStake);
+    }
+  }catch(e){console.warn('fStaking err',e.message)}
+  // Also try to get APR from stakingSummary (may not exist)
+  try{const s=await hl({type:'stakingSummary'});if(s?.apr)D.apr=parseFloat(s.apr)}catch(e){}
+}
 
 // AF: Get HYPE holdings + USDC balance from SPOT account
 async function fAfBal(){
@@ -351,8 +360,6 @@ async function fAfOrders(){
 
 async function fDelegations(){try{const d=await hs('/delegations');if(Array.isArray(d)&&d.length){const tot=d.reduce((s,v)=>s+parseFloat(v.amount||v.stake||0),0);if(tot>0&&!D.staked)D.staked=tot}}catch(e){}}
 async function fQueue(){const d=await hs('/unstakingQueue');if(Array.isArray(d))D.queue=d}
-async function fHolders(){const d=await hs('/holdersWithLimit/HYPE/20');if(d?.addresses)D.holders=d.addresses}
-
 async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const[meta,ctxs]=d;let tOI=0,tVol=0;D.markets=(meta.universe||[]).map((u,i)=>{const c=ctxs[i];if(!c)return null;const mid=parseFloat(c.midPx||c.markPx||0);const oi=parseFloat(c.openInterest||0)*mid;const vol=parseFloat(c.dayNtlVlm||0);tOI+=oi;tVol+=vol;return{name:u.name,mid,oi,vol}}).filter(Boolean);D.totalOI=tOI;D.totalPerpVol=tVol}}catch(e){}}
 
 async function fFeesBurned(){
@@ -367,9 +374,8 @@ async function fFeesBurned(){
 // ═══════════════════════════════════════════════════════════════
 async function loadAll(){
   const btn=$('refreshBtn');btn.textContent='⟳ …';
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fHolders(),fPerpStats()]);
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fPerpStats()]);
   if(!D.feesBurned)await fFeesBurned();
-  if(!D.staked&&D.validators.length){const t=D.validators.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||0),0);if(t>0)D.staked=t}
   // Compute total burned = AF HYPE (formally burned by vote) + on-chain fee burns
   D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
   btn.textContent='↻ REFRESH';renderAll();
@@ -418,16 +424,16 @@ function renderAll(){
   if(D.totalOI)set('psOI',F.usd(D.totalOI));
   if(D.totalPerpVol)set('psVol',F.usd(D.totalPerpVol));
   set('psMarkets',D.markets.length||'—');
-  set('psVals',D.validators.filter(v=>v.isActive!==false).length||D.validators.length||'—');
+  set('psVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
 
   // Staking page
   if(D.staked){set('skTotal',F.c(D.staked)+' HYPE');set('skTotalSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
   if(D.apr!=null)set('skApr',(D.apr*100).toFixed(2)+'%');
-  set('skVals',D.validators.filter(v=>v.isActive!==false).length||D.validators.length||'—');
-  const qt=D.queue.reduce((s,e)=>s+parseFloat(e.amount||e.hype||e.nHype||e.value||e.unstakeAmount||0),0);
+  set('skVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
+  const qt=D.queue.reduce((s,e)=>{let a=0;if(e.amount)a=parseFloat(e.amount);else if(e.nHype){const n=parseFloat(e.nHype);a=n>1e15?n/1e18:n}else if(e.hype)a=parseFloat(e.hype);else if(e.value)a=parseFloat(e.value);if(a>1e12)a=a/1e18;return s+a},0);
   set('skQueue',F.c(qt)+' HYPE');set('skQueueSub',D.queue.length+' wallets');
 
-  renderValidators();renderQueue();renderHolders();
+  renderValidators();renderQueue();
   if(_priceChart&&_pData.length)_drawPS();
 }
 
@@ -450,16 +456,32 @@ function drawRing(){
 // ═══════════════════════════════════════════════════════════════
 function renderValidators(){
   const el=$('validatorList');if(!el||!D.validators.length)return;
-  const s=[...D.validators].sort((a,b)=>parseFloat(b.stake||b.totalStake||0)-parseFloat(a.stake||a.totalStake||0));
-  el.innerHTML='<div class="val-row" style="color:var(--text-dim);font-size:10px;font-weight:600"><span class="val-rank">#</span><span>Name</span><span class="val-stake">Stake</span><span class="val-comm">Comm</span></div>'+s.slice(0,30).map((v,i)=>{const nm=v.name||v.validator||F.addr(v.address||v.validator||'');const st=parseFloat(v.stake||v.totalStake||v.stakedAmount||0);const cm=v.commission!=null?(parseFloat(v.commission)*100).toFixed(1)+'%':'—';return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.c(st)}</span><span class="val-comm">${cm}</span></div>`}).join('');
+  const s=[...D.validators].sort((a,b)=>parseFloat(b.stake||0)-parseFloat(a.stake||0));
+  el.innerHTML='<div class="val-row" style="color:var(--text-dim);font-size:10px;font-weight:600"><span class="val-rank">#</span><span>Name</span><span class="val-stake">Stake</span><span class="val-comm">Comm</span></div>'+s.map((v,i)=>{
+    const nm=v.name||v.validator||F.addr(v.validator||'');
+    const st=parseFloat(v.stake||0);
+    // commission_bps: 10000 = 100%, so /100 to get %
+    const cm=v.nRecentBlocks!=null?v.nRecentBlocks+' blks':'—';
+    const comm=v.commission!=null?v.commission:null;
+    const commStr=comm!=null?(comm<1?(comm*100).toFixed(1)+'%':comm.toFixed(1)+'%'):'—';
+    return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.c(st)}</span><span class="val-comm">${commStr}</span></div>`
+  }).join('');
 }
 function renderQueue(){
   const el=$('queueTable');if(!el){return}if(!D.queue.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">No pending unstakes</div>';return}
-  el.innerHTML=D.queue.slice(0,40).map(e=>{const a=F.addr(e.delegator||e.address||e.user||'');const amt=F.c(parseFloat(e.amount||e.hype||e.nHype||e.value||0));return`<div class="dt-row" style="grid-template-columns:1fr 100px"><span style="color:var(--accent)">${a}</span><span style="color:var(--text-bright);text-align:right">${amt}</span></div>`}).join('');
-}
-function renderHolders(){
-  const el=$('holdersTable');if(!el||!D.holders.length)return;
-  el.innerHTML=D.holders.map((h,i)=>{const a=h.address||h.user||h;const b=parseFloat(h.balance||h.total||h.amount||0);const p=b>0?((b/MAX_S)*100).toFixed(2)+'%':'';return`<div class="dt-row" style="grid-template-columns:24px 1fr 100px 50px"><span style="color:var(--text-muted);text-align:center">${i+1}</span><span style="color:var(--accent)">${F.addr(typeof a==='string'?a:'')}</span><span style="color:var(--text-bright);text-align:right">${F.c(b)}</span><span style="color:var(--text-dim);text-align:right;font-size:10px">${p}</span></div>`}).join('');
+  el.innerHTML=D.queue.slice(0,40).map(e=>{
+    const a=F.addr(e.user||e.delegator||e.address||'');
+    // nHype is in wei (needs /1e18), amount might be raw too
+    let amt=0;
+    if(e.amount)amt=parseFloat(e.amount);
+    else if(e.nHype){const n=parseFloat(e.nHype);amt=n>1e15?n/1e18:n}
+    else if(e.hype)amt=parseFloat(e.hype);
+    else if(e.value)amt=parseFloat(e.value);
+    else if(e.stake)amt=parseFloat(e.stake);
+    // If amt still looks like wei, convert
+    if(amt>1e12)amt=amt/1e18;
+    return`<div class="dt-row" style="grid-template-columns:1fr 100px"><span style="color:var(--accent)">${a}</span><span style="color:var(--text-bright);text-align:right">${F.c(amt)}</span></div>`
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -593,15 +615,24 @@ window.addEventListener('resize',()=>{
 // ═══════════════════════════════════════════════════════════════
 loadAll();
 setInterval(loadAll,30000);
-// Init AF chart + live polling after first load
-function _tryInitAf(){
+// Init charts after LightweightCharts loads
+function _tryInitCharts(){
   if(typeof LightweightCharts==='undefined'){
     console.warn('LightweightCharts not loaded yet, retrying in 2s…');
-    setTimeout(_tryInitAf,2000);return;
+    setTimeout(_tryInitCharts,2000);return;
   }
+  // Price chart on overview
+  _initPriceChart();
+  (async()=>{
+    set('priceChartMeta','Loading…');
+    const ok=await _fetchCandles(_pTf);
+    if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}
+    else set('priceChartMeta','No data');
+  })();
+  // AF live monitor chart + polling
   _initAfChart();_startAfLive();
 }
-setTimeout(_tryInitAf,2000);
+setTimeout(_tryInitCharts,1500);
 </script>
 </body>
 </html>
