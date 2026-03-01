@@ -900,6 +900,19 @@ async function fSpot() {
       if(c.dayNtlVlm) D.vol24=parseFloat(c.dayNtlVlm);
       if(c.prevDayPx&&D.price) D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;
       if(c.circulatingSupply) D.circSupply=parseFloat(c.circulatingSupply);
+      // Check for totalSupply — burned = maxSupply - totalSupply
+      if(c.totalSupply) {
+        const ts = parseFloat(c.totalSupply);
+        if(ts > 0 && ts < MAX_S) {
+          D.burned = MAX_S - ts;
+          console.log('[fSpot] totalSupply='+ts+' → burned='+D.burned);
+        }
+      }
+    }
+    // Also check meta for HYPE token details
+    if(meta?.tokens) {
+      const ht = meta.tokens.find(t => (t.spec?.name||t.name) === 'HYPE');
+      if(ht) D._hypeTokenMeta = ht; // store for fBurned to use
     }
   } catch(e){}
 }
@@ -984,44 +997,119 @@ async function fHolders() {
   const d=await hs('/holdersWithLimit/HYPE/20'); if(d?.addresses) D.holders=d.addresses;
 }
 async function fBurned() {
-  // Primary: query the dead address's HYPE balance directly
+  // ── Method 1: tokenDetails endpoint (most reliable) ──
+  // Returns totalSupply and maxSupply; burned = max - total
+  // HYPE token index is 150; try spotMeta to get tokenId first
   try {
-    const d=await hl({type:'spotClearinghouseState',user:BURN});
-    if(d?.balances) {
-      const h=d.balances.find(b=>b.coin==='HYPE'||b.coin==='@107');
-      if(h) {
-        const bal=parseFloat(h.total||h.hold||h.available||0);
-        if(bal>0) { D.burned=bal; console.log('[burned] dead addr balance:',bal); return; }
+    const spotMeta = await hl({type:'spotMeta'});
+    if(spotMeta?.tokens || spotMeta?.universe) {
+      // Find HYPE token to get its tokenId
+      const tokens = spotMeta.tokens || [];
+      const hypeToken = tokens.find(t => t.name === 'HYPE' || (t.spec && t.spec.name === 'HYPE') || t.index === 150);
+      const tokenId = hypeToken?.tokenId || hypeToken?.token_id || hypeToken?.evmContract;
+      if(tokenId) {
+        const td = await hl({type:'tokenDetails', tokenId});
+        if(td) {
+          const ts = parseFloat(td.totalSupply || 0);
+          const ms = parseFloat(td.maxSupply || MAX_S);
+          if(ts > 0 && ms > ts) {
+            D.burned = ms - ts;
+            console.log('[burned] tokenDetails: total='+ts+' max='+ms+' burned='+D.burned);
+            return;
+          }
+        }
       }
     }
-  } catch(e){ console.log('[burned] spotState failed, trying perp',e.message); }
-  // Fallback: try perp clearinghouse
+  } catch(e){ console.log('[burned] tokenDetails path failed:', e.message); }
+
+  // ── Method 2: spotMetaAndAssetCtxs — check HYPE context for totalSupply ──
   try {
-    const d=await hl({type:'clearinghouseState',user:BURN});
+    const d = await hl({type:'spotMetaAndAssetCtxs'});
+    if(Array.isArray(d) && d.length >= 2) {
+      const metas = d[0]?.tokens || d[0]?.universe || d[0] || [];
+      const ctxs = d[1] || [];
+      // Find HYPE in metas
+      let hypeIdx = -1;
+      if(Array.isArray(metas)) {
+        hypeIdx = metas.findIndex(m => m.name === 'HYPE' || (m.tokens && m.tokens.includes(150)));
+      }
+      // Check context for HYPE at known index @107 or found index
+      for(const idx of [107, hypeIdx]) {
+        if(idx >= 0 && ctxs[idx]) {
+          const c = ctxs[idx];
+          const ts = parseFloat(c.totalSupply || 0);
+          const cs = parseFloat(c.circulatingSupply || 0);
+          if(ts > 0 && ts < MAX_S) {
+            D.burned = MAX_S - ts;
+            if(cs > 0) D.circSupply = cs;
+            console.log('[burned] spotMetaAndAssetCtxs: totalSupply='+ts+' burned='+D.burned);
+            return;
+          }
+        }
+      }
+    }
+  } catch(e){ console.log('[burned] spotMeta path failed:', e.message); }
+
+  // ── Method 3: AF HYPE balance — AF accumulates burned HYPE ──
+  // After validator vote, AF HYPE is considered permanently burned
+  try {
+    const d = await hl({type:'spotClearinghouseState', user: AF});
+    if(d?.balances) {
+      const h = d.balances.find(b => b.coin==='HYPE' || b.coin==='@107');
+      if(h) {
+        const bal = parseFloat(h.total || h.hold || h.available || 0);
+        if(bal > 0) {
+          D.burned = bal;
+          console.log('[burned] AF HYPE balance:', bal);
+          return;
+        }
+      }
+    }
+  } catch(e){ console.log('[burned] AF balance failed:', e.message); }
+
+  // ── Method 4: HypurrScan token endpoint ──
+  try {
+    const d = await hs('/token/HYPE');
     if(d) {
-      const av=parseFloat(d.marginSummary?.accountValue||d.withdrawable||0);
-      if(av>0) { D.burned=av; console.log('[burned] dead addr perp:',av); return; }
+      const b = parseFloat(d.burned || d.totalBurned || d.burnedSupply || 0);
+      if(b > 0) { D.burned = b; console.log('[burned] hypurrscan:', b); return; }
+      const ts = parseFloat(d.totalSupply || 0);
+      if(ts > 0 && ts < MAX_S) { D.burned = MAX_S - ts; console.log('[burned] hypurrscan totalSupply:', ts); return; }
     }
   } catch(e){}
-  // Fallback: try HypurrScan token info
+
+  // ── Method 5: Try known HYPE tokenId directly ──
+  // HYPE tokenId from HypurrScan: 0xbaf265ef389da684513d98d68edf4eae
   try {
-    const d=await hs('/token/HYPE');
-    if(d) {
-      const b=parseFloat(d.burned||d.totalBurned||d.burnedSupply||0);
-      if(b>0) { D.burned=b; console.log('[burned] hypurrscan token:',b); return; }
+    const td = await hl({type:'tokenDetails', tokenId:'0xbaf265ef389da684513d98d68edf4eae'});
+    if(td) {
+      const ts = parseFloat(td.totalSupply || 0);
+      const ms = parseFloat(td.maxSupply || MAX_S);
+      if(ts > 0 && ms > ts) {
+        D.burned = ms - ts;
+        console.log('[burned] tokenDetails direct: total='+ts+' burned='+D.burned);
+        return;
+      }
     }
-  } catch(e){}
-  // Fallback: compute from max supply - circulating
-  if(D.circSupply && D.circSupply < MAX_S) {
-    // This is approximate — includes locked/vested, not just burned
-    // But better than showing nothing
-    const approx = MAX_S - D.circSupply;
-    // Only use if it's a reasonable burn amount (< 10% of supply)
-    if(approx > 0 && approx < MAX_S * 0.1) {
-      D.burned = approx;
-      console.log('[burned] estimated from supply gap:', approx);
-    }
+  } catch(e){ console.log('[burned] direct tokenId failed:', e.message); }
+
+  // ── Method 6: Try with token index as hex ──
+  const hexIds = [
+    '0x00000000000000000000000000000096', // 150 in hex, 32 hex chars
+    '0xc1fb593aeffbeb02f85e0308e9956a90', // known PURR-style format
+  ];
+  for(const tid of hexIds) {
+    try {
+      const td = await hl({type:'tokenDetails', tokenId: tid});
+      if(td && (td.name === 'HYPE' || td.spec?.name === 'HYPE')) {
+        const ts = parseFloat(td.totalSupply || 0);
+        const ms = parseFloat(td.maxSupply || MAX_S);
+        if(ts > 0) { D.burned = ms - ts; console.log('[burned] hex tokenId '+tid+':', D.burned); return; }
+      }
+    } catch(e){}
   }
+
+  console.log('[burned] all methods failed — no burn data available');
 }
 
 // ─── NEW: GLOBAL PERP STATS FETCHER ──────────────────────────────────────
@@ -1062,7 +1150,9 @@ async function loadAll() {
   const btn=document.getElementById('refreshBtn');
   btn.textContent='⟳ ...'; btn.classList.add('busy');
   setStatus('FETCHING','yellow');
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders(),fPerpStats(),fBurned()]);
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders(),fPerpStats()]);
+  // Run fBurned after fSpot so it can use totalSupply if found there
+  if(!D.burned) await fBurned();
   setStatus('LIVE','green');
   renderAll();
   if(document.getElementById('tab-charts').classList.contains('active')) {
