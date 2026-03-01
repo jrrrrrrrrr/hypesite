@@ -3,68 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HYPE BURN — Live Token Intelligence</title>
+<title>Hype Intelligence — Live HYPE Token Analytics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<style>
-:root {
-  --bg: #08090c;
-  --bg2: #0d0f14;
-  --surface: #12151c;
-  --surface2: #181c25;
-  --surface3: #1e222d;
-  --border: #222738;
-  --border-bright: #2e3448;
-  --accent: #00d4ff;
-  --accent-glow: rgba(0,212,255,0.15);
-  --fire: #ff6b2b;
-  --fire-glow: rgba(255,107,43,0.15);
-  --fire-bright: #ff8a50;
-  --green: #00e676;
-  --green-dim: rgba(0,230,118,0.12);
-  --red: #ff3d5a;
-  --red-dim: rgba(255,61,90,0.12);
-  --text: #c0c8d8;
-  --text-dim: #5a6580;
-  --text-bright: #eef2ff;
-  --text-muted: #3a4258;
-  --purple: #a78bfa;
-  --yellow: #fbbf24;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Outfit', sans-serif;
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+if(typeof LightweightCharts==='undefined'){
+  document.write('<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+</script>
+<style>
+:root{--bg:#08090c;--bg2:#0d0f14;--surface:#12151c;--surface2:#181c25;--surface3:#1e222d;--border:#222738;--border-bright:#2e3448;--accent:#00d4ff;--accent-glow:rgba(0,212,255,0.15);--fire:#ff6b2b;--fire-glow:rgba(255,107,43,0.15);--green:#00e676;--green-dim:rgba(0,230,118,0.12);--red:#ff3d5a;--red-dim:rgba(255,61,90,0.12);--text:#c0c8d8;--text-dim:#5a6580;--text-bright:#eef2ff;--text-muted:#3a4258;--purple:#a78bfa;--yellow:#fbbf24;--mono:'JetBrains Mono',monospace;--sans:'Outfit',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;opacity:0.02;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px}
 
 nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
 .nav-left{display:flex;align-items:center;gap:16px}
-.logo{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:0.08em;display:flex;align-items:center;gap:8px}
+.logo{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:0.06em;display:flex;align-items:center;gap:8px}
 .logo .fire{font-size:20px;filter:drop-shadow(0 0 6px rgba(255,107,43,0.5))}
-.logo .hype{color:var(--text-bright)}
-.logo .burn{color:var(--fire)}
+.logo .hype{color:var(--text-bright)}.logo .intel{color:var(--accent);font-weight:400;letter-spacing:0.1em;font-size:12px}
 .nav-tabs{display:flex;gap:2px}
-.nav-tab{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.06em;padding:6px 14px;border-radius:6px;background:transparent;border:none;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
-.nav-tab:hover{color:var(--text);background:var(--surface)}
-.nav-tab.active{color:var(--accent);background:var(--accent-glow)}
+.nav-tab{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.06em;padding:6px 14px;border-radius:6px;background:0;border:0;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
+.nav-tab:hover{color:var(--text);background:var(--surface)}.nav-tab.active{color:var(--accent);background:var(--accent-glow)}
 .nav-right{display:flex;align-items:center;gap:12px}
 .ws-status{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text-dim)}
 .ws-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);transition:all 0.3s}
-.ws-dot.connected{background:var(--green);box-shadow:0 0 8px var(--green)}
-.ws-dot.error{background:var(--red);box-shadow:0 0 8px var(--red)}
+.ws-dot.connected{background:var(--green);box-shadow:0 0 8px var(--green)}.ws-dot.error{background:var(--red);box-shadow:0 0 8px var(--red)}
 .price-live{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text-bright)}
-.price-chg{font-family:var(--mono);font-size:11px;font-weight:500}
-.price-chg.up{color:var(--green)}.price-chg.down{color:var(--red)}
+.price-chg{font-family:var(--mono);font-size:11px;font-weight:500}.price-chg.up{color:var(--green)}.price-chg.down{color:var(--red)}
 .refresh-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;letter-spacing:0.06em;transition:all 0.2s}
 .refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
 
-.page{display:none;padding:24px;max-width:1400px;margin:0 auto}
-.page.active{display:block}
+.page{display:none;padding:24px;max-width:1400px;margin:0 auto}.page.active{display:block}
 .section-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px}
 
 .hero{text-align:center;padding:40px 0 28px}
@@ -74,8 +46,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .hero-price{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;margin-bottom:4px}
 .hero-price .dollar{color:var(--text-dim);font-weight:300}
 .hero-sub{font-family:var(--mono);font-size:12px;color:var(--text-dim)}
-.hero-sub .change{font-weight:600}
-.hero-sub .change.up{color:var(--green)}.hero-sub .change.down{color:var(--red)}
+.hero-sub .change{font-weight:600}.hero-sub .change.up{color:var(--green)}.hero-sub .change.down{color:var(--red)}
 
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
 .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.3s}
@@ -85,6 +56,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .mc-value{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;line-height:1.2}
 .mc-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:3px}
 .mc-value.fire{color:var(--fire)}.mc-value.green{color:var(--green)}.mc-value.cyan{color:var(--accent)}
+.mc-breakdown{font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px;line-height:1.8;border-top:1px solid var(--border);padding-top:6px}
+.mc-breakdown .brk{display:flex;justify-content:space-between}.mc-breakdown .bv{color:var(--text)}
 
 .two-col{display:grid;grid-template-columns:280px 1fr;gap:20px;margin-bottom:28px;align-items:start}
 .ring-wrap{display:flex;flex-direction:column;align-items:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
@@ -94,13 +67,19 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .ring-center .total{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text-bright)}
 .ring-center .label{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.1em}
 .legend-row{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:3px 0}
-.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.legend-label{color:var(--text-dim);flex:1;margin-left:8px}
-.legend-val{color:var(--text-bright);font-weight:600}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.legend-label{color:var(--text-dim);flex:1;margin-left:8px}.legend-val{color:var(--text-bright);font-weight:600}
 
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .info-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
 .info-card .mc-value{font-size:17px}
+
+/* AF LIVE PANEL */
+.af-live{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px}
+.af-live-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.af-stat{text-align:center}
+.af-stat .lbl{font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase}
+.af-stat .val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text-bright)}
+.af-stat .val.fire{color:var(--fire)}.af-stat .val.green{color:var(--green)}.af-stat .val.cyan{color:var(--accent)}
 
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
 .chart-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
@@ -121,14 +100,12 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .staking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
 .val-row{display:grid;grid-template-columns:24px 1fr 90px 70px;gap:6px;padding:6px 0;border-bottom:1px solid rgba(34,39,56,0.35);font-family:var(--mono);font-size:11px;align-items:center}
 .val-rank{color:var(--text-muted);font-size:10px;text-align:center}.val-name{color:var(--text-bright);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.val-stake{color:var(--accent);text-align:right}.val-comm{color:var(--text-dim);text-align:right}
-
 .data-table{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:360px;overflow-y:auto}
 .dt-row{display:grid;gap:6px;padding:5px 0;border-bottom:1px solid rgba(34,39,56,0.3);font-family:var(--mono);font-size:11px}
 
 footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);margin-top:24px}
 footer p{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.04em;line-height:2.2}
 footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--accent)}
-
 @media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}}
 </style>
@@ -137,7 +114,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <nav>
   <div class="nav-left">
-    <div class="logo"><span class="fire">🔥</span><span class="hype">HYPE</span><span class="burn">BURN</span></div>
+    <div class="logo"><span class="fire">🔥</span><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('overview',this)">Overview</button>
       <button class="nav-tab" onclick="showPage('charts',this)">Charts</button>
@@ -163,8 +140,13 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <div class="metrics-grid">
-    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned">—</div><div class="mc-sub" id="mBurnedSub">of 1B max supply</div></div>
-    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div><div class="mc-label">🥩 Total Staked</div><div class="mc-value green" id="mStaked">—</div><div class="mc-sub" id="mStakedSub">securing the network</div></div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Total Burned</div>
+      <div class="mc-value fire" id="mBurned">—</div>
+      <div class="mc-sub" id="mBurnedSub">—</div>
+      <div class="mc-breakdown" id="mBurnedBreakdown"></div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div><div class="mc-label">🥩 Total Staked</div><div class="mc-value green" id="mStaked">—</div><div class="mc-sub" id="mStakedSub">—</div></div>
     <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div><div class="mc-label">📊 Circulating</div><div class="mc-value cyan" id="mCirc">—</div><div class="mc-sub" id="mCircSub">—</div></div>
     <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div><div class="mc-label">💰 24h Spot Volume</div><div class="mc-value" id="mVol">—</div><div class="mc-sub">&nbsp;</div></div>
   </div>
@@ -176,23 +158,44 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div style="width:100%">
         <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Free Float</span><span class="legend-val" id="lgCirc">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked</span><span class="legend-val" id="lgStaked">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned (AF+Fees)</span><span class="legend-val" id="lgBurned">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Other</span><span class="legend-val" id="lgOther">—</span></div>
       </div>
     </div>
     <div>
-      <div class="section-title">🏦 Assistance Fund &amp; Network</div>
+      <div class="section-title">🏦 Assistance Fund</div>
       <div class="info-grid">
-        <div class="info-card"><div class="mc-label">AF USDC</div><div class="mc-value" id="afUsdc" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">AF HYPE</div><div class="mc-value" id="afHype" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Buyback Bids</div><div class="mc-value" id="afBids" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Burn Rate</div><div class="mc-value fire" id="afBurnRate" style="font-size:17px">—</div><div class="mc-sub">HYPE / day</div></div>
-        <div class="info-card"><div class="mc-label">24h Fees</div><div class="mc-value" id="afFees24" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Open Interest</div><div class="mc-value" id="psOI" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Perp Volume</div><div class="mc-value" id="psVol" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:17px">—</div></div>
+        <div class="info-card"><div class="mc-label">AF HYPE Holdings</div><div class="mc-value fire" id="afHype" style="font-size:17px">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
+        <div class="info-card"><div class="mc-label">AF USDC Balance</div><div class="mc-value cyan" id="afUsdc" style="font-size:17px">—</div></div>
+        <div class="info-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="afFeeBurns" style="font-size:17px">—</div><div class="mc-sub">from HyperCore + HyperEVM</div></div>
+        <div class="info-card"><div class="mc-label">Limit Order</div><div class="mc-value" id="afBidInfo" style="font-size:17px">—</div><div class="mc-sub" id="afBidDetail">—</div></div>
+        <div class="info-card"><div class="mc-label">Bid / Price Spread</div><div class="mc-value" id="afSpread" style="font-size:17px">—</div></div>
+        <div class="info-card"><div class="mc-label">Session Fees</div><div class="mc-value green" id="afSessionFees" style="font-size:17px">—</div><div class="mc-sub" id="afSessionTime">since page load</div></div>
+      </div>
+
+      <!-- AF Live Monitor Chart -->
+      <div class="af-live">
+        <div class="chart-hdr">
+          <div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div>
+        </div>
+        <div class="af-live-stats">
+          <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
+          <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
+          <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
+          <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
+        </div>
+        <div class="chart-wrap" id="afWrap" style="height:280px"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="section-title">🏛 Platform Stats</div>
+        <div class="info-grid">
+          <div class="info-card"><div class="mc-label">Open Interest</div><div class="mc-value" id="psOI" style="font-size:17px">—</div></div>
+          <div class="info-card"><div class="mc-label">Perp Volume</div><div class="mc-value" id="psVol" style="font-size:17px">—</div></div>
+          <div class="info-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:17px">—</div></div>
+          <div class="info-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:17px">—</div></div>
+          <div class="info-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:17px">—</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -213,14 +216,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
     <div class="chart-wrap" id="priceWrap"></div>
     <div class="chart-ohlc"><span>O: <span class="v" id="csO">—</span></span><span>H: <span class="v" id="csH">—</span></span><span>L: <span class="v" id="csL">—</span></span><span>C: <span class="v" id="csC">—</span></span><span>Vol: <span class="v" id="csVol">—</span></span><span id="csChg" style="font-weight:600"></span></div>
-  </div>
-  <div class="chart-box">
-    <div class="chart-hdr">
-      <div class="left"><span class="chart-title" style="color:var(--fire)">🔥 Cumulative Burn</span><span class="chart-meta" id="burnChartMeta">—</span></div>
-      <div class="tf-btns"><button class="tf-btn active" data-btf onclick="setBurnWindow(24,this)">24H</button><button class="tf-btn" data-btf onclick="setBurnWindow(72,this)">3D</button><button class="tf-btn" data-btf onclick="setBurnWindow(168,this)">7D</button><button class="tf-btn" data-btf onclick="setBurnWindow(0,this)">ALL</button></div>
-    </div>
-    <div class="chart-wrap" id="burnWrap"></div>
-    <div class="chart-ohlc"><span>Total: <span class="v" id="bsTotal">—</span></span><span>Period: <span class="v" id="bsPeriod">—</span></span><span>USD: <span class="v" id="bsUsd">—</span></span><span>Rate: <span class="v" id="bsRate">—</span></span></div>
   </div>
 </div>
 
@@ -247,31 +242,40 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 </div>
 
 <footer>
-  <p>HYPE BURN — Independent HYPE Token Analytics</p>
+  <p>Hype Intelligence — Independent HYPE Token Analytics</p>
   <p>Data: <a href="https://api.hyperliquid.xyz" target="_blank">Hyperliquid API</a> · <a href="https://hypurrscan.io" target="_blank">HypurrScan</a></p>
   <p>Not affiliated with Hyper Foundation</p>
 </footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-const HL='https://api.hyperliquid.xyz/info', HS='https://api.hypurrscan.io';
-const AF='0xfefefefefefefefefefefefefefefefefefefefe', MAX_S=1e9;
+const HL='https://api.hyperliquid.xyz/info',HS='https://api.hypurrscan.io';
+const AF='0xfefefefefefefefefefefefefefefefefefefefe',MAX_S=1e9;
 const HYPE_TID='0x0d01dc56dcaaca66ad901c959b4011ec';
-const D={price:null,priceChg:null,vol24:null,circSupply:null,burned:null,staked:null,apr:null,validators:[],queue:[],holders:[],afBal:null,afUsdc:null,afOrders:[],fees24:null,feesAll:null,feesRecent:[],allMids:{},markets:[],totalOI:0,totalPerpVol:0};
+
+// D.feesBurned = on-chain fee burns (maxSupply - totalSupply)
+// D.afHype = AF HYPE holdings (formally recognized as burned since Dec 2025 vote)
+// D.totalBurned = D.afHype + D.feesBurned
+const D={price:null,priceChg:null,vol24:null,circSupply:null,
+  feesBurned:0,afHype:0,totalBurned:0,
+  staked:null,apr:null,validators:[],queue:[],holders:[],
+  afUsdc:0,afOrders:[],afBid:null,afBidSz:null,
+  fees24:null,feesRecent:[],allMids:{},markets:[],totalOI:0,totalPerpVol:0};
 
 const F={
   c:n=>{if(n==null)return'—';n=+n;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toFixed(2)},
   f2:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
   f4:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}),
+  full:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
   pct:n=>n==null?'—':(n>=0?'+':'')+Number(n).toFixed(2)+'%',
   addr:a=>a?a.slice(0,6)+'…'+a.slice(-4):'—',
   usd:n=>n==null?'—':'$'+F.c(n),
   t:ts=>{if(!ts)return'—';const d=new Date(+ts);return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})},
 };
 
-const $=id=>document.getElementById(id), set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+const $=id=>document.getElementById(id),set=(id,v)=>{const e=$(id);if(e)e.textContent=v},htm=(id,v)=>{const e=$(id);if(e)e.innerHTML=v};
 
-function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');if(id==='charts')setTimeout(async()=>{if(!_priceChart){_initPriceChart();set('priceChartMeta','Loading…');const ok=await _fetchCandles(_pTf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}else if(_pData.length){_drawPS()}if(!_burnChart){_initBurnChart()}else{_drawBurnSeries()}},80)}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');if(id==='charts'&&typeof LightweightCharts!=='undefined')setTimeout(async()=>{if(!_priceChart){_initPriceChart();set('priceChartMeta','Loading…');const ok=await _fetchCandles(_pTf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}else if(_pData.length){_drawPS()}},80)}
 
 // ═══════════════════════════════════════════════════════════════
 //  API
@@ -285,11 +289,9 @@ async function hs(path){try{const r=await fetch(HS+path);if(!r.ok)return null;re
 const WS_URL='wss://api.hyperliquid.xyz/ws';
 let _ws=null,_wsR=0,_wsT=null,_liveTrades=[];
 const WS_COINS=['BTC','ETH','HYPE','SOL','DOGE'];
-
 function _wsConnect(){
   if(_ws&&(_ws.readyState===0||_ws.readyState===1))return;
-  try{
-    _ws=new WebSocket(WS_URL);
+  try{_ws=new WebSocket(WS_URL);
     _ws.onopen=()=>{_wsR=0;_wsStatus('connected');_ws.send(JSON.stringify({method:'subscribe',subscription:{type:'allMids'}}));WS_COINS.forEach(c=>_ws.send(JSON.stringify({method:'subscribe',subscription:{type:'trades',coin:c}})))};
     _ws.onmessage=evt=>{try{const m=JSON.parse(evt.data);if(m.channel==='allMids'&&m.data?.mids){const px=parseFloat(m.data.mids['@107']||m.data.mids['HYPE']||0);if(px){D.price=px;set('navPrice','$'+F.f2(px));set('heroPrice',F.f2(px))}D.allMids=m.data.mids}else if(m.channel==='trades'&&Array.isArray(m.data)){m.data.forEach(t=>_liveTrades.unshift({coin:t.coin||'?',side:t.side||'?',px:parseFloat(t.px||0),sz:parseFloat(t.sz||0),time:t.time||Date.now()}));if(_liveTrades.length>60)_liveTrades.length=60;_renderTrades()}}catch(e){}};
     _ws.onclose=()=>{_wsStatus('off');_wsReconn()};_ws.onerror=()=>{_wsStatus('error')};
@@ -305,21 +307,59 @@ setTimeout(_wsConnect,500);
 // ═══════════════════════════════════════════════════════════════
 async function fPrice(){const m=await hl({type:'allMids'});const px=parseFloat(m?.['@107']||m?.['HYPE']||0);if(px)D.price=px}
 
-async function fSpot(){try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(!Array.isArray(d)||d.length<2)return;const ctxs=d[1]||[];const c=ctxs.find(x=>x.coin==='@107'||x.coin==='HYPE/USDC')||ctxs[107];if(c){if(c.dayNtlVlm)D.vol24=parseFloat(c.dayNtlVlm);if(c.prevDayPx&&D.price)D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;if(c.circulatingSupply)D.circSupply=parseFloat(c.circulatingSupply);if(c.totalSupply){const ts=parseFloat(c.totalSupply);if(ts>0&&ts<MAX_S){D.burned=MAX_S-ts;console.log('[fSpot] ✅ burned='+D.burned)}}}}catch(e){}}
+async function fSpot(){try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(!Array.isArray(d)||d.length<2)return;const ctxs=d[1]||[];const c=ctxs.find(x=>x.coin==='@107'||x.coin==='HYPE/USDC')||ctxs[107];if(c){if(c.dayNtlVlm)D.vol24=parseFloat(c.dayNtlVlm);if(c.prevDayPx&&D.price)D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;if(c.circulatingSupply)D.circSupply=parseFloat(c.circulatingSupply);if(c.totalSupply){const ts=parseFloat(c.totalSupply);if(ts>0&&ts<MAX_S){D.feesBurned=MAX_S-ts;console.log('[fSpot] ✅ feesBurned='+D.feesBurned)}}}}catch(e){}}
 
 async function fStaking(){try{const d=await hl({type:'stakingSummary'});if(d?.totalStaked)D.staked=parseFloat(d.totalStaked);if(d?.apr)D.apr=parseFloat(d.apr)}catch(e){}}
 async function fValidators(){const d=await hs('/validators');if(Array.isArray(d))D.validators=d}
-async function fAfBal(){try{const[p,s]=await Promise.all([hl({type:'clearinghouseState',user:AF}),hl({type:'spotClearinghouseState',user:AF})]);if(p?.marginSummary)D.afUsdc=parseFloat(p.marginSummary.accountValue||0);if(s?.balances){const h=s.balances.find(b=>b.coin==='HYPE'||b.token===150);if(h)D.afBal=parseFloat(h.total||0)}}catch(e){}}
-async function fAfOrders(){try{const d=await hl({type:'frontendOpenOrders',user:AF});if(Array.isArray(d))D.afOrders=d.filter(o=>(o.coin||'').includes('HYPE')||(o.coin||'').includes('@107'))}catch(e){}}
+
+// AF: Get HYPE holdings + USDC balance from SPOT account
+async function fAfBal(){
+  // Try spot balances
+  try{
+    const s=await hl({type:'spotClearinghouseState',user:AF});
+    if(s?.balances){
+      const hBal=s.balances.find(b=>b.coin==='HYPE'||b.token===150);
+      if(hBal) D.afHype=parseFloat(hBal.total||hBal.hold||0);
+      const uBal=s.balances.find(b=>b.coin==='USDC');
+      if(uBal) D.afUsdc=parseFloat(uBal.total||uBal.hold||0);
+    }
+  }catch(e){console.warn('fAfBal spot:',e.message)}
+  // Also check perp account for additional USDC
+  try{
+    const p=await hl({type:'clearinghouseState',user:AF});
+    if(p?.marginSummary){
+      const perpUsdc=parseFloat(p.marginSummary.accountValue||0);
+      if(perpUsdc>D.afUsdc) D.afUsdc=perpUsdc;
+    }
+  }catch(e){console.warn('fAfBal perp:',e.message)}
+}
+
+// AF orders: get limit buy price and size
+async function fAfOrders(){
+  try{
+    const d=await hl({type:'openOrders',user:AF});
+    if(Array.isArray(d)){
+      D.afOrders=d;
+      const buys=d.filter(o=>o.side==='B').sort((a,b)=>parseFloat(b.limitPx||b.px||0)-parseFloat(a.limitPx||a.px||0));
+      if(buys.length){
+        D.afBid=parseFloat(buys[0].limitPx||buys[0].px||0);
+        D.afBidSz=parseFloat(buys[0].sz||0);
+      }
+    }
+  }catch(e){}
+}
+
 async function fDelegations(){try{const d=await hs('/delegations');if(Array.isArray(d)&&d.length){const tot=d.reduce((s,v)=>s+parseFloat(v.amount||v.stake||0),0);if(tot>0&&!D.staked)D.staked=tot}}catch(e){}}
 async function fQueue(){const d=await hs('/unstakingQueue');if(Array.isArray(d))D.queue=d}
-async function fFees(){const[recent,all]=await Promise.all([hs('/feesRecent'),hs('/fees')]);if(Array.isArray(recent)&&recent.length){D.feesRecent=recent;const cut=Date.now()-864e5;const pts=recent.filter(p=>+(p.time||p.timestamp||0)>cut);const fv=p=>parseFloat(p.total||p.fees||p.amount||p.value||p.fee||p.usd||p.usdcVolume||p.totalFees||p.totalUsd||p.revenue||0);if(pts.length)D.fees24=pts.reduce((s,p)=>s+fv(p),0)}if(all&&typeof all==='object'&&!Array.isArray(all)){if(all.totalBurned||all.burned)D.burned=parseFloat(all.totalBurned||all.burned)}}
 async function fHolders(){const d=await hs('/holdersWithLimit/HYPE/20');if(d?.addresses)D.holders=d.addresses}
+
 async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const[meta,ctxs]=d;let tOI=0,tVol=0;D.markets=(meta.universe||[]).map((u,i)=>{const c=ctxs[i];if(!c)return null;const mid=parseFloat(c.midPx||c.markPx||0);const oi=parseFloat(c.openInterest||0)*mid;const vol=parseFloat(c.dayNtlVlm||0);tOI+=oi;tVol+=vol;return{name:u.name,mid,oi,vol}}).filter(Boolean);D.totalOI=tOI;D.totalPerpVol=tVol}}catch(e){}}
 
-async function fBurned(){
-  try{const td=await hl({type:'tokenDetails',tokenId:HYPE_TID});if(td?.totalSupply){const ts=parseFloat(td.totalSupply),ms=parseFloat(td.maxSupply||MAX_S);if(ts>0&&ms>ts){D.burned=ms-ts;if(td.circulatingSupply)D.circSupply=parseFloat(td.circulatingSupply);console.log('[burned] ✅ tokenDetails: '+D.burned);return}}}catch(e){}
-  try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const ctx=(d[1]||[]).find(c=>c.coin==='@107'||c.coin==='HYPE/USDC');if(ctx?.totalSupply){const ts=parseFloat(ctx.totalSupply);if(ts>0&&ts<MAX_S){D.burned=MAX_S-ts;console.log('[burned] ✅ ctx: '+D.burned);return}}}}catch(e){}
+async function fFeesBurned(){
+  // Try tokenDetails first for precise fee burns
+  try{const td=await hl({type:'tokenDetails',tokenId:HYPE_TID});if(td?.totalSupply){const ts=parseFloat(td.totalSupply),ms=parseFloat(td.maxSupply||MAX_S);if(ts>0&&ms>ts){D.feesBurned=ms-ts;if(td.circulatingSupply)D.circSupply=parseFloat(td.circulatingSupply);console.log('[feesBurned] ✅ tokenDetails: '+D.feesBurned);return}}}catch(e){}
+  // Fallback to spotMeta
+  try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const ctx=(d[1]||[]).find(c=>c.coin==='@107'||c.coin==='HYPE/USDC');if(ctx?.totalSupply){const ts=parseFloat(ctx.totalSupply);if(ts>0&&ts<MAX_S){D.feesBurned=MAX_S-ts;console.log('[feesBurned] ✅ ctx: '+D.feesBurned);return}}}}catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -327,9 +367,11 @@ async function fBurned(){
 // ═══════════════════════════════════════════════════════════════
 async function loadAll(){
   const btn=$('refreshBtn');btn.textContent='⟳ …';
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fFees(),fHolders(),fPerpStats()]);
-  if(!D.burned)await fBurned();
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fHolders(),fPerpStats()]);
+  if(!D.feesBurned)await fFeesBurned();
   if(!D.staked&&D.validators.length){const t=D.validators.reduce((s,v)=>s+parseFloat(v.stake||v.totalStake||0),0);if(t>0)D.staked=t}
+  // Compute total burned = AF HYPE (formally burned by vote) + on-chain fee burns
+  D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
   btn.textContent='↻ REFRESH';renderAll();
 }
 
@@ -339,19 +381,40 @@ function renderAll(){
   if(D.price&&D.circSupply)set('heroMcap',F.usd(D.price*D.circSupply));
   if(D.price)set('heroFdv',F.usd(D.price*MAX_S));
 
-  if(D.burned){set('mBurned',F.c(D.burned)+' HYPE');set('mBurnedSub',((D.burned/MAX_S)*100).toFixed(3)+'% of max supply')}
+  // Total burned = AF HYPE + fee burns
+  if(D.totalBurned>0){
+    set('mBurned',F.c(D.totalBurned)+' HYPE');
+    const pctMax=((D.totalBurned/MAX_S)*100).toFixed(2);
+    const circ=D.circSupply||MAX_S;
+    const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
+    set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
+    htm('mBurnedBreakdown',
+      '<div class="brk"><span>AF HYPE (burned by vote)</span><span class="bv">'+F.c(D.afHype)+' HYPE</span></div>'+
+      '<div class="brk"><span>Fee burns (on-chain)</span><span class="bv">'+F.c(D.feesBurned)+' HYPE</span></div>'+
+      (D.price?'<div class="brk"><span>Total value burned</span><span class="bv">'+F.usd(D.totalBurned*D.price)+'</span></div>':'')
+    );
+  }
   if(D.staked){set('mStaked',F.c(D.staked)+' HYPE');set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
   if(D.circSupply){set('mCirc',F.c(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max')}
   if(D.vol24)set('mVol',F.usd(D.vol24));
 
   drawRing();
 
-  if(D.afUsdc!=null)set('afUsdc','$'+F.c(D.afUsdc));
-  if(D.afBal!=null)set('afHype',F.c(D.afBal)+' HYPE');
-  set('afBids',D.afOrders.length||'0');
-  if(D.fees24&&D.price)set('afBurnRate',F.c(D.fees24/D.price));
-  if(D.fees24)set('afFees24',F.usd(D.fees24));
+  // AF section
+  if(D.afHype){set('afHype',F.c(D.afHype)+' HYPE');if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price))}
+  set('afUsdc','$'+F.full(D.afUsdc));
+  set('afFeeBurns',F.c(D.feesBurned)+' HYPE');
+  if(D.afBid){
+    set('afBidInfo','$'+F.f2(D.afBid));
+    if(D.afBidSz)set('afBidDetail',F.c(D.afBidSz)+' HYPE · $'+F.f2(D.afBidSz*D.afBid)+' order');
+  }
+  if(D.afBid&&D.price){
+    const spread=((D.price-D.afBid)/D.price*100).toFixed(3);
+    const el=$('afSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}
+  }
   if(D.apr!=null)set('afApr',(D.apr*100).toFixed(2)+'%');
+
+  // Platform stats
   if(D.totalOI)set('psOI',F.usd(D.totalOI));
   if(D.totalPerpVol)set('psVol',F.usd(D.totalPerpVol));
   set('psMarkets',D.markets.length||'—');
@@ -365,8 +428,6 @@ function renderAll(){
   set('skQueue',F.c(qt)+' HYPE');set('skQueueSub',D.queue.length+' wallets');
 
   renderValidators();renderQueue();renderHolders();
-  // Redraw charts if they exist
-  if(_burnChart&&D.feesRecent.length)_drawBurnSeries();
   if(_priceChart&&_pData.length)_drawPS();
 }
 
@@ -376,7 +437,7 @@ function renderAll(){
 function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
   const dpr=window.devicePixelRatio||1;cv.width=220*dpr;cv.height=220*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,220,220);
-  const burned=D.burned||0,staked=D.staked||0,circ=D.circSupply||(MAX_S-burned),free=Math.max(0,circ-staked),other=Math.max(0,MAX_S-circ-burned);
+  const burned=D.totalBurned||0,staked=D.staked||0,circ=D.circSupply||(MAX_S-burned),free=Math.max(0,circ-staked),other=Math.max(0,MAX_S-circ-burned);
   set('lgCirc',F.c(free));set('lgStaked',F.c(staked));set('lgBurned',F.c(burned));set('lgOther',F.c(other));
   const segs=[{v:free,c:'#00d4ff'},{v:staked,c:'#00e676'},{v:burned,c:'#ff6b2b'},{v:other,c:'#2e3448'}];
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
@@ -392,25 +453,24 @@ function renderValidators(){
   const s=[...D.validators].sort((a,b)=>parseFloat(b.stake||b.totalStake||0)-parseFloat(a.stake||a.totalStake||0));
   el.innerHTML='<div class="val-row" style="color:var(--text-dim);font-size:10px;font-weight:600"><span class="val-rank">#</span><span>Name</span><span class="val-stake">Stake</span><span class="val-comm">Comm</span></div>'+s.slice(0,30).map((v,i)=>{const nm=v.name||v.validator||F.addr(v.address||v.validator||'');const st=parseFloat(v.stake||v.totalStake||v.stakedAmount||0);const cm=v.commission!=null?(parseFloat(v.commission)*100).toFixed(1)+'%':'—';return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.c(st)}</span><span class="val-comm">${cm}</span></div>`}).join('');
 }
-
 function renderQueue(){
   const el=$('queueTable');if(!el){return}if(!D.queue.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">No pending unstakes</div>';return}
   el.innerHTML=D.queue.slice(0,40).map(e=>{const a=F.addr(e.delegator||e.address||e.user||'');const amt=F.c(parseFloat(e.amount||e.hype||e.nHype||e.value||0));return`<div class="dt-row" style="grid-template-columns:1fr 100px"><span style="color:var(--accent)">${a}</span><span style="color:var(--text-bright);text-align:right">${amt}</span></div>`}).join('');
 }
-
 function renderHolders(){
   const el=$('holdersTable');if(!el||!D.holders.length)return;
   el.innerHTML=D.holders.map((h,i)=>{const a=h.address||h.user||h;const b=parseFloat(h.balance||h.total||h.amount||0);const p=b>0?((b/MAX_S)*100).toFixed(2)+'%':'';return`<div class="dt-row" style="grid-template-columns:24px 1fr 100px 50px"><span style="color:var(--text-muted);text-align:center">${i+1}</span><span style="color:var(--accent)">${F.addr(typeof a==='string'?a:'')}</span><span style="color:var(--text-bright);text-align:right">${F.c(b)}</span><span style="color:var(--text-dim);text-align:right;font-size:10px">${p}</span></div>`}).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  CHARTS
+//  CHARTS — LightweightCharts
 // ═══════════════════════════════════════════════════════════════
 function _lcBase(x){return Object.assign({layout:{background:{color:'#12151c'},textColor:'#5a6580',fontFamily:"'JetBrains Mono',monospace",fontSize:10},grid:{vertLines:{color:'rgba(34,39,56,0.55)'},horzLines:{color:'rgba(34,39,56,0.55)'}},crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(0,212,255,0.3)',labelBackgroundColor:'#181c25',width:1},horzLine:{color:'rgba(0,212,255,0.3)',labelBackgroundColor:'#181c25',width:1}},rightPriceScale:{borderColor:'#222738',textColor:'#5a6580'},timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:true},handleScroll:true,handleScale:true,autoSize:false},x||{})}
-function _ws2(id){const el=$(id);return el?{w:Math.max(el.clientWidth,200),h:el.clientHeight||360}:{w:800,h:360}}
+function _wsz(id){const el=$(id);return el?{w:Math.max(el.clientWidth,200),h:el.clientHeight||360}:{w:800,h:360}}
 
+// ── PRICE CHART ──────────────────────────────────────────
 let _priceChart=null,_pcS=null,_paS=null,_pvS=null,_pData=[],_pTf=60,_pType='candle';
-function _initPriceChart(){const w=$('priceWrap');if(!w)return;if(_priceChart){try{_priceChart.remove()}catch(e){}_priceChart=null}_pcS=null;_paS=null;_pvS=null;w.innerHTML='';const s=_ws2('priceWrap');_priceChart=LightweightCharts.createChart(w,_lcBase({width:s.w,height:s.h}));if(_pType==='area'){_paS=_priceChart.addAreaSeries({lineColor:'#00d4ff',topColor:'rgba(0,212,255,0.15)',bottomColor:'rgba(0,212,255,0.01)',lineWidth:2,priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.2)'})}else{_pcS=_priceChart.addCandlestickSeries({upColor:'#00e676',downColor:'#ff3d5a',borderUpColor:'#00e676',borderDownColor:'#ff3d5a',wickUpColor:'rgba(0,230,118,0.6)',wickDownColor:'rgba(255,61,90,0.6)',priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.2)'})}_pvS=_priceChart.addHistogramSeries({color:'rgba(0,212,255,0.06)',priceFormat:{type:'volume'},priceScaleId:'vol',lastValueVisible:false,priceLineVisible:false});_priceChart.priceScale('vol').applyOptions({scaleMargins:{top:0.85,bottom:0},visible:false});_priceChart.subscribeCrosshairMove(p=>{const sr=_pType==='area'?_paS:_pcS;if(!sr||!p.time)return;const d=p.seriesData.get(sr);if(!d)return;if(_pType==='candle'){const ch=d.close-d.open,pc=(ch/d.open*100).toFixed(2);set('csO','$'+F.f2(d.open));set('csH','$'+F.f2(d.high));set('csL','$'+F.f2(d.low));set('csC','$'+F.f2(d.close));const el=$('csChg');if(el){el.textContent=(ch>=0?'+':'')+F.f2(ch)+' ('+pc+'%)';el.style.color=ch>=0?'var(--green)':'var(--red)'}}else set('csC','$'+F.f2(d.value||0));const vd=p.seriesData.get(_pvS);if(vd)set('csVol',F.c(vd.value))});if(_pData.length)_drawPS()}
+function _initPriceChart(){const w=$('priceWrap');if(!w)return;if(_priceChart){try{_priceChart.remove()}catch(e){}_priceChart=null}_pcS=null;_paS=null;_pvS=null;w.innerHTML='';const s=_wsz('priceWrap');_priceChart=LightweightCharts.createChart(w,_lcBase({width:s.w,height:s.h}));if(_pType==='area'){_paS=_priceChart.addAreaSeries({lineColor:'#00d4ff',topColor:'rgba(0,212,255,0.15)',bottomColor:'rgba(0,212,255,0.01)',lineWidth:2,priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.2)'})}else{_pcS=_priceChart.addCandlestickSeries({upColor:'#00e676',downColor:'#ff3d5a',borderUpColor:'#00e676',borderDownColor:'#ff3d5a',wickUpColor:'rgba(0,230,118,0.6)',wickDownColor:'rgba(255,61,90,0.6)',priceLineVisible:true,priceLineColor:'rgba(0,212,255,0.2)'})}_pvS=_priceChart.addHistogramSeries({color:'rgba(0,212,255,0.06)',priceFormat:{type:'volume'},priceScaleId:'vol',lastValueVisible:false,priceLineVisible:false});_priceChart.priceScale('vol').applyOptions({scaleMargins:{top:0.85,bottom:0},visible:false});_priceChart.subscribeCrosshairMove(p=>{const sr=_pType==='area'?_paS:_pcS;if(!sr||!p.time)return;const d=p.seriesData.get(sr);if(!d)return;if(_pType==='candle'){const ch=d.close-d.open,pc=(ch/d.open*100).toFixed(2);set('csO','$'+F.f2(d.open));set('csH','$'+F.f2(d.high));set('csL','$'+F.f2(d.low));set('csC','$'+F.f2(d.close));const el=$('csChg');if(el){el.textContent=(ch>=0?'+':'')+F.f2(ch)+' ('+pc+'%)';el.style.color=ch>=0?'var(--green)':'var(--red)'}}else set('csC','$'+F.f2(d.value||0));const vd=p.seriesData.get(_pvS);if(vd)set('csVol',F.c(vd.value))});if(_pData.length)_drawPS()}
 
 function _drawPS(){if(!_priceChart||!_pData.length)return;try{if(_pType==='area'&&_paS)_paS.setData(_pData.map(c=>({time:c.time,value:c.close})));else if(_pcS)_pcS.setData(_pData);if(_pvS)_pvS.setData(_pData.map(c=>({time:c.time,value:c.volume,color:c.close>=c.open?'rgba(0,230,118,0.08)':'rgba(255,61,90,0.08)'})));const l=_pData[_pData.length-1];if(l){set('csO','$'+F.f2(l.open));set('csH','$'+F.f2(l.high));set('csL','$'+F.f2(l.low));set('csC','$'+F.f2(l.close))}_priceChart.timeScale().fitContent()}catch(e){}}
 
@@ -419,45 +479,129 @@ async function _fetchCandles(tf){const im={60:'1h',240:'4h',1440:'1D',10080:'1W'
 async function loadPriceChart(tf,btn){_pTf=tf;document.querySelectorAll('[data-ptf]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');set('priceChartMeta','Loading…');const ok=await _fetchCandles(tf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}
 function setPriceType(t){_pType=t;$('btnCandle').classList.toggle('active',t==='candle');$('btnArea').classList.toggle('active',t==='area');_initPriceChart()}
 
-let _burnChart=null,_burnAS=null,_burnH=24;
-function _initBurnChart(){const w=$('burnWrap');if(!w)return;if(_burnChart){try{_burnChart.remove()}catch(e){}_burnChart=null;_burnAS=null}w.innerHTML='';const s=_ws2('burnWrap');_burnChart=LightweightCharts.createChart(w,_lcBase({width:s.w,height:s.h,rightPriceScale:{borderColor:'#222738',textColor:'#5a6580',scaleMargins:{top:0.1,bottom:0.05}}}));_burnAS=_burnChart.addAreaSeries({lineColor:'#ff6b2b',topColor:'rgba(255,107,43,0.18)',bottomColor:'rgba(255,107,43,0.01)',lineWidth:2,priceLineVisible:false,crosshairMarkerVisible:true,crosshairMarkerRadius:4,priceFormat:{type:'custom',formatter:v=>F.c(v)+' HYPE'}});_burnChart.subscribeCrosshairMove(p=>{if(!p.time||!_burnAS)return;const d=p.seriesData.get(_burnAS);if(d){set('bsPeriod',F.c(d.value)+' HYPE');if(D.price)set('bsUsd',F.usd(d.value*D.price))}});_drawBurnSeries()}
+// ── AF LIVE MONITOR CHART ─────────────────────────────────
+let _afChart=null,_afPriceSeries=null,_afBidSeries=null,_afUsdcSeries=null;
+let _afLiveTimer=null,_afSessionStart=Date.now(),_afUsdcAtStart=null,_afPoints=[];
 
-function _drawBurnSeries(){if(!_burnAS)return;const sorted=[...D.feesRecent].sort((a,b)=>+(a.time||a.timestamp||0)-(+(b.time||b.timestamp||0)));if(!sorted.length)return;const cut=_burnH>0?Date.now()-_burnH*36e5:0;const f=sorted.filter(p=>+(p.time||p.timestamp||0)>cut);if(f.length<2)return;const px=D.price||1;let cum=0;const pts=[],seen=new Set();for(const p of f){cum+=parseFloat(p.total||p.fees||p.amount||0)/px;const t=Math.floor(+(p.time||p.timestamp||0)/1000);if(!seen.has(t)){seen.add(t);pts.push({time:t,value:cum})}}if(pts.length<2)return;try{_burnAS.setData(pts);set('bsTotal',F.c(D.burned||cum)+' HYPE');set('bsPeriod',F.c(cum)+' HYPE');if(D.price)set('bsUsd',F.usd(cum*D.price));const ts=(+(f[f.length-1].time||f[f.length-1].timestamp||0)-+(f[0].time||f[0].timestamp||0))/36e5;if(ts>0){set('bsRate',F.c(cum/ts)+'/hr');set('burnChartMeta',pts.length+' pts · '+F.c(cum)+' burned')}_burnChart.timeScale().fitContent()}catch(e){}}
+function _initAfChart(){
+  const wrap=$('afWrap');if(!wrap)return;
+  if(_afChart){try{_afChart.remove()}catch(e){}_afChart=null}
+  wrap.innerHTML='';
+  const s=_wsz('afWrap');
+  _afChart=LightweightCharts.createChart(wrap,_lcBase({
+    width:s.w,height:s.h,
+    rightPriceScale:{borderColor:'#222738',textColor:'#5a6580',scaleMargins:{top:0.05,bottom:0.05}},
+    leftPriceScale:{visible:false},
+    timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:true,rightOffset:4}
+  }));
+  _afPriceSeries=_afChart.addLineSeries({color:'#00d4ff',lineWidth:2,priceLineVisible:false,lastValueVisible:true,title:'HYPE Price',crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBackgroundColor:'#00d4ff'});
+  _afBidSeries=_afChart.addLineSeries({color:'#ff3d5a',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:true,title:'Limit Order Price',crosshairMarkerVisible:true,crosshairMarkerRadius:3,crosshairMarkerBackgroundColor:'#ff3d5a'});
+  _afUsdcSeries=_afChart.addLineSeries({color:'#ff9a3c',lineWidth:1.5,priceScaleId:'usdc',priceLineVisible:false,lastValueVisible:true,title:'USDC Balance',crosshairMarkerVisible:true,crosshairMarkerRadius:3,crosshairMarkerBackgroundColor:'#ff9a3c'});
+  _afChart.priceScale('usdc').applyOptions({scaleMargins:{top:0.7,bottom:0},visible:true,borderColor:'#222738',textColor:'#5a6580'});
+  _afChart.subscribeCrosshairMove(param=>{
+    if(!param.time)return;
+    const px=param.seriesData.get(_afPriceSeries),bid=param.seriesData.get(_afBidSeries),usd=param.seriesData.get(_afUsdcSeries);
+    if(px)set('afLivePrice','$'+F.f2(px.value));
+    if(bid)set('afLiveBid','$'+F.f2(bid.value));
+    if(usd)set('afLiveUsdc',F.full(usd.value)+' USDC');
+    if(px&&bid){const spread=((px.value-bid.value)/px.value*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}}
+  });
+  _redrawAfSeries();
+}
 
-function setBurnWindow(h,btn){_burnH=h;document.querySelectorAll('[data-btf]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');_drawBurnSeries();if(_burnChart)_burnChart.timeScale().fitContent()}
+function _redrawAfSeries(){
+  if(!_afChart||!_afPoints.length)return;
+  try{
+    const dedup=arr=>{const seen=new Set(),out=[];for(const p of arr){if(!seen.has(p.time)){seen.add(p.time);out.push(p)}}return out};
+    _afPriceSeries.setData(dedup(_afPoints.filter(p=>p.price!=null).map(p=>({time:p.time,value:p.price}))));
+    _afBidSeries.setData(dedup(_afPoints.filter(p=>p.bid!=null).map(p=>({time:p.time,value:p.bid}))));
+    _afUsdcSeries.setData(dedup(_afPoints.filter(p=>p.usdc!=null).map(p=>({time:p.time,value:p.usdc}))));
+    _afChart.timeScale().fitContent();
+  }catch(e){console.warn('af draw',e)}
+}
 
-window.addEventListener('resize',()=>{if(_priceChart){const s=_ws2('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}if(_burnChart){const s=_ws2('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}});
-
-// ═══════════════════════════════════════════════════════════════
-//  AF USDC LIVE POLLING (every 5s)
-// ═══════════════════════════════════════════════════════════════
-let _afLiveTimer=null;
 async function _afLiveTick(){
   try{
-    const[p,s]=await Promise.all([
-      hl({type:'clearinghouseState',user:AF}),
-      hl({type:'spotClearinghouseState',user:AF})
-    ]);
-    if(p?.marginSummary){
-      D.afUsdc=parseFloat(p.marginSummary.accountValue||0);
-      set('afUsdc','$'+F.c(D.afUsdc));
-    }
-    if(s?.balances){
-      const h=s.balances.find(b=>b.coin==='HYPE'||b.token===150);
-      if(h){D.afBal=parseFloat(h.total||0);set('afHype',F.c(D.afBal)+' HYPE')}
-    }
-    // Also refresh AF orders count
-    try{
-      const o=await hl({type:'frontendOpenOrders',user:AF});
-      if(Array.isArray(o)){D.afOrders=o.filter(x=>(x.coin||'').includes('HYPE')||(x.coin||'').includes('@107'));set('afBids',D.afOrders.length||'0')}
-    }catch(e){}
-  }catch(e){console.warn('AF live tick error',e)}
-}
-function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000)}
-_startAfLive();
+    // 1. Get price
+    const mids=await hl({type:'allMids'});const px=parseFloat(mids['@107']||mids['HYPE']||0);
+    if(px){D.price=px;set('navPrice','$'+F.f2(px));set('heroPrice',F.f2(px))}
 
+    // 2. Get AF spot balances (USDC + HYPE)
+    let usdc=null;
+    try{
+      const st=await hl({type:'spotClearinghouseState',user:AF});
+      if(st?.balances){
+        const u=st.balances.find(b=>b.coin==='USDC');
+        if(u) usdc=parseFloat(u.total||u.hold||0);
+        const h=st.balances.find(b=>b.coin==='HYPE'||b.token===150);
+        if(h){D.afHype=parseFloat(h.total||h.hold||0);set('afHype',F.c(D.afHype)+' HYPE');if(px)set('afHypeUsd','≈ '+F.usd(D.afHype*px))}
+      }
+    }catch(e){}
+    if(usdc!=null){D.afUsdc=usdc;set('afUsdc','$'+F.full(usdc))}
+
+    // 3. Get AF limit orders
+    let bid=null,bidSz=null;
+    try{
+      const orders=await hl({type:'openOrders',user:AF});
+      if(Array.isArray(orders)){
+        const buys=orders.filter(o=>o.side==='B').sort((a,b)=>parseFloat(b.limitPx||0)-parseFloat(a.limitPx||0));
+        if(buys[0]){bid=parseFloat(buys[0].limitPx||buys[0].px||0);bidSz=parseFloat(buys[0].sz||0)}
+      }
+    }catch(e){}
+    if(bid){D.afBid=bid;D.afBidSz=bidSz;set('afBidInfo','$'+F.f2(bid));if(bidSz)set('afBidDetail',F.c(bidSz)+' HYPE · $'+F.f2(bidSz*bid)+' order')}
+
+    // 4. Push point to chart
+    const t=Math.floor(Date.now()/1000);
+    _afPoints.push({time:t,price:px||null,bid:bid||null,usdc:usdc||null});
+    if(_afPoints.length>1440)_afPoints=_afPoints.slice(-1440);
+
+    // 5. Update live stats
+    if(px)set('afLivePrice','$'+F.f2(px));
+    if(bid)set('afLiveBid','$'+F.f2(bid));
+    if(usdc!=null)set('afLiveUsdc',F.full(usdc)+' USDC');
+    if(px&&bid){const spread=((px-bid)/px*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}}
+
+    // 6. Session fees tracking (USDC balance decrease = fees spent buying HYPE)
+    if(usdc!=null){
+      if(_afUsdcAtStart==null)_afUsdcAtStart=usdc;
+      const elapsed=Date.now()-_afSessionStart;
+      const m=Math.floor(elapsed/60000),s=Math.floor((elapsed%60000)/1000);
+      set('afSessionTime',m+'m '+s+'s on page');
+      // Session fees = how much USDC AF has spent (decrease in balance means buying)
+      const spent=_afUsdcAtStart-usdc;
+      set('afSessionFees','$'+F.f2(Math.abs(spent)));
+    }
+
+    // 7. Recompute total burned
+    D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
+
+    set('afChartMeta','Live · '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
+    _redrawAfSeries();
+  }catch(e){console.warn('af tick',e)}
+}
+
+function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000)}
+
+// ── RESIZE ──────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  if(_priceChart){const s=_wsz('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}
+  if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
 loadAll();
 setInterval(loadAll,30000);
+// Init AF chart + live polling after first load
+function _tryInitAf(){
+  if(typeof LightweightCharts==='undefined'){
+    console.warn('LightweightCharts not loaded yet, retrying in 2s…');
+    setTimeout(_tryInitAf,2000);return;
+  }
+  _initAfChart();_startAfLive();
+}
+setTimeout(_tryInitAf,2000);
 </script>
 </body>
 </html>
