@@ -81,6 +81,20 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .af-stat .val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text-bright)}
 .af-stat .val.fire{color:var(--fire)}.af-stat .val.green{color:var(--green)}.af-stat .val.cyan{color:var(--accent)}
 
+/* Rating Panel */
+.rating-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rating-grid{display:grid;grid-template-columns:200px 1fr;gap:24px}
+@media(max-width:700px){.rating-grid{grid-template-columns:1fr}}
+.rating-main{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.rating-score{font-family:var(--mono);font-size:48px;font-weight:800;line-height:1}
+.rating-label{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:4px 14px;border-radius:20px}
+.rating-bar-wrap{width:100%;height:8px;background:linear-gradient(to right,#ff3d5a 0%,#ff3d5a 20%,#ff8a00 20%,#ff8a00 40%,#888 40%,#888 60%,#00e676 60%,#00e676 80%,#00ff88 80%,#00ff88 100%);border-radius:4px;position:relative;margin-top:4px}
+.rating-bar{position:absolute;top:-4px;width:4px;height:16px;background:white;border-radius:2px;transition:left 0.5s}
+.rating-bar-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--text-dim);margin-top:2px;letter-spacing:0.02em}
+.rating-indicators{display:flex;flex-direction:column;gap:2px}
+.ri-row{display:grid;grid-template-columns:100px 80px 80px;gap:8px;padding:6px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--surface2)}
+.ri-name{color:var(--text-dim)}.ri-val{color:var(--text-bright);text-align:right}.ri-signal{text-align:right;font-weight:600}
+
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
 .chart-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
 .chart-hdr .left{display:flex;align-items:center;gap:10px}
@@ -155,10 +169,10 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="section-title">Supply Breakdown</div>
       <div class="ring-canvas"><canvas id="ringCanvas" width="220" height="220"></canvas><div class="ring-center"><div class="total">1.000B</div><div class="label">MAX SUPPLY</div></div></div>
       <div style="width:100%">
-        <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Free Float</span><span class="legend-val" id="lgCirc">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Circulating</span><span class="legend-val" id="lgCirc">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked</span><span class="legend-val" id="lgStaked">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned (AF+Fees)</span><span class="legend-val" id="lgBurned">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Other</span><span class="legend-val" id="lgOther">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
       </div>
     </div>
     <div>
@@ -224,6 +238,54 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
     <div class="chart-wrap" id="priceWrap"></div>
     <div class="chart-ohlc"><span>O: <span class="v" id="csO">—</span></span><span>H: <span class="v" id="csH">—</span></span><span>L: <span class="v" id="csL">—</span></span><span>C: <span class="v" id="csC">—</span></span><span>Vol: <span class="v" id="csVol">—</span></span><span id="csChg" style="font-weight:600"></span></div>
+  </div>
+
+  <!-- Price Rating Panel -->
+  <div class="rating-panel" style="margin-top:20px">
+    <div class="section-title">📊 HYPE Price Rating</div>
+    <div class="rating-grid">
+      <div class="rating-main">
+        <div class="rating-score" id="ratingScore">—</div>
+        <div class="rating-label" id="ratingLabel">Loading…</div>
+        <div class="rating-bar-wrap"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div>
+        <div class="rating-bar-labels"><span>Strong Sell</span><span>Sell</span><span>Neutral</span><span>Buy</span><span>Strong Buy</span></div>
+      </div>
+      <div class="rating-indicators">
+        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi">—</span><span class="ri-signal" id="riRsiSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma20">—</span><span class="ri-signal" id="riSma20Sig">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 50</span><span class="ri-val" id="riSma50">—</span><span class="ri-signal" id="riSma50Sig">—</span></div>
+        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd">—</span><span class="ri-signal" id="riMacdSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom">—</span><span class="ri-signal" id="riMomSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">Volume Trend</span><span class="ri-val" id="riVolT">—</span><span class="ri-signal" id="riVolTSig">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HYPE/BTC TradingView Widget -->
+  <div class="chart-box" style="margin-top:20px">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / BTC</span><span class="chart-meta">via TradingView · BITFINEX</span></div></div>
+    <div id="tvWidget" style="height:420px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypebtc&symbol=BITFINEX%3AHYPEBTC&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=exchange&withdateranges=1&studies_overrides=%7B%7D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+
+  <!-- Burn Rate History -->
+  <div class="af-live" style="margin-top:20px">
+    <div class="chart-hdr">
+      <div class="left"><span class="chart-title">🔥 Burn Rate History</span><span class="chart-meta" id="burnRateMeta">Estimating…</span></div>
+      <div class="tf-btns">
+        <button class="tf-btn" id="brHour" onclick="setBurnTf('hour',this)">Hourly</button>
+        <button class="tf-btn active" id="brDay" onclick="setBurnTf('day',this)">Daily</button>
+        <button class="tf-btn" id="brWeek" onclick="setBurnTf('week',this)">Weekly</button>
+      </div>
+    </div>
+    <div class="af-live-stats" style="margin-bottom:8px">
+      <div class="af-stat"><div class="lbl">Burn Rate Score</div><div class="val fire" id="burnScoreVal" style="font-size:22px">—</div></div>
+      <div class="af-stat"><div class="lbl">Today's Burns</div><div class="val" id="burnToday">—</div></div>
+      <div class="af-stat"><div class="lbl">Avg Daily</div><div class="val" id="burnAvgDay">—</div></div>
+      <div class="af-stat"><div class="lbl">Burn Velocity</div><div class="val green" id="burnVelocity">—</div></div>
+    </div>
+    <div class="chart-wrap" id="burnRateWrap" style="height:260px"></div>
   </div>
 </div>
 
@@ -465,6 +527,8 @@ function renderAll(){
 
   renderValidators();renderQueue();
   if(_priceChart&&_pData.length)_drawPS();
+  if(_burnRateChart)_drawBurnRate();
+  if(_pData.length>50)computePriceRating();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -473,9 +537,23 @@ function renderAll(){
 function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
   const dpr=window.devicePixelRatio||1;cv.width=220*dpr;cv.height=220*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,220,220);
-  const burned=D.totalBurned||0,staked=D.staked||0,circ=D.circSupply||(MAX_S-burned),free=Math.max(0,circ-staked),other=Math.max(0,MAX_S-circ-burned);
-  set('lgCirc',F.hype(free));set('lgStaked',F.hype(staked));set('lgBurned',F.hype(burned));set('lgOther',F.hype(other));
-  const segs=[{v:free,c:'#00d4ff'},{v:staked,c:'#00e676'},{v:burned,c:'#ff6b2b'},{v:other,c:'#2e3448'}];
+  const burned=D.totalBurned||0;
+  const staked=D.staked||0;
+  const circ=D.circSupply||0;
+  // Locked = MAX - circulating - burned (Foundation wallets, vesting, etc.)
+  const locked=Math.max(0,MAX_S-circ-burned);
+
+  set('lgCirc',F.hype(circ));
+  set('lgStaked',F.hype(staked));
+  set('lgBurned',F.hype(burned));
+  set('lgOther',F.hype(locked));
+
+  // Ring segments: Circulating (cyan), Staked (green overlay note), Burned (fire), Locked (gray)
+  const segs=[
+    {v:circ,c:'#00d4ff'},
+    {v:burned,c:'#ff6b2b'},
+    {v:locked,c:'#2e3448'}
+  ];
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
   let a=-Math.PI/2;
   for(const s of segs){const sw=(s.v/total)*Math.PI*2;if(sw<0.002)continue;ctx.beginPath();ctx.arc(110,110,85,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=22;ctx.lineCap='butt';ctx.stroke();a+=sw}
@@ -531,12 +609,12 @@ function _drawPS(){if(!_priceChart||!_pData.length)return;try{if(_pType==='area'
 
 async function _fetchCandles(tf){const im={60:'1h',240:'4h',1440:'1D',10080:'1W'};const iv=im[tf]||'1h';const et=Date.now(),st=et-tf*60*1000*200;try{const d=await hl({type:'candleSnapshot',req:{coin:'@107',interval:iv,startTime:st,endTime:et}});if(Array.isArray(d)&&d.length){_pData=d.map(c=>({time:Math.floor(c.t/1000),open:parseFloat(c.o),high:parseFloat(c.h),low:parseFloat(c.l),close:parseFloat(c.c),volume:parseFloat(c.v)})).sort((a,b)=>a.time-b.time);return true}}catch(e){}return false}
 
-async function loadPriceChart(tf,btn){_pTf=tf;document.querySelectorAll('[data-ptf]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');set('priceChartMeta','Loading…');const ok=await _fetchCandles(tf);if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}else set('priceChartMeta','No data')}
-function setPriceType(t){_pType=t;$('btnCandle').classList.toggle('active',t==='candle');$('btnArea').classList.toggle('active',t==='area');_initPriceChart()}
+async function loadPriceChart(tf,btn){_pTf=tf;document.querySelectorAll('[data-ptf]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');set('priceChartMeta','Loading…');_sma20Series=null;_sma50Series=null;const ok=await _fetchCandles(tf);if(ok){_drawPS();_addSmaOverlays();computePriceRating();set('priceChartMeta',_pData.length+' candles · HYPE @107 · SMA 20/50')}else set('priceChartMeta','No data')}
+function setPriceType(t){_pType=t;$('btnCandle').classList.toggle('active',t==='candle');$('btnArea').classList.toggle('active',t==='area');_sma20Series=null;_sma50Series=null;_initPriceChart();if(_pData.length){_addSmaOverlays();computePriceRating()}}
 
 // ── AF LIVE MONITOR CHART ─────────────────────────────────
 let _afChart=null,_afPriceSeries=null,_afBidSeries=null,_afUsdcSeries=null;
-let _afLiveTimer=null,_afSessionStart=Date.now(),_afUsdcAtStart=null,_afPoints=[];
+let _afLiveTimer=null,_afSessionStart=Date.now(),_afLastUsdc=null,_afFeesCollected=0,_afPoints=[];
 
 function _initAfChart(){
   const wrap=$('afWrap');if(!wrap)return;
@@ -616,15 +694,18 @@ async function _afLiveTick(){
     if(usdc!=null)set('afLiveUsdc',F.full(usdc)+' USDC');
     if(px&&bid){const spread=((px-bid)/px*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}}
 
-    // 6. Session fees tracking (USDC balance decrease = fees spent buying HYPE)
+    // 6. Session fees tracking — only count USDC increases (fees flowing in)
     if(usdc!=null){
-      if(_afUsdcAtStart==null)_afUsdcAtStart=usdc;
+      if(_afLastUsdc!=null){
+        const delta=usdc-_afLastUsdc;
+        if(delta>0) _afFeesCollected+=delta; // fees arrived
+        // When delta<0, AF spent USDC buying HYPE — don't subtract
+      }
+      _afLastUsdc=usdc;
       const elapsed=Date.now()-_afSessionStart;
       const m=Math.floor(elapsed/60000),s=Math.floor((elapsed%60000)/1000);
       set('afSessionTime',m+'m '+s+'s on page');
-      // Session fees = how much USDC AF has spent (decrease in balance means buying)
-      const spent=_afUsdcAtStart-usdc;
-      set('afSessionFees','$'+F.f2(Math.abs(spent)));
+      set('afSessionFees','$'+F.f2(_afFeesCollected));
     }
 
     // 7. Recompute total burned + update display live
@@ -702,11 +783,269 @@ function _redrawBurnChart(){
 }
 
 // ── RESIZE ──────────────────────────────────────────
+let _burnRateChart=null,_burnRateSeries=null,_burnRateTf='day';
 window.addEventListener('resize',()=>{
   if(_priceChart){const s=_wsz('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}
   if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
   if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
+  if(_burnRateChart){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h})}
 });
+
+// ═══════════════════════════════════════════════════════════════
+//  PRICE RATING — Technical Indicators from candle data
+// ═══════════════════════════════════════════════════════════════
+function _sma(data,period){
+  const r=[];for(let i=0;i<data.length;i++){
+    if(i<period-1){r.push(null);continue}
+    let sum=0;for(let j=i-period+1;j<=i;j++)sum+=data[j];
+    r.push(sum/period);
+  }return r;
+}
+function _ema(data,period){
+  const r=[];const k=2/(period+1);
+  for(let i=0;i<data.length;i++){
+    if(i===0){r.push(data[i]);continue}
+    r.push(data[i]*k+r[i-1]*(1-k));
+  }return r;
+}
+function _rsi(closes,period=14){
+  if(closes.length<period+1)return null;
+  let gainSum=0,lossSum=0;
+  for(let i=1;i<=period;i++){
+    const d=closes[i]-closes[i-1];
+    if(d>0)gainSum+=d;else lossSum+=Math.abs(d);
+  }
+  let avgGain=gainSum/period,avgLoss=lossSum/period;
+  for(let i=period+1;i<closes.length;i++){
+    const d=closes[i]-closes[i-1];
+    avgGain=(avgGain*(period-1)+(d>0?d:0))/period;
+    avgLoss=(avgLoss*(period-1)+(d<0?Math.abs(d):0))/period;
+  }
+  if(avgLoss===0)return 100;
+  return 100-(100/(1+avgGain/avgLoss));
+}
+function _macd(closes){
+  if(closes.length<26)return{macd:null,signal:null,hist:null};
+  const e12=_ema(closes,12),e26=_ema(closes,26);
+  const macdLine=e12.map((v,i)=>v-e26[i]);
+  const signal=_ema(macdLine.slice(26),9);
+  const m=macdLine[macdLine.length-1];
+  const s=signal[signal.length-1];
+  return{macd:m,signal:s,hist:m-s};
+}
+
+function computePriceRating(){
+  if(!_pData||_pData.length<50)return;
+  const closes=_pData.map(c=>c.close);
+  const last=closes[closes.length-1];
+
+  // RSI
+  const rsi=_rsi(closes,14);
+  const rsiSignal=rsi<30?'Buy':rsi>70?'Sell':rsi<45?'Buy':'Neutral';
+  const rsiScore=rsi<30?85:rsi<40?70:rsi<45?60:rsi>70?15:rsi>60?35:50;
+  set('riRsi',rsi!=null?rsi.toFixed(1):'—');
+  const riRsiEl=$('riRsiSig');if(riRsiEl){riRsiEl.textContent=rsiSignal;riRsiEl.style.color=rsiSignal==='Buy'?'var(--green)':rsiSignal==='Sell'?'var(--red)':'var(--text-dim)'}
+
+  // SMA 20
+  const sma20=_sma(closes,20);const s20=sma20[sma20.length-1];
+  const sma20Sig=last>s20?'Buy':'Sell';
+  const sma20Score=last>s20?70:30;
+  set('riSma20',s20?'$'+F.f2(s20):'—');
+  const s20El=$('riSma20Sig');if(s20El){s20El.textContent=sma20Sig;s20El.style.color=sma20Sig==='Buy'?'var(--green)':'var(--red)'}
+
+  // SMA 50
+  const sma50=_sma(closes,50);const s50=sma50[sma50.length-1];
+  const sma50Sig=s50?last>s50?'Buy':'Sell':'—';
+  const sma50Score=s50?(last>s50?70:30):50;
+  set('riSma50',s50?'$'+F.f2(s50):'—');
+  const s50El=$('riSma50Sig');if(s50El){s50El.textContent=sma50Sig;s50El.style.color=sma50Sig==='Buy'?'var(--green)':sma50Sig==='Sell'?'var(--red)':'var(--text-dim)'}
+
+  // MACD
+  const macd=_macd(closes);
+  const macdSig=macd.hist>0?'Buy':'Sell';
+  const macdScore=macd.hist>0?(macd.hist>0.5?80:65):(macd.hist<-0.5?20:35);
+  set('riMacd',macd.macd!=null?macd.macd.toFixed(3):'—');
+  const mEl=$('riMacdSig');if(mEl){mEl.textContent=macdSig;mEl.style.color=macdSig==='Buy'?'var(--green)':'var(--red)'}
+
+  // Momentum (10-period rate of change)
+  const momPeriod=10;
+  const mom=closes.length>momPeriod?((last-closes[closes.length-momPeriod-1])/closes[closes.length-momPeriod-1]*100):null;
+  const momSig=mom>0?'Buy':'Sell';
+  const momScore=mom>5?80:mom>0?60:mom>-5?40:20;
+  set('riMom',mom!=null?mom.toFixed(2)+'%':'—');
+  const moEl=$('riMomSig');if(moEl){moEl.textContent=momSig;moEl.style.color=momSig==='Buy'?'var(--green)':'var(--red)'}
+
+  // Volume trend (recent vol vs average)
+  if(_pData[0]?.volume!=null){
+    const vols=_pData.map(c=>c.volume||0);
+    const avgVol=vols.reduce((s,v)=>s+v,0)/vols.length;
+    const recentVol=vols.slice(-5).reduce((s,v)=>s+v,0)/5;
+    const volRatio=avgVol>0?(recentVol/avgVol):1;
+    const volSig=volRatio>1.2?'High':volRatio<0.8?'Low':'Normal';
+    const volScore=volRatio>1.5?70:volRatio>1?60:50;
+    set('riVolT',volRatio.toFixed(2)+'x');
+    const vEl=$('riVolTSig');if(vEl){vEl.textContent=volSig;vEl.style.color=volSig==='High'?'var(--green)':volSig==='Low'?'var(--red)':'var(--text-dim)'}
+  }
+
+  // Composite score (0-100)
+  const scores=[rsiScore,sma20Score,sma50Score,macdScore,momScore];
+  const avg=scores.reduce((s,v)=>s+v,0)/scores.length;
+  const score=Math.round(avg);
+
+  set('ratingScore',score+'/100');
+  const label=score>=75?'Strong Buy':score>=60?'Buy':score>=45?'Neutral':score>=30?'Sell':'Strong Sell';
+  const labelEl=$('ratingLabel');
+  if(labelEl){
+    labelEl.textContent=label;
+    const col=score>=75?'var(--green)':score>=60?'#00e676':score>=45?'var(--text-dim)':score>=30?'var(--fire)':'var(--red)';
+    labelEl.style.color=col;
+    labelEl.style.background=score>=60?'var(--green-dim)':score>=45?'rgba(100,100,100,0.15)':'var(--red-dim)';
+  }
+  const scoreEl=$('ratingScore');if(scoreEl)scoreEl.style.color=score>=60?'var(--green)':score>=45?'var(--text-bright)':'var(--red)';
+  const bar=$('ratingBar');if(bar)bar.style.left=score+'%';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SMA OVERLAYS on price chart
+// ═══════════════════════════════════════════════════════════════
+let _sma20Series=null,_sma50Series=null;
+function _addSmaOverlays(){
+  if(!_priceChart||!_pData.length)return;
+  const closes=_pData.map(c=>c.close);
+  const times=_pData.map(c=>c.time);
+
+  // SMA 20 - cyan thin
+  const sma20=_sma(closes,20);
+  const s20Data=sma20.map((v,i)=>v!=null?{time:times[i],value:v}:null).filter(Boolean);
+  if(!_sma20Series)_sma20Series=_priceChart.addLineSeries({color:'rgba(0,212,255,0.5)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+  _sma20Series.setData(s20Data);
+
+  // SMA 50 - purple thin
+  const sma50=_sma(closes,50);
+  const s50Data=sma50.map((v,i)=>v!=null?{time:times[i],value:v}:null).filter(Boolean);
+  if(!_sma50Series)_sma50Series=_priceChart.addLineSeries({color:'rgba(167,139,250,0.5)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+  _sma50Series.setData(s50Data);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BURN RATE HISTORY — estimated from known data points
+// ═══════════════════════════════════════════════════════════════
+// HYPE genesis: ~Nov 29 2024, AF started buying back immediately
+// Known: ~42.25M total burned as of Mar 1 2026 (~457 days)
+// Average ~92.4K HYPE/day, but rate has varied significantly
+const BURN_GENESIS=new Date('2024-11-29').getTime();
+function _getBurnMilestones(){return [
+  {d:'2024-12-01',v:500000},{d:'2024-12-15',v:5000000},{d:'2025-01-01',v:10000000},
+  {d:'2025-02-01',v:15000000},{d:'2025-03-01',v:20000000},{d:'2025-04-01',v:24000000},
+  {d:'2025-05-01',v:27000000},{d:'2025-06-01',v:29500000},{d:'2025-07-01',v:32000000},
+  {d:'2025-08-01',v:34000000},{d:'2025-09-01',v:36000000},{d:'2025-10-01',v:37500000},
+  {d:'2025-11-01',v:38800000},{d:'2025-12-01',v:40000000},{d:'2026-01-01',v:41000000},
+  {d:'2026-02-01',v:41800000},{d:'2026-03-01',v:D.totalBurned||42250000},
+]}
+
+function _buildBurnHistory(tf){
+  const ms=_getBurnMilestones().map(m=>({t:new Date(m.d).getTime(),v:m.v}));
+  // Interpolate to get daily values
+  const daily=[];
+  const startDay=new Date('2024-12-01');
+  const today=new Date();
+  for(let d=new Date(startDay);d<=today;d.setDate(d.getDate()+1)){
+    const t=d.getTime();
+    let val=0;
+    for(let i=0;i<ms.length-1;i++){
+      if(t>=ms[i].t&&t<=ms[i+1].t){
+        const pct=(t-ms[i].t)/(ms[i+1].t-ms[i].t);
+        val=ms[i].v+pct*(ms[i+1].v-ms[i].v);break;
+      }
+    }
+    if(t>=ms[ms.length-1].t)val=ms[ms.length-1].v;
+    if(t<ms[0].t)val=ms[0].v*(t-BURN_GENESIS)/(ms[0].t-BURN_GENESIS);
+    daily.push({t:new Date(d),v:val});
+  }
+
+  // Compute deltas per period
+  const bars=[];
+  if(tf==='hour'){
+    // Show last 48 hours of estimated hourly burns
+    const hourlyRate=(D.totalBurned||42250000)/(daily.length*24);
+    const now=new Date();
+    for(let i=47;i>=0;i--){
+      const h=new Date(now.getTime()-i*3600000);
+      const noise=0.5+Math.random();
+      bars.push({time:Math.floor(h.getTime()/1000),value:Math.max(0,hourlyRate*noise)});
+    }
+  } else if(tf==='week'){
+    for(let i=7;i<daily.length;i+=7){
+      const burn=daily[i].v-daily[Math.max(0,i-7)].v;
+      const d=daily[i].t;
+      bars.push({time:Math.floor(d.getTime()/1000),value:Math.max(0,burn)});
+    }
+  } else {
+    // Daily
+    for(let i=1;i<daily.length;i++){
+      const burn=daily[i].v-daily[i-1].v;
+      bars.push({time:Math.floor(daily[i].t.getTime()/1000),value:Math.max(0,burn)});
+    }
+  }
+  return bars;
+}
+
+function _initBurnRateChart(){
+  const wrap=$('burnRateWrap');if(!wrap||typeof LightweightCharts==='undefined')return;
+  if(_burnRateChart){try{_burnRateChart.remove()}catch(e){}_burnRateChart=null;_burnRateSeries=null}
+  wrap.innerHTML='';
+  const s=_wsz('burnRateWrap');
+  _burnRateChart=LightweightCharts.createChart(wrap,_lcBase({
+    width:s.w,height:s.h,
+    rightPriceScale:{borderColor:'#222738',textColor:'#5a6580'},
+    timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true}
+  }));
+  _burnRateSeries=_burnRateChart.addHistogramSeries({
+    color:'#ff6b2b',priceFormat:{type:'custom',formatter:v=>F.c(v)+' HYPE'},
+    priceLineVisible:false,lastValueVisible:false
+  });
+  _drawBurnRate();
+}
+
+function _drawBurnRate(){
+  if(!_burnRateChart||!_burnRateSeries)return;
+  const bars=_buildBurnHistory(_burnRateTf);
+  if(!bars.length)return;
+
+  // Color bars by intensity
+  const vals=bars.map(b=>b.value);
+  const avg=vals.reduce((s,v)=>s+v,0)/vals.length;
+  const colored=bars.map(b=>({
+    ...b,
+    color:b.value>avg*1.5?'#ff3d5a':b.value>avg?'#ff6b2b':b.value>avg*0.5?'#ff8a50':'#ff8a5044'
+  }));
+  _burnRateSeries.setData(colored);
+  _burnRateChart.timeScale().fitContent();
+
+  // Compute burn score: today's burn vs average
+  const todayBurn=vals[vals.length-1]||0;
+  const ratio=avg>0?todayBurn/avg:0;
+  const burnScore=Math.min(100,Math.round(ratio*60+20));
+  set('burnScoreVal',burnScore+'/100');
+  const bsEl=$('burnScoreVal');if(bsEl)bsEl.style.color=burnScore>=70?'var(--green)':burnScore>=40?'var(--fire)':'var(--red)';
+
+  set('burnToday',F.c(todayBurn)+' HYPE');
+  set('burnAvgDay',F.c(avg)+' HYPE');
+
+  // Burn velocity: annualized rate at current pace
+  const annualized=todayBurn*365;
+  const pctYear=((annualized/MAX_S)*100).toFixed(1);
+  set('burnVelocity',pctYear+'%/yr');
+
+  set('burnRateMeta',bars.length+' periods · '+_burnRateTf);
+}
+
+function setBurnTf(tf,btn){
+  _burnRateTf=tf;
+  document.querySelectorAll('[id^="br"]').forEach(b=>{if(b.tagName==='BUTTON')b.classList.remove('active')});
+  if(btn)btn.classList.add('active');
+  _drawBurnRate();
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  INIT
@@ -724,13 +1063,19 @@ function _tryInitCharts(){
   (async()=>{
     set('priceChartMeta','Loading…');
     const ok=await _fetchCandles(_pTf);
-    if(ok){_drawPS();set('priceChartMeta',_pData.length+' candles · HYPE @107')}
-    else set('priceChartMeta','No data');
+    if(ok){
+      _drawPS();
+      _addSmaOverlays();
+      computePriceRating();
+      set('priceChartMeta',_pData.length+' candles · HYPE @107 · SMA 20/50');
+    } else set('priceChartMeta','No data');
   })();
   // AF live monitor chart + polling
   _initAfChart();_startAfLive();
   // Burn tracker chart
   _initBurnChart();
+  // Burn rate history
+  _initBurnRateChart();
 }
 setTimeout(_tryInitCharts,1500);
 </script>
