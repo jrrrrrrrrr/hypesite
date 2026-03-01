@@ -53,7 +53,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .metric-card:hover{border-color:var(--border-bright)}
 .mc-glow{position:absolute;top:-30px;right:-30px;width:70px;height:70px;border-radius:50%;filter:blur(35px);opacity:0.12;pointer-events:none}
 .mc-label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px}
-.mc-value{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;line-height:1.2}
+.mc-value{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;line-height:1.2}
 .mc-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:3px}
 .mc-value.fire{color:var(--fire)}.mc-value.green{color:var(--green)}.mc-value.cyan{color:var(--accent)}
 .mc-breakdown{font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px;line-height:1.8;border-top:1px solid var(--border);padding-top:6px}
@@ -186,6 +186,20 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div class="chart-wrap" id="afWrap" style="height:280px"></div>
       </div>
 
+      <!-- Cumulative Burn Chart -->
+      <div class="af-live" style="margin-top:16px">
+        <div class="chart-hdr">
+          <div class="left"><span class="chart-title">🔥 Live Burn Tracker</span><span class="chart-meta" id="burnChartMeta">Collecting data…</span></div>
+        </div>
+        <div class="af-live-stats" style="margin-bottom:8px">
+          <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
+          <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
+          <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
+          <div class="af-stat"><div class="lbl">USD Value</div><div class="val green" id="burnLiveUsd">—</div></div>
+        </div>
+        <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
+      </div>
+
       <div style="margin-top:16px">
         <div class="section-title">🏛 Platform Stats</div>
         <div class="info-grid">
@@ -260,6 +274,8 @@ const D={price:null,priceChg:null,vol24:null,circSupply:null,
 
 const F={
   c:n=>{if(n==null)return'—';n=+n;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toFixed(2)},
+  // Full digit format: 42,500,001.12
+  hype:n=>{if(n==null)return'—';return Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})},
   f2:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
   f4:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4}),
   full:n=>n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
@@ -307,17 +323,22 @@ async function fSpot(){try{const d=await hl({type:'spotMetaAndAssetCtxs'});if(!A
 
 async function fStaking(){
   try{
-    // Use the correct Hyperliquid native API endpoint
     const d=await hl({type:'validatorSummaries'});
     if(Array.isArray(d)&&d.length){
       D.validators=d;
       let totalStake=0;
-      d.forEach(v=>{totalStake+=parseFloat(v.stake||0)});
+      d.forEach(v=>{
+        let s=parseFloat(v.stake||0);
+        // Raw stake values are in smallest units; auto-detect and convert
+        if(s>1e12) s=s/1e8; // HYPE has 8 decimal places on L1
+        v._stakeHype=s; // store converted value
+        totalStake+=s;
+      });
       if(totalStake>0)D.staked=totalStake;
-      console.log('[fStaking] ✅ '+d.length+' validators, totalStaked='+totalStake);
+      console.log('[fStaking] ✅ '+d.length+' validators, totalStaked='+F.hype(totalStake));
+      if(d[0])console.log('[fStaking] sample:',JSON.stringify({name:d[0].name,stake:d[0].stake,_stakeHype:d[0]._stakeHype,commission:d[0].commission,isJailed:d[0].isJailed}));
     }
   }catch(e){console.warn('fStaking err',e.message)}
-  // Also try to get APR from stakingSummary (may not exist)
   try{const s=await hl({type:'stakingSummary'});if(s?.apr)D.apr=parseFloat(s.apr)}catch(e){}
 }
 
@@ -389,27 +410,27 @@ function renderAll(){
 
   // Total burned = AF HYPE + fee burns
   if(D.totalBurned>0){
-    set('mBurned',F.c(D.totalBurned)+' HYPE');
+    set('mBurned',F.hype(D.totalBurned)+' HYPE');
     const pctMax=((D.totalBurned/MAX_S)*100).toFixed(2);
     const circ=D.circSupply||MAX_S;
     const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
     set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
     htm('mBurnedBreakdown',
-      '<div class="brk"><span>AF HYPE (burned by vote)</span><span class="bv">'+F.c(D.afHype)+' HYPE</span></div>'+
-      '<div class="brk"><span>Fee burns (on-chain)</span><span class="bv">'+F.c(D.feesBurned)+' HYPE</span></div>'+
+      '<div class="brk"><span>AF HYPE (burned by vote)</span><span class="bv">'+F.hype(D.afHype)+'</span></div>'+
+      '<div class="brk"><span>Fee burns (on-chain)</span><span class="bv">'+F.hype(D.feesBurned)+'</span></div>'+
       (D.price?'<div class="brk"><span>Total value burned</span><span class="bv">'+F.usd(D.totalBurned*D.price)+'</span></div>':'')
     );
   }
-  if(D.staked){set('mStaked',F.c(D.staked)+' HYPE');set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
-  if(D.circSupply){set('mCirc',F.c(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max')}
+  if(D.staked){set('mStaked',F.hype(D.staked)+' HYPE');set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
+  if(D.circSupply){set('mCirc',F.hype(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max')}
   if(D.vol24)set('mVol',F.usd(D.vol24));
 
   drawRing();
 
   // AF section
-  if(D.afHype){set('afHype',F.c(D.afHype)+' HYPE');if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price))}
+  if(D.afHype){set('afHype',F.hype(D.afHype)+' HYPE');if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price))}
   set('afUsdc','$'+F.full(D.afUsdc));
-  set('afFeeBurns',F.c(D.feesBurned)+' HYPE');
+  set('afFeeBurns',F.hype(D.feesBurned)+' HYPE');
   if(D.afBid){
     set('afBidInfo','$'+F.f2(D.afBid));
     if(D.afBidSz)set('afBidDetail',F.c(D.afBidSz)+' HYPE · $'+F.f2(D.afBidSz*D.afBid)+' order');
@@ -427,7 +448,7 @@ function renderAll(){
   set('psVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
 
   // Staking page
-  if(D.staked){set('skTotal',F.c(D.staked)+' HYPE');set('skTotalSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
+  if(D.staked){set('skTotal',F.hype(D.staked)+' HYPE');set('skTotalSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
   if(D.apr!=null)set('skApr',(D.apr*100).toFixed(2)+'%');
   set('skVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
   const qt=D.queue.reduce((s,e)=>{let a=0;if(e.amount)a=parseFloat(e.amount);else if(e.nHype){const n=parseFloat(e.nHype);a=n>1e15?n/1e18:n}else if(e.hype)a=parseFloat(e.hype);else if(e.value)a=parseFloat(e.value);if(a>1e12)a=a/1e18;return s+a},0);
@@ -444,7 +465,7 @@ function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
   const dpr=window.devicePixelRatio||1;cv.width=220*dpr;cv.height=220*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,220,220);
   const burned=D.totalBurned||0,staked=D.staked||0,circ=D.circSupply||(MAX_S-burned),free=Math.max(0,circ-staked),other=Math.max(0,MAX_S-circ-burned);
-  set('lgCirc',F.c(free));set('lgStaked',F.c(staked));set('lgBurned',F.c(burned));set('lgOther',F.c(other));
+  set('lgCirc',F.hype(free));set('lgStaked',F.hype(staked));set('lgBurned',F.hype(burned));set('lgOther',F.hype(other));
   const segs=[{v:free,c:'#00d4ff'},{v:staked,c:'#00e676'},{v:burned,c:'#ff6b2b'},{v:other,c:'#2e3448'}];
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
   let a=-Math.PI/2;
@@ -456,15 +477,18 @@ function drawRing(){
 // ═══════════════════════════════════════════════════════════════
 function renderValidators(){
   const el=$('validatorList');if(!el||!D.validators.length)return;
-  const s=[...D.validators].sort((a,b)=>parseFloat(b.stake||0)-parseFloat(a.stake||0));
+  const s=[...D.validators].sort((a,b)=>(b._stakeHype||0)-(a._stakeHype||0));
   el.innerHTML='<div class="val-row" style="color:var(--text-dim);font-size:10px;font-weight:600"><span class="val-rank">#</span><span>Name</span><span class="val-stake">Stake</span><span class="val-comm">Comm</span></div>'+s.map((v,i)=>{
-    const nm=v.name||v.validator||F.addr(v.validator||'');
-    const st=parseFloat(v.stake||0);
-    // commission_bps: 10000 = 100%, so /100 to get %
-    const cm=v.nRecentBlocks!=null?v.nRecentBlocks+' blks':'—';
-    const comm=v.commission!=null?v.commission:null;
-    const commStr=comm!=null?(comm<1?(comm*100).toFixed(1)+'%':comm.toFixed(1)+'%'):'—';
-    return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.c(st)}</span><span class="val-comm">${commStr}</span></div>`
+    const nm=v.name||F.addr(v.validator||'');
+    const st=v._stakeHype||0;
+    const comm=v.commission!=null?parseFloat(v.commission):null;
+    let commStr='—';
+    if(comm!=null){
+      if(comm>100) commStr=(comm/100).toFixed(1)+'%'; // bps: 10000=100%, 500=5%
+      else if(comm>1) commStr=comm.toFixed(1)+'%'; // already percentage
+      else commStr=(comm*100).toFixed(1)+'%'; // fraction: 0.05 = 5%
+    }
+    return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.hype(st)}</span><span class="val-comm">${commStr}</span></div>`
   }).join('');
 }
 function renderQueue(){
@@ -556,7 +580,7 @@ async function _afLiveTick(){
         const u=st.balances.find(b=>b.coin==='USDC');
         if(u) usdc=parseFloat(u.total||u.hold||0);
         const h=st.balances.find(b=>b.coin==='HYPE'||b.token===150);
-        if(h){D.afHype=parseFloat(h.total||h.hold||0);set('afHype',F.c(D.afHype)+' HYPE');if(px)set('afHypeUsd','≈ '+F.usd(D.afHype*px))}
+        if(h){D.afHype=parseFloat(h.total||h.hold||0);set('afHype',F.hype(D.afHype)+' HYPE');if(px)set('afHypeUsd','≈ '+F.usd(D.afHype*px))}
       }
     }catch(e){}
     if(usdc!=null){D.afUsdc=usdc;set('afUsdc','$'+F.full(usdc))}
@@ -594,8 +618,24 @@ async function _afLiveTick(){
       set('afSessionFees','$'+F.f2(Math.abs(spent)));
     }
 
-    // 7. Recompute total burned
+    // 7. Recompute total burned + update display live
     D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
+    if(D.totalBurned>0){
+      set('mBurned',F.hype(D.totalBurned)+' HYPE');
+      const pctMax=((D.totalBurned/MAX_S)*100).toFixed(2);
+      const circ=D.circSupply||MAX_S;
+      const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
+      set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
+      set('afFeeBurns',F.hype(D.feesBurned)+' HYPE');
+    }
+
+    // 8. Push burn chart data point
+    const bt=Math.floor(Date.now()/1000);
+    if(D.totalBurned>0){
+      _burnPoints.push({time:bt,value:D.totalBurned});
+      if(_burnPoints.length>1440)_burnPoints=_burnPoints.slice(-1440);
+      _redrawBurnChart();
+    }
 
     set('afChartMeta','Live · '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
     _redrawAfSeries();
@@ -604,10 +644,59 @@ async function _afLiveTick(){
 
 function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000)}
 
+// ── BURN CHART ──────────────────────────────────────────
+let _burnChart=null,_burnSeries=null,_burnPoints=[];
+
+function _initBurnChart(){
+  const wrap=$('burnWrap');if(!wrap)return;
+  if(_burnChart){try{_burnChart.remove()}catch(e){}_burnChart=null;_burnSeries=null}
+  wrap.innerHTML='';
+  const s=_wsz('burnWrap');
+  _burnChart=LightweightCharts.createChart(wrap,_lcBase({
+    width:s.w,height:s.h,
+    rightPriceScale:{borderColor:'#222738',textColor:'#5a6580',scaleMargins:{top:0.05,bottom:0.05}},
+    timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:true,rightOffset:4}
+  }));
+  _burnSeries=_burnChart.addAreaSeries({
+    lineColor:'#ff6b2b',topColor:'rgba(255,107,43,0.2)',bottomColor:'rgba(255,107,43,0.01)',
+    lineWidth:2,priceLineVisible:false,lastValueVisible:true,
+    crosshairMarkerVisible:true,crosshairMarkerRadius:4,
+    priceFormat:{type:'custom',formatter:v=>F.hype(v)+' HYPE'}
+  });
+  _burnChart.subscribeCrosshairMove(param=>{
+    if(!param.time||!_burnSeries)return;
+    const d=param.seriesData.get(_burnSeries);
+    if(d){
+      set('burnLiveTotal',F.hype(d.value)+' HYPE');
+      if(D.price)set('burnLiveUsd','$'+F.hype(d.value*D.price));
+    }
+  });
+  _redrawBurnChart();
+}
+
+function _redrawBurnChart(){
+  if(!_burnChart||!_burnSeries||!_burnPoints.length)return;
+  try{
+    const dedup=arr=>{const seen=new Set(),out=[];for(const p of arr){if(!seen.has(p.time)){seen.add(p.time);out.push(p)}}return out};
+    _burnSeries.setData(dedup(_burnPoints));
+    // Update stats
+    const last=_burnPoints[_burnPoints.length-1];
+    if(last){
+      set('burnLiveTotal',F.hype(last.value)+' HYPE');
+      set('burnLiveAf',F.hype(D.afHype));
+      set('burnLiveFees',F.hype(D.feesBurned));
+      if(D.price)set('burnLiveUsd','$'+F.hype(last.value*D.price));
+    }
+    set('burnChartMeta','Live · '+_burnPoints.length+' pts');
+    _burnChart.timeScale().fitContent();
+  }catch(e){console.warn('burn draw',e)}
+}
+
 // ── RESIZE ──────────────────────────────────────────
 window.addEventListener('resize',()=>{
   if(_priceChart){const s=_wsz('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}
   if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
+  if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -631,6 +720,8 @@ function _tryInitCharts(){
   })();
   // AF live monitor chart + polling
   _initAfChart();_startAfLive();
+  // Burn tracker chart
+  _initBurnChart();
 }
 setTimeout(_tryInitCharts,1500);
 </script>
