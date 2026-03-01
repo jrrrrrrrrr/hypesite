@@ -326,17 +326,26 @@ async function fStaking(){
     const d=await hl({type:'validatorSummaries'});
     if(Array.isArray(d)&&d.length){
       D.validators=d;
+      // First pass: compute raw sum to determine unit
+      let rawSum=0;
+      d.forEach(v=>{rawSum+=parseFloat(v.stake||0)});
+      // Find divisor that puts total in 100M-999M range (HYPE max supply = 1B)
+      let div=1;
+      for(const test of [1,1e2,1e4,1e6,1e8,1e10,1e12,1e14,1e16,1e18]){
+        const t=rawSum/test;
+        if(t>=1e7&&t<=1e9){div=test;break}
+      }
+      console.log('[fStaking] rawSum='+rawSum+' div='+div+' result='+rawSum/div);
+      // Second pass: convert all validators
       let totalStake=0;
       d.forEach(v=>{
-        let s=parseFloat(v.stake||0);
-        // Raw stake values are in smallest units; auto-detect and convert
-        if(s>1e12) s=s/1e8; // HYPE has 8 decimal places on L1
-        v._stakeHype=s; // store converted value
+        const s=parseFloat(v.stake||0)/div;
+        v._stakeHype=s;
         totalStake+=s;
       });
       if(totalStake>0)D.staked=totalStake;
       console.log('[fStaking] ✅ '+d.length+' validators, totalStaked='+F.hype(totalStake));
-      if(d[0])console.log('[fStaking] sample:',JSON.stringify({name:d[0].name,stake:d[0].stake,_stakeHype:d[0]._stakeHype,commission:d[0].commission,isJailed:d[0].isJailed}));
+      if(d[0])console.log('[fStaking] sample:',JSON.stringify({name:d[0].name,rawStake:d[0].stake,converted:d[0]._stakeHype}));
     }
   }catch(e){console.warn('fStaking err',e.message)}
   try{const s=await hl({type:'stakingSummary'});if(s?.apr)D.apr=parseFloat(s.apr)}catch(e){}
