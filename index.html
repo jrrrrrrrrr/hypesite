@@ -900,20 +900,9 @@ async function fSpot() {
       if(c.dayNtlVlm) D.vol24=parseFloat(c.dayNtlVlm);
       if(c.prevDayPx&&D.price) D.priceChg=((D.price-parseFloat(c.prevDayPx))/parseFloat(c.prevDayPx))*100;
       if(c.circulatingSupply) D.circSupply=parseFloat(c.circulatingSupply);
-      // Check for totalSupply — burned = maxSupply - totalSupply
-      if(c.totalSupply) {
-        const ts = parseFloat(c.totalSupply);
-        if(ts > 0 && ts < MAX_S) {
-          D.burned = MAX_S - ts;
-          console.log('[fSpot] totalSupply='+ts+' → burned='+D.burned);
-        }
-      }
     }
-    // Also check meta for HYPE token details
-    if(meta?.tokens) {
-      const ht = meta.tokens.find(t => (t.spec?.name||t.name) === 'HYPE');
-      if(ht) D._hypeTokenMeta = ht; // store for fBurned to use
-    }
+    // Store meta for fBurned to use (avoid duplicate API call)
+    if(meta) D._spotMeta = meta;
   } catch(e){}
 }
 async function fStaking() {
@@ -997,119 +986,119 @@ async function fHolders() {
   const d=await hs('/holdersWithLimit/HYPE/20'); if(d?.addresses) D.holders=d.addresses;
 }
 async function fBurned() {
-  // ── Method 1: tokenDetails endpoint (most reliable) ──
-  // Returns totalSupply and maxSupply; burned = max - total
-  // HYPE token index is 150; try spotMeta to get tokenId first
+  // ── DIAGNOSTIC: log exactly what spotMeta returns for HYPE ──
   try {
-    const spotMeta = await hl({type:'spotMeta'});
-    if(spotMeta?.tokens || spotMeta?.universe) {
-      // Find HYPE token to get its tokenId
-      const tokens = spotMeta.tokens || [];
-      const hypeToken = tokens.find(t => t.name === 'HYPE' || (t.spec && t.spec.name === 'HYPE') || t.index === 150);
-      const tokenId = hypeToken?.tokenId || hypeToken?.token_id || hypeToken?.evmContract;
-      if(tokenId) {
-        const td = await hl({type:'tokenDetails', tokenId});
-        if(td) {
-          const ts = parseFloat(td.totalSupply || 0);
-          const ms = parseFloat(td.maxSupply || MAX_S);
-          if(ts > 0 && ms > ts) {
-            D.burned = ms - ts;
-            console.log('[burned] tokenDetails: total='+ts+' max='+ms+' burned='+D.burned);
-            return;
-          }
-        }
-      }
-    }
-  } catch(e){ console.log('[burned] tokenDetails path failed:', e.message); }
+    // Use cached meta from fSpot if available, otherwise fetch fresh
+    const spotMeta = D._spotMeta || await hl({type:'spotMeta'});
+    console.log('[burned][spotMeta] raw type:', typeof spotMeta);
+    console.log('[burned][spotMeta] keys:', spotMeta ? Object.keys(spotMeta) : 'null');
 
-  // ── Method 2: spotMetaAndAssetCtxs — check HYPE context for totalSupply ──
-  try {
-    const d = await hl({type:'spotMetaAndAssetCtxs'});
-    if(Array.isArray(d) && d.length >= 2) {
-      const metas = d[0]?.tokens || d[0]?.universe || d[0] || [];
-      const ctxs = d[1] || [];
-      // Find HYPE in metas
-      let hypeIdx = -1;
-      if(Array.isArray(metas)) {
-        hypeIdx = metas.findIndex(m => m.name === 'HYPE' || (m.tokens && m.tokens.includes(150)));
-      }
-      // Check context for HYPE at known index @107 or found index
-      for(const idx of [107, hypeIdx]) {
-        if(idx >= 0 && ctxs[idx]) {
-          const c = ctxs[idx];
-          const ts = parseFloat(c.totalSupply || 0);
-          const cs = parseFloat(c.circulatingSupply || 0);
-          if(ts > 0 && ts < MAX_S) {
-            D.burned = MAX_S - ts;
-            if(cs > 0) D.circSupply = cs;
-            console.log('[burned] spotMetaAndAssetCtxs: totalSupply='+ts+' burned='+D.burned);
-            return;
-          }
-        }
-      }
-    }
-  } catch(e){ console.log('[burned] spotMeta path failed:', e.message); }
+    // spotMeta returns {tokens: [...], universe: [...]}
+    const tokens = spotMeta?.tokens || [];
+    const universe = spotMeta?.universe || [];
 
-  // ── Method 3: AF HYPE balance — AF accumulates burned HYPE ──
-  // After validator vote, AF HYPE is considered permanently burned
-  try {
-    const d = await hl({type:'spotClearinghouseState', user: AF});
-    if(d?.balances) {
-      const h = d.balances.find(b => b.coin==='HYPE' || b.coin==='@107');
-      if(h) {
-        const bal = parseFloat(h.total || h.hold || h.available || 0);
-        if(bal > 0) {
-          D.burned = bal;
-          console.log('[burned] AF HYPE balance:', bal);
-          return;
-        }
-      }
-    }
-  } catch(e){ console.log('[burned] AF balance failed:', e.message); }
+    // Find HYPE token — try multiple field patterns
+    const hypeToken = tokens.find(t =>
+      t?.name === 'HYPE' ||
+      (t?.spec && t.spec.name === 'HYPE') ||
+      t?.token === 150 ||
+      t?.index === 150
+    );
 
-  // ── Method 4: HypurrScan token endpoint ──
-  try {
-    const d = await hs('/token/HYPE');
-    if(d) {
-      const b = parseFloat(d.burned || d.totalBurned || d.burnedSupply || 0);
-      if(b > 0) { D.burned = b; console.log('[burned] hypurrscan:', b); return; }
-      const ts = parseFloat(d.totalSupply || 0);
-      if(ts > 0 && ts < MAX_S) { D.burned = MAX_S - ts; console.log('[burned] hypurrscan totalSupply:', ts); return; }
-    }
-  } catch(e){}
+    if(hypeToken) {
+      console.log('[burned][HYPE token] FULL object:', JSON.stringify(hypeToken).slice(0, 800));
 
-  // ── Method 5: Try known HYPE tokenId directly ──
-  // HYPE tokenId from HypurrScan: 0xbaf265ef389da684513d98d68edf4eae
-  try {
-    const td = await hl({type:'tokenDetails', tokenId:'0xbaf265ef389da684513d98d68edf4eae'});
-    if(td) {
-      const ts = parseFloat(td.totalSupply || 0);
-      const ms = parseFloat(td.maxSupply || MAX_S);
-      if(ts > 0 && ms > ts) {
-        D.burned = ms - ts;
-        console.log('[burned] tokenDetails direct: total='+ts+' burned='+D.burned);
+      // Check if maxSupply != totalSupply directly on the token object
+      const maxS = parseFloat(hypeToken.maxSupply || hypeToken.max_supply || 0);
+      const totalS = parseFloat(hypeToken.totalSupply || hypeToken.total_supply || 0);
+      const totalGenesis = hypeToken.totalGenesisBalanceWei;
+
+      console.log('[burned][HYPE token] maxSupply=', maxS, 'totalSupply=', totalS, 'totalGenesis=', totalGenesis);
+
+      if(totalS > 0 && maxS > totalS) {
+        D.burned = maxS - totalS;
+        console.log('[burned] ✅ from spotMeta token: max-total =', D.burned);
         return;
       }
-    }
-  } catch(e){ console.log('[burned] direct tokenId failed:', e.message); }
 
-  // ── Method 6: Try with token index as hex ──
-  const hexIds = [
-    '0x00000000000000000000000000000096', // 150 in hex, 32 hex chars
-    '0xc1fb593aeffbeb02f85e0308e9956a90', // known PURR-style format
-  ];
-  for(const tid of hexIds) {
-    try {
-      const td = await hl({type:'tokenDetails', tokenId: tid});
-      if(td && (td.name === 'HYPE' || td.spec?.name === 'HYPE')) {
-        const ts = parseFloat(td.totalSupply || 0);
-        const ms = parseFloat(td.maxSupply || MAX_S);
-        if(ts > 0) { D.burned = ms - ts; console.log('[burned] hex tokenId '+tid+':', D.burned); return; }
+      // Try tokenDetails with whatever ID we can find
+      const possibleIds = [
+        hypeToken.tokenId,
+        hypeToken.token_id,
+        hypeToken.evmContract,
+        hypeToken.address,
+        hypeToken.contractAddress,
+      ].filter(Boolean);
+
+      console.log('[burned] possible tokenIds found:', possibleIds);
+
+      for(const tid of possibleIds) {
+        try {
+          const td = await hl({type:'tokenDetails', tokenId: tid});
+          console.log('[burned][tokenDetails] for', tid, ':', JSON.stringify(td).slice(0, 500));
+          const ts = parseFloat(td?.totalSupply || 0);
+          const ms = parseFloat(td?.maxSupply || MAX_S);
+          if(ts > 0 && ms > ts) {
+            D.burned = ms - ts;
+            console.log('[burned] ✅ from tokenDetails:', D.burned);
+            return;
+          }
+        } catch(e) { console.log('[burned] tokenDetails failed for', tid, ':', e.message); }
       }
-    } catch(e){}
+
+      // Try with the integer token index as padded hex (34 chars total)
+      const tokenIdx = hypeToken.token ?? hypeToken.index ?? 150;
+      const hexId = '0x' + tokenIdx.toString(16).padStart(32, '0');
+      console.log('[burned] trying hex tokenId:', hexId);
+      try {
+        const td = await hl({type:'tokenDetails', tokenId: hexId});
+        console.log('[burned][tokenDetails hex] response:', JSON.stringify(td).slice(0, 500));
+        const ts = parseFloat(td?.totalSupply || 0);
+        const ms = parseFloat(td?.maxSupply || MAX_S);
+        if(ts > 0 && ms > ts) {
+          D.burned = ms - ts;
+          console.log('[burned] ✅ from tokenDetails hex:', D.burned);
+          return;
+        }
+      } catch(e) { console.log('[burned] hex tokenId failed:', e.message); }
+    } else {
+      console.log('[burned] HYPE token NOT found in spotMeta.tokens');
+      console.log('[burned] first 3 tokens:', JSON.stringify(tokens.slice(0, 3)).slice(0, 600));
+    }
+  } catch(e) { console.log('[burned] spotMeta call failed:', e.message); }
+
+  // ── FALLBACK: check spotMetaAndAssetCtxs response shape ──
+  try {
+    const d = await hl({type:'spotMetaAndAssetCtxs'});
+    if(Array.isArray(d) && d[1] && d[1][107]) {
+      const ctx = d[1][107];
+      console.log('[burned][ctx107] ALL keys:', Object.keys(ctx));
+      console.log('[burned][ctx107] full:', JSON.stringify(ctx).slice(0, 500));
+      // Maybe totalSupply is named differently
+      for(const key of Object.keys(ctx)) {
+        if(key.toLowerCase().includes('supply') || key.toLowerCase().includes('burn')) {
+          console.log('[burned][ctx107]', key, '=', ctx[key]);
+        }
+      }
+    }
+  } catch(e) {}
+
+  // ── FALLBACK: HypurrScan endpoints ──
+  for(const path of ['/token/HYPE', '/supply/HYPE', '/stats', '/stats/HYPE']) {
+    try {
+      const d = await hs(path);
+      if(d) {
+        console.log('[burned][hypurrscan ' + path + ']', JSON.stringify(d).slice(0, 500));
+        // Try any burn-related field
+        const burned = parseFloat(d.burned || d.totalBurned || d.burnedSupply || d.burn || 0);
+        if(burned > 0) { D.burned = burned; console.log('[burned] ✅ from HS', path); return; }
+        const ts = parseFloat(d.totalSupply || d.supply || 0);
+        if(ts > 0 && ts < MAX_S) { D.burned = MAX_S - ts; console.log('[burned] ✅ from HS supply diff'); return; }
+      }
+    } catch(e) {}
   }
 
-  console.log('[burned] all methods failed — no burn data available');
+  console.log('[burned] ❌ ALL methods exhausted. Open browser console and search for [burned] to see diagnostics.');
 }
 
 // ─── NEW: GLOBAL PERP STATS FETCHER ──────────────────────────────────────
