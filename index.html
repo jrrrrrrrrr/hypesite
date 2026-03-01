@@ -447,7 +447,6 @@
           <div class="insight" id="insightPanel"><div class="insight-ttl">📡 Trading Intelligence</div><div class="insight-body" id="insightBody">Loading...</div></div>
           <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--accent2)"></div>24h Fee Revenue</div><div class="pmeta" id="feeMetaLabel">—</div></div><div class="fee-chart" id="feeChart24h"><div class="es"><span class="skel" style="width:120px"></span></div></div></div>
         </div>
-        <div class="panel"><div class="ph"><div class="ptitle"><div class="pdot" style="background:var(--green)"></div>Live Activity Feed</div><div class="pmeta">Delegations + Transfers · Most recent first</div></div><div id="overviewFeed"><div class="es"><span class="skel" style="width:200px"></span></div></div></div>
       </div>
 
       <!-- CHARTS TAB -->
@@ -984,6 +983,46 @@ async function fFees() {
 async function fHolders() {
   const d=await hs('/holdersWithLimit/HYPE/20'); if(d?.addresses) D.holders=d.addresses;
 }
+async function fBurned() {
+  // Primary: query the dead address's HYPE balance directly
+  try {
+    const d=await hl({type:'spotClearinghouseState',user:BURN});
+    if(d?.balances) {
+      const h=d.balances.find(b=>b.coin==='HYPE'||b.coin==='@107');
+      if(h) {
+        const bal=parseFloat(h.total||h.hold||h.available||0);
+        if(bal>0) { D.burned=bal; console.log('[burned] dead addr balance:',bal); return; }
+      }
+    }
+  } catch(e){ console.log('[burned] spotState failed, trying perp',e.message); }
+  // Fallback: try perp clearinghouse
+  try {
+    const d=await hl({type:'clearinghouseState',user:BURN});
+    if(d) {
+      const av=parseFloat(d.marginSummary?.accountValue||d.withdrawable||0);
+      if(av>0) { D.burned=av; console.log('[burned] dead addr perp:',av); return; }
+    }
+  } catch(e){}
+  // Fallback: try HypurrScan token info
+  try {
+    const d=await hs('/token/HYPE');
+    if(d) {
+      const b=parseFloat(d.burned||d.totalBurned||d.burnedSupply||0);
+      if(b>0) { D.burned=b; console.log('[burned] hypurrscan token:',b); return; }
+    }
+  } catch(e){}
+  // Fallback: compute from max supply - circulating
+  if(D.circSupply && D.circSupply < MAX_S) {
+    // This is approximate — includes locked/vested, not just burned
+    // But better than showing nothing
+    const approx = MAX_S - D.circSupply;
+    // Only use if it's a reasonable burn amount (< 10% of supply)
+    if(approx > 0 && approx < MAX_S * 0.1) {
+      D.burned = approx;
+      console.log('[burned] estimated from supply gap:', approx);
+    }
+  }
+}
 
 // ─── NEW: GLOBAL PERP STATS FETCHER ──────────────────────────────────────
 async function fPerpStats() {
@@ -1023,7 +1062,7 @@ async function loadAll() {
   const btn=document.getElementById('refreshBtn');
   btn.textContent='⟳ ...'; btn.classList.add('busy');
   setStatus('FETCHING','yellow');
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders(),fPerpStats()]);
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fValidators(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fTransfers(),fFees(),fHolders(),fPerpStats(),fBurned()]);
   setStatus('LIVE','green');
   renderAll();
   if(document.getElementById('tab-charts').classList.contains('active')) {
@@ -1132,7 +1171,6 @@ function renderAll() {
   if(!alerts.length) alerts.push({i:'✅',t:'No critical alerts. Monitoring all feeds.'});
   htm('alertsPanel',alerts.map(a=>`<div class="alert-row"><span class="alert-ico">${a.i}</span><span>${a.t}</span></div>`).join(''));
 
-  renderOverviewFeed();
   renderQueueList(qt);
   renderStakingFlows();
   renderAF();
@@ -1157,10 +1195,6 @@ function renderAll() {
 }
 
 // ─── EXISTING RENDER FUNCTIONS ────────────────────────────────────────────
-function renderOverviewFeed() {
-  const all=[...D.delegations.slice(0,10).map(e=>({...e,_t:'delegation'})),...D.transfers.slice(0,10).map(e=>({...e,_t:'transfer'}))].sort((a,b)=>+(b.time||b.timestamp||0)-(+(a.time||a.timestamp||0))).slice(0,20);
-  htm('overviewFeed',all.length?all.map(e=>feedRow(e)).join(''):es('No events yet','Will populate from /delegations + /aLotOfTransfers'));
-}
 
 function renderQueueList(qt) {
   if(!D.queue.length){ htm('queueList',`<div class="es">Queue data from /fullUnstakingQueue<br><a href="https://hypurrscan.io/staking" target="_blank">View on HypurrScan ↗</a></div>`); return; }
