@@ -124,10 +124,17 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .data-table{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:360px;overflow-y:auto}
 .dt-row{display:grid;gap:6px;padding:5px 0;border-bottom:1px solid rgba(34,39,56,0.3);font-family:var(--mono);font-size:11px}
 
+/* Overview layout */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.overview-grid .supply-card{grid-column:1/-1}
+.ov-row{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;padding:2px 0}
+.ov-k{color:var(--text-dim);font-size:10px}.ov-v{color:var(--text-bright);font-weight:600}
+.ov-v.fire{color:var(--fire)}.ov-v.cyan{color:var(--accent)}.ov-v.green{color:var(--green)}
+
 footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);margin-top:24px}
 footer p{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.04em;line-height:2.2}
 footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--accent)}
-@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}}
+@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}}
 @media(max-width:800px){.rating-grid{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}}
 </style>
@@ -139,6 +146,8 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="logo"><span class="fire">🔥</span><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('overview',this)">Overview</button>
+      <button class="nav-tab" onclick="showPage('charts',this)">Charts</button>
+      <button class="nav-tab" onclick="showPage('burns',this)">Burns</button>
       <button class="nav-tab" onclick="showPage('staking',this)">Staking</button>
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
     </div>
@@ -160,40 +169,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
   </div>
 
-  <!-- HYPE/USDT Perps Chart — TradingView (moved to top) -->
-  <div class="chart-box" style="margin-top:20px">
-    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · via TradingView</span></div></div>
-    <div id="tvPerps" style="height:480px;border-radius:8px;overflow:hidden">
-      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypeperps&symbol=BINANCE%3AHYPEUSDT.P&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&studies=%5B%22STD%3BBollinger_Bands%22%2C%22STD%3BMACD%22%5D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%5D&locale=en" style="width:100%;height:100%;border:0"></iframe>
-    </div>
-  </div>
-
-  <!-- Squeeze Momentum + Rainbow Fib Panels (ported from PineScript) -->
-  <div class="indicator-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
-    <!-- SqzMom Panel -->
-    <div class="af-live">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">SQZMOM Rainbow</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
-      <div class="af-live-stats" style="margin-bottom:6px">
-        <div class="af-stat"><div class="lbl">Squeeze</div><div class="val" id="sqzState">—</div></div>
-        <div class="af-stat"><div class="lbl">Direction</div><div class="val" id="sqzDir">—</div></div>
-        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="sqzStr">—</div></div>
-        <div class="af-stat"><div class="lbl">Momentum</div><div class="val" id="sqzMom">—</div></div>
-      </div>
-      <div class="chart-wrap" id="sqzWrap" style="height:180px"></div>
-    </div>
-    <!-- Rainbow Fib Panel -->
-    <div class="af-live">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">Rainbow Fib Retracement</span><span class="chart-meta" id="rfMeta">—</span></div></div>
-      <div class="af-live-stats" style="margin-bottom:6px">
-        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfTrend">—</div></div>
-        <div class="af-stat"><div class="lbl">Price Zone</div><div class="val" id="rfZone">—</div></div>
-        <div class="af-stat"><div class="lbl">0.618 Golden</div><div class="val" id="rf618">—</div></div>
-        <div class="af-stat"><div class="lbl">Proximity</div><div class="val" id="rfProx">—</div></div>
-      </div>
-      <div class="rf-levels" id="rfLevels"></div>
-    </div>
-  </div>
-
   <div class="metrics-grid">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
       <div class="mc-label">🔥 Total Burned</div>
@@ -206,101 +181,180 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div><div class="mc-label">💰 24h Spot Volume</div><div class="mc-value" id="mVol">—</div><div class="mc-sub">&nbsp;</div></div>
   </div>
 
-  <div class="two-col">
-    <div class="ring-wrap">
-      <div class="section-title">Supply Breakdown</div>
-      <div class="ring-canvas"><canvas id="ringCanvas" width="220" height="220"></canvas><div class="ring-center"><div class="total">1.000B</div><div class="label">MAX SUPPLY</div></div></div>
-      <div style="width:100%">
-        <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Circulating</span><span class="legend-val" id="lgCirc">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned (AF+Fees)</span><span class="legend-val" id="lgBurned">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px;padding-left:16px">Ring = Circulating + Burned + Locked = 1B<br>Holder staking is a subset of Circulating</div>
+  <!-- Supply + AF + Rating in balanced 3-col grid -->
+  <div class="overview-grid">
+    <!-- Supply Breakdown — full width -->
+    <div class="metric-card supply-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:12px">Supply Breakdown</div>
+      <div style="display:flex;align-items:center;gap:24px;justify-content:center">
+        <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="160" height="160" style="width:160px;height:160px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;min-width:280px">
+          <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="section-title">🏦 Assistance Fund</div>
-      <div class="info-grid">
-        <div class="info-card"><div class="mc-label">AF HYPE Holdings</div><div class="mc-value fire" id="afHype" style="font-size:17px">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
-        <div class="info-card"><div class="mc-label">AF USDC Balance</div><div class="mc-value cyan" id="afUsdc" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="afFeeBurns" style="font-size:17px">—</div><div class="mc-sub">from HyperCore + HyperEVM</div></div>
-        <div class="info-card"><div class="mc-label">Limit Order</div><div class="mc-value" id="afBidInfo" style="font-size:17px">—</div><div class="mc-sub" id="afBidDetail">—</div></div>
-        <div class="info-card"><div class="mc-label">Bid / Price Spread</div><div class="mc-value" id="afSpread" style="font-size:17px">—</div></div>
-        <div class="info-card"><div class="mc-label">Session Fees</div><div class="mc-value green" id="afSessionFees" style="font-size:17px">—</div><div class="mc-sub" id="afSessionTime">since page load</div></div>
+    <!-- AF Summary — compact -->
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:10px">🏦 Assistance Fund</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="ov-row"><span class="ov-k">HYPE Holdings</span><span class="ov-v fire" id="afHype">—</span></div>
+        <div class="ov-row"><span class="ov-k">USDC Balance</span><span class="ov-v cyan" id="afUsdc">—</span></div>
+        <div class="ov-row"><span class="ov-k">Limit Bid</span><span class="ov-v" id="afBidInfo">—</span></div>
+        <div class="ov-row"><span class="ov-k">Bid Spread</span><span class="ov-v green" id="afSpread">—</span></div>
+        <div class="ov-row"><span class="ov-k">Fee Burns</span><span class="ov-v" id="afFeeBurns">—</span></div>
+        <div class="ov-row"><span class="ov-k">Session Fees</span><span class="ov-v green" id="afSessionFees">—</span></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:2px" id="afSessionTime">since page load</div>
       </div>
-
-      <!-- AF Live Monitor Chart -->
-      <div class="af-live">
-        <div class="chart-hdr">
-          <div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div>
-        </div>
-        <div class="af-live-stats">
-          <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
-          <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
-          <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
-          <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
-        </div>
-        <div class="chart-wrap" id="afWrap" style="height:280px"></div>
+    </div>
+    <!-- Price Rating — compact -->
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:10px">📊 Price Rating</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
+        <div class="rating-score" id="ratingScore" style="font-size:36px">—</div>
+        <div><div class="rating-label" id="ratingLabel" style="font-size:11px">Loading…</div>
+        <div class="rating-bar-wrap" style="width:140px;margin-top:6px"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div></div>
       </div>
-
-      <!-- Cumulative Burn Chart -->
-      <div class="af-live" style="margin-top:16px">
-        <div class="chart-hdr">
-          <div class="left"><span class="chart-title">🔥 Live Burn Tracker</span><span class="chart-meta" id="burnChartMeta">Collecting data…</span></div>
-        </div>
-        <div class="af-live-stats" style="margin-bottom:8px">
-          <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
-          <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
-          <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
-          <div class="af-stat"><div class="lbl">USD Value</div><div class="val green" id="burnLiveUsd">—</div></div>
-        </div>
-        <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
-      </div>
-
-      <div style="margin-top:16px">
-        <div class="section-title">🏛 Platform Stats</div>
-        <div class="info-grid">
-          <div class="info-card"><div class="mc-label">Open Interest</div><div class="mc-value" id="psOI" style="font-size:17px">—</div></div>
-          <div class="info-card"><div class="mc-label">Perp Volume</div><div class="mc-value" id="psVol" style="font-size:17px">—</div></div>
-          <div class="info-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:17px">—</div></div>
-          <div class="info-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:17px">—</div></div>
-          <div class="info-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:17px">—</div></div>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi">—</span><span class="ri-signal" id="riRsiSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma20">—</span><span class="ri-signal" id="riSma20Sig">—</span></div>
+        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd">—</span><span class="ri-signal" id="riMacdSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom">—</span><span class="ri-signal" id="riMomSig">—</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Price Rating Panel -->
-  <div class="rating-panel" style="margin-top:20px">
-    <div class="section-title">📊 HYPE Price Rating</div>
+  <!-- Platform Stats -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-top:0">
+    <div class="metric-card"><div class="mc-label">Open Interest</div><div class="mc-value" id="psOI" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Perp Volume</div><div class="mc-value" id="psVol" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
+  </div>
+</div>
+
+<!-- ══ CHARTS TAB ══════════════════════════════════════════════ -->
+<div class="page" id="page-charts">
+  <div class="chart-box">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · TradingView</span></div></div>
+    <div id="tvPerps" style="height:500px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypeperps&symbol=BINANCE%3AHYPEUSDT.P&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&studies=%5B%22STD%3BBollinger_Bands%22%2C%22STD%3BMACD%22%5D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%5D&locale=en" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+
+  <!-- HYPE/BTC -->
+  <div class="chart-box">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / BTC</span><span class="chart-meta">BITFINEX · TradingView</span></div></div>
+    <div id="tvWidget" style="height:420px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypebtc&symbol=BITFINEX%3AHYPEBTC&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%7D&locale=en" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+
+  <!-- Indicator Panels -->
+  <div class="indicator-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <!-- SqzMom Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">SQZMOM Rainbow</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Squeeze</div><div class="val" id="sqzState">—</div></div>
+        <div class="af-stat"><div class="lbl">Direction</div><div class="val" id="sqzDir">—</div></div>
+        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="sqzStr">—</div></div>
+        <div class="af-stat"><div class="lbl">Momentum</div><div class="val" id="sqzMom">—</div></div>
+      </div>
+      <div class="chart-wrap" id="sqzWrap" style="height:180px"></div>
+    </div>
+    <!-- Rainbow Fib Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">Rainbow Fib Retracement</span><span class="chart-meta" id="rfMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfTrend">—</div></div>
+        <div class="af-stat"><div class="lbl">Price Zone</div><div class="val" id="rfZone">—</div></div>
+        <div class="af-stat"><div class="lbl">0.618 Golden</div><div class="val" id="rf618">—</div></div>
+        <div class="af-stat"><div class="lbl">Proximity</div><div class="val" id="rfProx">—</div></div>
+      </div>
+      <div class="rf-levels" id="rfLevels"></div>
+    </div>
+    <!-- RainbowFlow Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">🌈 RainbowFlow</span><span class="chart-meta" id="rfwMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Score</div><div class="val" id="rfwScore">—</div></div>
+        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfwTrend">—</div></div>
+        <div class="af-stat"><div class="lbl">RSI</div><div class="val" id="rfwRsi">—</div></div>
+        <div class="af-stat"><div class="lbl">Volume</div><div class="val" id="rfwVol">—</div></div>
+      </div>
+    </div>
+    <!-- QuantumFlow Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">⚡ QuantumFlow Fusion</span><span class="chart-meta" id="qffMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="qffScore">—</div></div>
+        <div class="af-stat"><div class="lbl">Ribbon</div><div class="val" id="qffRibbon">—</div></div>
+        <div class="af-stat"><div class="lbl">Vol Pressure</div><div class="val" id="qffVol">—</div></div>
+        <div class="af-stat"><div class="lbl">Risk</div><div class="val" id="qffRisk">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Price Rating -->
+  <div class="rating-panel" style="margin-top:16px">
+    <div class="section-title">📊 Full Technical Analysis</div>
     <div class="rating-grid">
       <div class="rating-main">
-        <div class="rating-score" id="ratingScore">—</div>
-        <div class="rating-label" id="ratingLabel">Loading…</div>
-        <div class="rating-bar-wrap"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div>
+        <div class="rating-score" id="ratingScore2">—</div>
+        <div class="rating-label" id="ratingLabel2">Loading…</div>
+        <div class="rating-bar-wrap"><div class="rating-bar" id="ratingBar2" style="width:50%"></div></div>
         <div class="rating-bar-labels"><span>Strong Sell</span><span>Sell</span><span>Neutral</span><span>Buy</span><span>Strong Buy</span></div>
       </div>
       <div class="rating-indicators">
-        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi">—</span><span class="ri-signal" id="riRsiSig">—</span></div>
-        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma20">—</span><span class="ri-signal" id="riSma20Sig">—</span></div>
+        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi2">—</span><span class="ri-signal" id="riRsiSig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma202">—</span><span class="ri-signal" id="riSma20Sig2">—</span></div>
         <div class="ri-row"><span class="ri-name">SMA 50</span><span class="ri-val" id="riSma50">—</span><span class="ri-signal" id="riSma50Sig">—</span></div>
-        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd">—</span><span class="ri-signal" id="riMacdSig">—</span></div>
-        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom">—</span><span class="ri-signal" id="riMomSig">—</span></div>
+        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd2">—</span><span class="ri-signal" id="riMacdSig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom2">—</span><span class="ri-signal" id="riMomSig2">—</span></div>
         <div class="ri-row"><span class="ri-name">Volume Trend</span><span class="ri-val" id="riVolT">—</span><span class="ri-signal" id="riVolTSig">—</span></div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- HYPE/BTC TradingView Widget -->
-  <div class="chart-box" style="margin-top:20px">
-    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / BTC</span><span class="chart-meta">via TradingView · BITFINEX</span></div></div>
-    <div id="tvWidget" style="height:420px;border-radius:8px;overflow:hidden">
-      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypebtc&symbol=BITFINEX%3AHYPEBTC&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=exchange&withdateranges=1&studies_overrides=%7B%7D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart" style="width:100%;height:100%;border:0"></iframe>
+<!-- ══ BURNS TAB ═══════════════════════════════════════════════ -->
+<div class="page" id="page-burns">
+  <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned2">—</div><div class="mc-sub" id="mBurnedSub2">—</div></div>
+    <div class="metric-card"><div class="mc-label">AF HYPE (burned by vote)</div><div class="mc-value fire" id="burnAfHype">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
+    <div class="metric-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="burnFees">—</div><div class="mc-sub">HyperCore + HyperEVM</div></div>
+  </div>
+
+  <!-- AF Live Monitor -->
+  <div class="af-live">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats">
+      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
+      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
+      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
+      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
     </div>
+    <div class="chart-wrap" id="afWrap" style="height:280px"></div>
+  </div>
+
+  <!-- Live Burn Tracker -->
+  <div class="af-live">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🔥 Live Burn Tracker</span><span class="chart-meta" id="burnChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats" style="margin-bottom:8px">
+      <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
+      <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
+      <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
+      <div class="af-stat"><div class="lbl">USD Value</div><div class="val green" id="burnLiveUsd">—</div></div>
+    </div>
+    <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
   </div>
 
   <!-- Burn Rate History -->
-  <div class="af-live" style="margin-top:20px">
+  <div class="af-live">
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">🔥 Burn Rate History</span><span class="chart-meta" id="burnRateMeta">Estimating…</span></div>
       <div class="tf-btns">
@@ -310,12 +364,12 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       </div>
     </div>
     <div class="af-live-stats" style="margin-bottom:8px">
-      <div class="af-stat"><div class="lbl">Burn Rate Score</div><div class="val fire" id="burnScoreVal" style="font-size:22px">—</div></div>
-      <div class="af-stat"><div class="lbl">Today's Burns</div><div class="val" id="burnToday">—</div></div>
+      <div class="af-stat"><div class="lbl">Burn Score</div><div class="val fire" id="burnScoreVal" style="font-size:22px">—</div></div>
+      <div class="af-stat"><div class="lbl">Last Period</div><div class="val" id="burnToday">—</div></div>
       <div class="af-stat"><div class="lbl">Avg Daily</div><div class="val" id="burnAvgDay">—</div></div>
-      <div class="af-stat"><div class="lbl">Burn Velocity</div><div class="val green" id="burnVelocity">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Velocity</div><div class="val green" id="burnVelocity">—</div></div>
     </div>
-    <div class="chart-wrap" id="burnRateWrap" style="height:260px"></div>
+    <div class="chart-wrap" id="burnRateWrap" style="height:320px"></div>
   </div>
 </div>
 
@@ -587,7 +641,17 @@ function renderAll(){
 
   renderValidators();renderQueue();
   if(_burnRateChart)_drawBurnRate();
-  if(_pData.length>30){computePriceRating();computeSqzMom();computeRainbowFib()}
+
+  // Burns tab
+  if(D.totalBurned>0){
+    set('mBurned2',F.hype(D.totalBurned)+' HYPE');
+    set('mBurnedSub2',((D.totalBurned/MAX_S)*100).toFixed(2)+'% of max supply');
+    set('burnAfHype',F.hype(D.afHype)+' HYPE');
+    if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price));
+    set('burnFees',F.hype(D.feesBurned)+' HYPE');
+  }
+
+  if(_pData.length>30){computePriceRating();computeSqzMom();computeRainbowFib();computeRainbowFlow();computeQuantumFlow()}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -595,57 +659,58 @@ function renderAll(){
 // ═══════════════════════════════════════════════════════════════
 function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
-  const dpr=window.devicePixelRatio||1;cv.width=220*dpr;cv.height=220*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,220,220);
+  const sz=160;
+  const dpr=window.devicePixelRatio||1;cv.width=sz*dpr;cv.height=sz*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,sz,sz);
   const burned=D.totalBurned||0;
   const circ=D.circSupply||0;
   const pubStaked=D.publicStaked||0;
   const fndStaked=D.foundationStaked||0;
-
-  // Locked = MAX - circulating - burned (Foundation validators are part of this)
   const locked=Math.max(0,MAX_S-circ-burned);
+  const unstakedCirc=Math.max(0,circ-pubStaked);
 
-  set('lgCirc',F.hype(circ));
+  set('lgCirc',F.hype(unstakedCirc));
   set('lgStaked',F.hype(pubStaked));
   set('lgBurned',F.hype(burned));
   set('lgOther',F.hype(locked));
 
-  // Ring: 3 segments that ADD TO 1B exactly
   const segs=[
-    {v:circ,c:'#00d4ff',label:'Circulating',detail:F.hype(circ)+' HYPE ('+((circ/MAX_S)*100).toFixed(1)+'%)\nIncludes '+F.hype(pubStaked)+' staked by holders'},
-    {v:burned,c:'#ff6b2b',label:'Burned (AF+Fees)',detail:F.hype(burned)+' HYPE ('+((burned/MAX_S)*100).toFixed(1)+'%)\nAF buybacks + on-chain fee burns'},
-    {v:locked,c:'#2e3448',label:'Locked / Foundation',detail:F.hype(locked)+' HYPE ('+((locked/MAX_S)*100).toFixed(1)+'%)\nIncludes '+F.hype(fndStaked)+' Foundation validator stake'}
+    {v:unstakedCirc,c:'#00d4ff',label:'Unstaked Circulating',detail:F.hype(unstakedCirc)+' ('+((unstakedCirc/MAX_S)*100).toFixed(1)+'%)\nFreely tradeable tokens'},
+    {v:pubStaked,c:'#00e676',label:'Staked by Holders',detail:F.hype(pubStaked)+' ('+((pubStaked/MAX_S)*100).toFixed(1)+'%)\nDelegated to validators'},
+    {v:burned,c:'#ff6b2b',label:'Burned',detail:F.hype(burned)+' ('+((burned/MAX_S)*100).toFixed(1)+'%)\nAF buybacks + fee burns'},
+    {v:locked,c:'#2e3448',label:'Locked / Foundation',detail:F.hype(locked)+' ('+((locked/MAX_S)*100).toFixed(1)+'%)\nIncludes '+F.hype(fndStaked)+' Foundation stake'}
   ];
   _ringSegs=segs;
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
+  const cx=sz/2,cy=sz/2,r=60;
   let a=-Math.PI/2;
   for(const s of segs){
     const sw=(s.v/total)*Math.PI*2;if(sw<0.002)continue;
     s._startAngle=a;s._endAngle=a+sw;
-    ctx.beginPath();ctx.arc(110,110,85,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=22;ctx.lineCap='butt';ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,r,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=18;ctx.lineCap='butt';ctx.stroke();
     a+=sw;
   }
 }
 let _ringSegs=[];
-// Ring hover tooltip
 function _initRingHover(){
   const cv=$('ringCanvas');if(!cv)return;
+  const sz=160;
   const tip=document.createElement('div');
-  tip.id='ringTip';tip.style.cssText='position:absolute;display:none;background:rgba(18,21,28,0.95);border:1px solid var(--border-bright);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--text-bright);pointer-events:none;z-index:50;white-space:pre-line;max-width:260px';
+  tip.id='ringTip';tip.style.cssText='position:absolute;display:none;background:rgba(18,21,28,0.95);border:1px solid var(--border-bright);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--text-bright);pointer-events:none;z-index:50;white-space:pre-line;max-width:220px';
   cv.parentElement.style.position='relative';cv.parentElement.appendChild(tip);
   cv.addEventListener('mousemove',e=>{
     if(!_ringSegs.length){tip.style.display='none';return}
     const rect=cv.getBoundingClientRect();
-    const x=(e.clientX-rect.left)/(rect.width/220)-110;
-    const y=(e.clientY-rect.top)/(rect.height/220)-110;
+    const x=(e.clientX-rect.left)/(rect.width/sz)-sz/2;
+    const y=(e.clientY-rect.top)/(rect.height/sz)-sz/2;
     const dist=Math.sqrt(x*x+y*y);
-    if(dist<65||dist>105){tip.style.display='none';return}
+    if(dist<42||dist>78){tip.style.display='none';return}
     let angle=Math.atan2(y,x);if(angle<-Math.PI/2)angle+=Math.PI*2;
     const seg=_ringSegs.find(s=>angle>=s._startAngle&&angle<s._endAngle);
     if(seg){
-      tip.innerHTML='<div style="color:'+seg.c+';font-weight:700;margin-bottom:3px">'+seg.label+'</div>'+seg.detail;
+      tip.innerHTML='<div style="color:'+seg.c+';font-weight:700;margin-bottom:2px">'+seg.label+'</div>'+seg.detail;
       tip.style.display='block';
-      tip.style.left=Math.min(e.clientX-rect.left+10,rect.width-200)+'px';
-      tip.style.top=(e.clientY-rect.top-60)+'px';
+      tip.style.left=Math.min(e.clientX-rect.left+10,rect.width-160)+'px';
+      tip.style.top=(e.clientY-rect.top-50)+'px';
     } else tip.style.display='none';
   });
   cv.addEventListener('mouseleave',()=>{tip.style.display='none'});
@@ -878,7 +943,7 @@ function _redrawBurnChart(){
 }
 
 // ── RESIZE ──────────────────────────────────────────
-let _burnRateChart=null,_burnRateSeries=null,_burnRateTf='day';
+let _burnRateChart=null,_burnRateSeries=null,_burnRateMaSeries=null,_burnRateTf='day';
 window.addEventListener('resize',()=>{
   if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
   if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
@@ -934,70 +999,64 @@ function computePriceRating(){
   const closes=_pData.map(c=>c.close);
   const last=closes[closes.length-1];
 
-  // RSI
+  // Helper to set both overview + charts page elements
+  function setDual(base,val){set(base,val);set(base+'2',val)}
+  function setSigDual(base,sig){
+    const col=sig==='Buy'?'var(--green)':sig==='Sell'?'var(--red)':'var(--text-dim)';
+    [base,base+'2'].forEach(id=>{const el=$(id);if(el){el.textContent=sig;el.style.color=col}});
+  }
+
   const rsi=_rsi(closes,14);
   const rsiSignal=rsi<30?'Buy':rsi>70?'Sell':rsi<45?'Buy':'Neutral';
   const rsiScore=rsi<30?85:rsi<40?70:rsi<45?60:rsi>70?15:rsi>60?35:50;
-  set('riRsi',rsi!=null?rsi.toFixed(1):'—');
-  const riRsiEl=$('riRsiSig');if(riRsiEl){riRsiEl.textContent=rsiSignal;riRsiEl.style.color=rsiSignal==='Buy'?'var(--green)':rsiSignal==='Sell'?'var(--red)':'var(--text-dim)'}
+  setDual('riRsi',rsi!=null?rsi.toFixed(1):'—');
+  setSigDual('riRsiSig',rsiSignal);
 
-  // SMA 20
   const sma20=_sma(closes,20);const s20=sma20[sma20.length-1];
   const sma20Sig=last>s20?'Buy':'Sell';
   const sma20Score=last>s20?70:30;
-  set('riSma20',s20?'$'+F.f2(s20):'—');
-  const s20El=$('riSma20Sig');if(s20El){s20El.textContent=sma20Sig;s20El.style.color=sma20Sig==='Buy'?'var(--green)':'var(--red)'}
+  setDual('riSma20',s20?'$'+F.f2(s20):'—');
+  setSigDual('riSma20Sig',sma20Sig);
 
-  // SMA 50
   const sma50=_sma(closes,50);const s50=sma50[sma50.length-1];
   const sma50Sig=s50?last>s50?'Buy':'Sell':'—';
   const sma50Score=s50?(last>s50?70:30):50;
   set('riSma50',s50?'$'+F.f2(s50):'—');
   const s50El=$('riSma50Sig');if(s50El){s50El.textContent=sma50Sig;s50El.style.color=sma50Sig==='Buy'?'var(--green)':sma50Sig==='Sell'?'var(--red)':'var(--text-dim)'}
 
-  // MACD
   const macd=_macd(closes);
   const macdSig=macd.hist>0?'Buy':'Sell';
   const macdScore=macd.hist>0?(macd.hist>0.5?80:65):(macd.hist<-0.5?20:35);
-  set('riMacd',macd.macd!=null?macd.macd.toFixed(3):'—');
-  const mEl=$('riMacdSig');if(mEl){mEl.textContent=macdSig;mEl.style.color=macdSig==='Buy'?'var(--green)':'var(--red)'}
+  setDual('riMacd',macd.macd!=null?macd.macd.toFixed(3):'—');
+  setSigDual('riMacdSig',macdSig);
 
-  // Momentum (10-period rate of change)
   const momPeriod=10;
   const mom=closes.length>momPeriod?((last-closes[closes.length-momPeriod-1])/closes[closes.length-momPeriod-1]*100):null;
   const momSig=mom>0?'Buy':'Sell';
   const momScore=mom>5?80:mom>0?60:mom>-5?40:20;
-  set('riMom',mom!=null?mom.toFixed(2)+'%':'—');
-  const moEl=$('riMomSig');if(moEl){moEl.textContent=momSig;moEl.style.color=momSig==='Buy'?'var(--green)':'var(--red)'}
+  setDual('riMom',mom!=null?mom.toFixed(2)+'%':'—');
+  setSigDual('riMomSig',momSig);
 
-  // Volume trend (recent vol vs average)
   if(_pData[0]?.volume!=null){
     const vols=_pData.map(c=>c.volume||0);
     const avgVol=vols.reduce((s,v)=>s+v,0)/vols.length;
     const recentVol=vols.slice(-5).reduce((s,v)=>s+v,0)/5;
     const volRatio=avgVol>0?(recentVol/avgVol):1;
     const volSig=volRatio>1.2?'High':volRatio<0.8?'Low':'Normal';
-    const volScore=volRatio>1.5?70:volRatio>1?60:50;
     set('riVolT',volRatio.toFixed(2)+'x');
     const vEl=$('riVolTSig');if(vEl){vEl.textContent=volSig;vEl.style.color=volSig==='High'?'var(--green)':volSig==='Low'?'var(--red)':'var(--text-dim)'}
   }
 
-  // Composite score (0-100)
   const scores=[rsiScore,sma20Score,sma50Score,macdScore,momScore];
   const avg=scores.reduce((s,v)=>s+v,0)/scores.length;
   const score=Math.round(avg);
-
-  set('ratingScore',score+'/100');
   const label=score>=75?'Strong Buy':score>=60?'Buy':score>=45?'Neutral':score>=30?'Sell':'Strong Sell';
-  const labelEl=$('ratingLabel');
-  if(labelEl){
-    labelEl.textContent=label;
-    const col=score>=75?'var(--green)':score>=60?'#00e676':score>=45?'var(--text-dim)':score>=30?'var(--fire)':'var(--red)';
-    labelEl.style.color=col;
-    labelEl.style.background=score>=60?'var(--green-dim)':score>=45?'rgba(100,100,100,0.15)':'var(--red-dim)';
-  }
-  const scoreEl=$('ratingScore');if(scoreEl)scoreEl.style.color=score>=60?'var(--green)':score>=45?'var(--text-bright)':'var(--red)';
-  const bar=$('ratingBar');if(bar)bar.style.left=score+'%';
+  const col=score>=75?'var(--green)':score>=60?'#00e676':score>=45?'var(--text-dim)':score>=30?'var(--fire)':'var(--red)';
+  const bg=score>=60?'var(--green-dim)':score>=45?'rgba(100,100,100,0.15)':'var(--red-dim)';
+
+  ['ratingScore','ratingScore2'].forEach(id=>{const el=$(id);if(el){el.textContent=score+'/100';el.style.color=col}});
+  ['ratingLabel','ratingLabel2'].forEach(id=>{const el=$(id);if(el){el.textContent=label;el.style.color=col;el.style.background=bg}});
+  ['ratingBar','ratingBar2'].forEach(id=>{const el=$(id);if(el)el.style.left=score+'%'});
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1087,7 +1146,7 @@ function _buildBurnHistory(tf){
 
 function _initBurnRateChart(){
   const wrap=$('burnRateWrap');if(!wrap||typeof LightweightCharts==='undefined')return;
-  if(_burnRateChart){try{_burnRateChart.remove()}catch(e){}_burnRateChart=null;_burnRateSeries=null}
+  if(_burnRateChart){try{_burnRateChart.remove()}catch(e){}_burnRateChart=null;_burnRateSeries=null;_burnRateMaSeries=null}
   wrap.innerHTML='';
   const s=_wsz('burnRateWrap');
   _burnRateChart=LightweightCharts.createChart(wrap,_lcBase({
@@ -1107,30 +1166,77 @@ function _drawBurnRate(){
   const bars=_buildBurnHistory(_burnRateTf);
   if(!bars.length)return;
 
-  // Color bars by intensity
   const vals=bars.map(b=>b.value);
-  const avg=vals.reduce((s,v)=>s+v,0)/vals.length;
-  const colored=bars.map(b=>({
-    ...b,
-    color:b.value>avg*1.5?'#ff3d5a':b.value>avg?'#ff6b2b':b.value>avg*0.5?'#ff8a50':'#ff8a5044'
-  }));
+  // Exclude last bar (incomplete period) from stats
+  const completedVals=vals.slice(0,-1);
+  const allAvg=completedVals.length>0?completedVals.reduce((s,v)=>s+v,0)/completedVals.length:0;
+  const maxVal=Math.max(...vals,1);
+  const recent7=completedVals.slice(-7);
+  const recentAvg=recent7.length>0?recent7.reduce((s,v)=>s+v,0)/recent7.length:allAvg;
+  const older7=completedVals.slice(-14,-7);
+  const olderAvg=older7.length>0?older7.reduce((s,v)=>s+v,0)/older7.length:allAvg;
+
+  // Color gradient: intensity-based with distinct fire palette
+  const colored=bars.map(b=>{
+    const t=maxVal>0?b.value/maxVal:0;
+    let color;
+    if(t>0.85) color='#ff1744';      // extreme
+    else if(t>0.65) color='#ff3d5a';  // high
+    else if(t>0.45) color='#ff6b2b';  // above avg
+    else if(t>0.25) color='#ff8a50';  // normal
+    else color='rgba(255,138,80,0.4)'; // low
+    return{...b,color};
+  });
   _burnRateSeries.setData(colored);
+
+  // Add/update SMA overlay line
+  if(!_burnRateMaSeries){
+    _burnRateMaSeries=_burnRateChart.addLineSeries({color:'rgba(0,212,255,0.6)',lineWidth:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+  }
+  const smaLen=Math.min(7,Math.floor(bars.length/3));
+  if(smaLen>=2){
+    const maData=[];
+    for(let i=smaLen-1;i<bars.length;i++){
+      let s=0;for(let j=i-smaLen+1;j<=i;j++)s+=bars[j].value;
+      maData.push({time:bars[i].time,value:s/smaLen});
+    }
+    _burnRateMaSeries.setData(maData);
+  }
   _burnRateChart.timeScale().fitContent();
 
-  // Compute burn score: today's burn vs average
-  const todayBurn=vals[vals.length-1]||0;
-  const ratio=avg>0?todayBurn/avg:0;
-  const burnScore=Math.min(100,Math.round(ratio*60+20));
+  // --- Stats ---
+  const lastComplete=completedVals.length>0?completedVals[completedVals.length-1]:0;
+  const prevComplete=completedVals.length>1?completedVals[completedVals.length-2]:0;
+
+  // Burn rate score: weighted by recency trend + absolute level
+  const trendRatio=olderAvg>0?recentAvg/olderAvg:1;
+  const levelRatio=allAvg>0?recentAvg/allAvg:0;
+  const burnScore=Math.min(100,Math.max(0,Math.round(levelRatio*35+trendRatio*35+15)));
   set('burnScoreVal',burnScore+'/100');
-  const bsEl=$('burnScoreVal');if(bsEl)bsEl.style.color=burnScore>=70?'var(--green)':burnScore>=40?'var(--fire)':'var(--red)';
+  const bsEl=$('burnScoreVal');if(bsEl)bsEl.style.color=burnScore>=60?'var(--green)':burnScore>=35?'var(--fire)':'var(--red)';
 
-  set('burnToday',F.c(todayBurn)+' HYPE');
-  set('burnAvgDay',F.c(avg)+' HYPE');
+  // Period change arrow
+  const pctChange=prevComplete>0?((lastComplete-prevComplete)/prevComplete*100).toFixed(1):0;
+  const changeArrow=pctChange>0?'▲':'▼';
+  const changeColor=pctChange>0?'var(--green)':'var(--red)';
+  set('burnToday',F.c(lastComplete)+' HYPE');
+  const btEl=$('burnToday');if(btEl&&prevComplete>0)btEl.innerHTML=F.c(lastComplete)+' HYPE <span style="color:'+changeColor+';font-size:10px">'+changeArrow+Math.abs(pctChange)+'%</span>';
 
-  // Burn velocity: annualized rate at current pace
-  const annualized=todayBurn*365;
+  // Avg normalized to daily
+  let dailyAvg=allAvg;
+  if(_burnRateTf==='hour')dailyAvg=allAvg*24;
+  else if(_burnRateTf==='week')dailyAvg=allAvg/7;
+  set('burnAvgDay',F.c(dailyAvg)+' HYPE/day');
+
+  // Burn velocity annualized from recent trend
+  let annualized=recentAvg;
+  if(_burnRateTf==='hour')annualized*=24*365;
+  else if(_burnRateTf==='week')annualized=annualized/7*365;
+  else annualized*=365;
   const pctYear=((annualized/MAX_S)*100).toFixed(1);
-  set('burnVelocity',pctYear+'%/yr');
+  const trendArrow=trendRatio>1.05?'↑':trendRatio<0.95?'↓':'→';
+  set('burnVelocity',pctYear+'%/yr '+trendArrow);
+  const velEl=$('burnVelocity');if(velEl)velEl.style.color=parseFloat(pctYear)>2?'var(--green)':parseFloat(pctYear)>0.5?'var(--fire)':'var(--text-dim)';
 
   set('burnRateMeta',bars.length+' periods · '+_burnRateTf);
 }
@@ -1349,6 +1455,182 @@ function computeRainbowFib(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  RAINBOWFLOW — Ported from PineScript v1.0
+// ═══════════════════════════════════════════════════════════════
+function computeRainbowFlow(){
+  if(_pData.length<30)return;
+  const d=_pData, n=d.length, P=14;
+  const closes=d.map(c=>c.close),highs=d.map(c=>c.high),lows=d.map(c=>c.low),vols=d.map(c=>c.volume||0),opens=d.map(c=>c.open);
+
+  // RSI
+  let gains=0,losses=0;
+  for(let i=1;i<=P&&i<n;i++){const ch=closes[i]-closes[i-1];if(ch>0)gains+=ch;else losses-=ch}
+  let avgG=gains/P,avgL=losses/P;
+  for(let i=P+1;i<n;i++){const ch=closes[i]-closes[i-1];avgG=(avgG*13+(ch>0?ch:0))/P;avgL=(avgL*13+(ch<0?-ch:0))/P}
+  const rsi=avgL===0?100:100-100/(1+avgG/avgL);
+  const rsiNorm=(rsi-50)/50;
+
+  // ROC
+  const rocIdx=n-1-P;const roc=rocIdx>=0?(closes[n-1]-closes[rocIdx])/closes[rocIdx]*100:0;
+  let rocAbsMax=0;for(let i=Math.max(P,n-100);i<n;i++){const r=i-P>=0?Math.abs((closes[i]-closes[i-P])/closes[i-P]*100):0;if(r>rocAbsMax)rocAbsMax=r}
+  const rocNorm=rocAbsMax>0?roc/rocAbsMax:0;
+
+  // Fast/Slow MA trend
+  const ema=(arr,len)=>{const k=2/(len+1);let v=arr[0];for(let i=1;i<arr.length;i++)v=arr[i]*k+v*(1-k);return v};
+  const fastMA=ema(closes,20),slowMA=ema(closes,50);
+  const last=closes[n-1];
+  const maScore=last>fastMA&&fastMA>slowMA?1:last<fastMA&&fastMA<slowMA?-1:last>fastMA?0.5:-0.5;
+
+  // Blend (Momentum mode)
+  let raw=rsiNorm*0.7+rocNorm*0.3;
+  raw=Math.max(-1,Math.min(1,raw));
+
+  // Rainbow color: 8 stops
+  const stops=['#ff1744','#ff6d00','#ffd600','#ffffff','#00e5ff','#00e676','#e040fb','#f8bbd0'];
+  const t=(raw+1)/2;const seg=t*7;const idx=Math.min(6,Math.floor(seg));
+  const scoreDisp=Math.round(raw*100);
+
+  // Whale detection
+  const volAvg=vols.slice(-20).reduce((s,v)=>s+v,0)/20;
+  const lastVol=vols[n-1];
+  const isWhale=lastVol>volAvg*2.5;
+  const body=Math.abs(closes[n-1]-opens[n-1]);
+  const range=highs[n-1]-lows[n-1];
+  const strongBody=range>0?body/range>0.4:false;
+  const whaleBull=isWhale&&closes[n-1]>opens[n-1]&&strongBody;
+  const whaleBear=isWhale&&closes[n-1]<opens[n-1]&&strongBody;
+
+  // Top/Bottom signals
+  const priceHH=n>5&&highs[n-1]>Math.max(...highs.slice(-6,-1));
+  const rsiCalc=rsi; // already computed above
+  const topSig=rsi>72&&priceHH;
+  const bottomSig=rsi<28&&n>5&&lows[n-1]<Math.min(...lows.slice(-6,-1));
+
+  // Dashboard updates
+  const scoreEl=$('rfwScore');
+  if(scoreEl){scoreEl.textContent=scoreDisp;scoreEl.style.color=raw>0.3?'#00e676':raw<-0.3?'#ff1744':'#ffd600'}
+  const trendEl=$('rfwTrend');
+  if(trendEl){const bull=fastMA>slowMA;trendEl.textContent=bull?'🟢 BULL':'🔴 BEAR';trendEl.style.color=bull?'var(--green)':'var(--red)'}
+  const rsiEl=$('rfwRsi');
+  if(rsiEl){rsiEl.textContent=Math.round(rsi);rsiEl.style.color=rsi>72?'var(--red)':rsi<28?'var(--green)':'var(--text-bright)'}
+  const volEl=$('rfwVol');
+  if(volEl){
+    if(whaleBull){volEl.textContent='🐋 WHALE BUY';volEl.style.color='#00e676'}
+    else if(whaleBear){volEl.textContent='🐋 WHALE SELL';volEl.style.color='#ff1744'}
+    else if(isWhale){volEl.textContent='🐋 Whale';volEl.style.color='#ffd600'}
+    else{volEl.textContent='Normal';volEl.style.color='var(--text-dim)'}
+  }
+  let signalStr='';
+  if(topSig)signalStr='🔴 TOP';else if(bottomSig)signalStr='🟢 BOTTOM';
+  set('rfwMeta','Score '+scoreDisp+(signalStr?' · '+signalStr:''));
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  QUANTUMFLOW FUSION — Ported from PineScript v2.3
+// ═══════════════════════════════════════════════════════════════
+function computeQuantumFlow(){
+  if(_pData.length<50)return;
+  const d=_pData, n=d.length, P=14;
+  const closes=d.map(c=>c.close),highs=d.map(c=>c.high),lows=d.map(c=>c.low),vols=d.map(c=>c.volume||0),opens=d.map(c=>c.open);
+
+  // EMA helper
+  const emaArr=(arr,len)=>{const k=2/(len+1);const out=[arr[0]];for(let i=1;i<arr.length;i++)out.push(arr[i]*k+out[i-1]*(1-k));return out};
+  const smaArr=(arr,len)=>{const out=[];for(let i=0;i<arr.length;i++){if(i<len-1){out.push(arr[i]);continue}let s=0;for(let j=i-len+1;j<=i;j++)s+=arr[j];out.push(s/len)}return out};
+  const lastN=(arr)=>arr[arr.length-1];
+
+  // 6 Adaptive MAs (Fibonacci periods)
+  const ma1=lastN(emaArr(closes,P));
+  const ma2=lastN(emaArr(closes,P*2));
+  const ma3=lastN(emaArr(closes,P*3));
+  const ma4=lastN(emaArr(closes,P*5));
+  const ma5=lastN(emaArr(closes,P*8));
+  const ma6=lastN(emaArr(closes,Math.min(P*13,n-1)));
+
+  // Ribbon alignment score
+  const bullA=(ma1>ma2?1:0)+(ma2>ma3?1:0)+(ma3>ma4?1:0)+(ma4>ma5?1:0)+(ma5>ma6?1:0);
+  const bearA=(ma1<ma2?1:0)+(ma2<ma3?1:0)+(ma3<ma4?1:0)+(ma4<ma5?1:0)+(ma5<ma6?1:0);
+  const ribbonScore=bullA-bearA;
+
+  // RSI
+  let gains=0,losses=0;
+  for(let i=1;i<=P&&i<n;i++){const ch=closes[i]-closes[i-1];if(ch>0)gains+=ch;else losses-=ch}
+  let avgG=gains/P,avgL=losses/P;
+  for(let i=P+1;i<n;i++){const ch=closes[i]-closes[i-1];avgG=(avgG*(P-1)+(ch>0?ch:0))/P;avgL=(avgL*(P-1)+(ch<0?-ch:0))/P}
+  const rsi=avgL===0?100:100-100/(1+avgG/avgL);
+  const rsiNorm=(rsi-50)/50;
+
+  // ROC + MACD approximation
+  const rocIdx=n-1-P;const roc=rocIdx>=0?(closes[n-1]-closes[rocIdx])/closes[rocIdx]*100:0;
+  let rocAbsMax=0;for(let i=Math.max(P,n-100);i<n;i++){const r=i-P>=0?Math.abs((closes[i]-closes[i-P])/closes[i-P]*100):0;if(r>rocAbsMax)rocAbsMax=r}
+  const rocNorm=rocAbsMax>0?roc/rocAbsMax:0;
+  const emaFast=lastN(emaArr(closes,P));
+  const emaSlow=lastN(emaArr(closes,P*2));
+  const macdLine=emaFast-emaSlow;
+  const macdRange=Math.max(...closes.slice(-100).map((_,i,a)=>{const f=lastN(emaArr(a.slice(0,i+1),P));const s=lastN(emaArr(a.slice(0,i+1),P*2));return Math.abs(f-s)}),1);
+  const macdNorm=macdLine/macdRange;
+  const momentumScore=rsiNorm*0.4+rocNorm*0.35+macdNorm*0.25;
+
+  // Volume pressure
+  const lastVol=vols[n-1];const lastOpen=opens[n-1];const lastClose=closes[n-1];
+  const lastHigh=highs[n-1];const lastLow=lows[n-1];
+  const candleRange=lastHigh-lastLow;
+  const upperWick=lastHigh-Math.max(lastOpen,lastClose);
+  const lowerWick=Math.min(lastOpen,lastClose)-lastLow;
+  const wickBias=candleRange>0?(lowerWick-upperWick)/candleRange:0;
+  const bullCandle=lastClose>=lastOpen;
+  const dirVol=lastVol*(bullCandle?(0.5+wickBias*0.5):-(0.5-wickBias*0.5));
+  const volSma=vols.slice(-20).reduce((s,v)=>s+v,0)/20;
+  const volSurge=lastVol>volSma*1.5;
+  const isWhaleBull=volSurge&&lastClose>lastOpen;
+  const isWhaleBear=volSurge&&lastClose<lastOpen;
+
+  // ATR + volatility regime
+  const trueRanges=[];
+  for(let i=1;i<n;i++)trueRanges.push(Math.max(highs[i]-lows[i],Math.abs(highs[i]-closes[i-1]),Math.abs(lows[i]-closes[i-1])));
+  const atr=trueRanges.slice(-P*2).reduce((s,v)=>s+v,0)/(P*2);
+  const atrAvg=trueRanges.slice(-50).reduce((s,v)=>s+v,0)/50;
+  const atrRatio=atrAvg>0?atr/atrAvg:1;
+  const volExpanded=atrRatio>1.2;
+  const volCompressed=atrRatio<0.8;
+
+  // Composite strength score
+  const trendNorm=ribbonScore/5;
+  const volComponent=volExpanded?Math.sign(trendNorm)*0.5:volCompressed?Math.sign(trendNorm)*0.2:Math.sign(trendNorm)*0.35;
+  const rawScore=momentumScore*0.3+trendNorm*0.3+(dirVol>0?0.3:-0.3)*0.25+volComponent*0.15;
+  const strengthScore=Math.max(-1,Math.min(1,rawScore));
+  const scoreDisp=Math.round(strengthScore*100);
+
+  // Risk score
+  const maDeviation=atr>0?Math.abs(closes[n-1]-ma3)/atr:0;
+  const riskRaw=Math.min(100,Math.round((atrRatio-1)*30+maDeviation*20+Math.abs(strengthScore-trendNorm)*30+(volExpanded?10:0)));
+  const riskScore=Math.max(0,riskRaw);
+
+  // Volume pressure display
+  const vpSmooth=dirVol>0?Math.min(1,dirVol/(volSma||1)):Math.max(-1,dirVol/(volSma||1));
+
+  // Dashboard updates
+  const sEl=$('qffScore');
+  if(sEl){sEl.textContent=scoreDisp+'/100';sEl.style.color=strengthScore>0.3?'var(--green)':strengthScore<-0.3?'var(--red)':'var(--text-dim)'}
+  const rEl=$('qffRibbon');
+  if(rEl){
+    const lbl=ribbonScore>=4?'🟢 STRONG BULL':ribbonScore>=2?'🟩 BULL':ribbonScore<=-4?'🔴 STRONG BEAR':ribbonScore<=-2?'🟥 BEAR':'⬜ NEUTRAL';
+    rEl.textContent=lbl;rEl.style.color=ribbonScore>=2?'var(--green)':ribbonScore<=-2?'var(--red)':'var(--text-dim)';
+  }
+  const vEl=$('qffVol');
+  if(vEl){
+    const lbl=vpSmooth>0.3?'🐋 BUY SURGE':vpSmooth>0.1?'📈 Buying':vpSmooth<-0.3?'🐋 SELL SURGE':vpSmooth<-0.1?'📉 Selling':'⟺ Neutral';
+    vEl.textContent=lbl;vEl.style.color=vpSmooth>0.1?'var(--green)':vpSmooth<-0.1?'var(--red)':'var(--text-dim)';
+  }
+  const rkEl=$('qffRisk');
+  if(rkEl){
+    const lbl=riskScore<30?'🟢 LOW':riskScore<60?'🟡 MED':'🔴 HIGH';
+    rkEl.textContent=lbl+' ('+riskScore+')';rkEl.style.color=riskScore<30?'var(--green)':riskScore<60?'var(--yellow)':'var(--red)';
+  }
+  const regime=volExpanded?'🔥 Expanded':volCompressed?'🌀 Squeeze':'〰️ Normal';
+  set('qffMeta','Str '+scoreDisp+' · '+regime);
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 loadAll();
@@ -1358,21 +1640,16 @@ function _tryInitCharts(){
     console.warn('LightweightCharts not loaded yet, retrying in 2s…');
     setTimeout(_tryInitCharts,2000);return;
   }
-  // Fetch candle data for indicators (TradingView handles the visible chart)
   (async()=>{
     const ok=await _fetchCandles(60);
     if(ok){
-      computePriceRating();
-      computeSqzMom();
-      computeRainbowFib();
+      computePriceRating();computeSqzMom();computeRainbowFib();
+      computeRainbowFlow();computeQuantumFlow();
     }
   })();
-  // SqzMom histogram chart
   _initSqzChart();
-  // AF live monitor + burn charts
   _initAfChart();_startAfLive();
   _initBurnChart();_initBurnRateChart();
-  // Ring hover
   _initRingHover();
 }
 setTimeout(_tryInitCharts,1500);
