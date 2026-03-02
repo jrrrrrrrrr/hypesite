@@ -441,7 +441,29 @@ const F={
 
 const $=id=>document.getElementById(id),set=(id,v)=>{const e=$(id);if(e)e.textContent=v},htm=(id,v)=>{const e=$(id);if(e)e.innerHTML=v};
 
-function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active')}
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const pg=$('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');
+  // Double-rAF + timeout ensures layout is fully computed before chart init
+  setTimeout(()=>{requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+    if(id==='burns'){
+      if(!_burnChart&&typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart()}
+      if(!_burnRateChart&&typeof LightweightCharts!=='undefined'){_initBurnRateChart()}
+    }
+    if(id==='charts'){
+      if(!_sqzChart&&typeof LightweightCharts!=='undefined'){_initSqzChart();if(_pData.length>30)computeSqzMom()}
+    }
+    _resizeAllCharts();
+  })})},50);
+}
+function _resizeAllCharts(){
+  const isVis=id=>{const el=$(id);return el&&el.closest('.page.active')};
+  if(_afChart&&isVis('afWrap')){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h});_afChart.timeScale().fitContent()}
+  if(_burnChart&&isVis('burnWrap')){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h});_burnChart.timeScale().fitContent()}
+  if(_burnRateChart&&isVis('burnRateWrap')){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h});_burnRateChart.timeScale().fitContent()}
+  if(_sqzChart&&isVis('sqzWrap')){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h});_sqzChart.timeScale().fitContent()}
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  API
@@ -768,7 +790,7 @@ function renderQueue(){
 //  CHARTS — LightweightCharts
 // ═══════════════════════════════════════════════════════════════
 function _lcBase(x){return Object.assign({layout:{background:{color:'#12151c'},textColor:'#5a6580',fontFamily:"'JetBrains Mono',monospace",fontSize:10},grid:{vertLines:{color:'rgba(34,39,56,0.55)'},horzLines:{color:'rgba(34,39,56,0.55)'}},crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(0,212,255,0.3)',labelBackgroundColor:'#181c25',width:1},horzLine:{color:'rgba(0,212,255,0.3)',labelBackgroundColor:'#181c25',width:1}},rightPriceScale:{borderColor:'#222738',textColor:'#5a6580'},timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:true},handleScroll:true,handleScale:true,autoSize:false},x||{})}
-function _wsz(id){const el=$(id);return el?{w:Math.max(el.clientWidth,200),h:el.clientHeight||360}:{w:800,h:360}}
+function _wsz(id){const el=$(id);if(!el)return{w:800,h:360};let w=el.clientWidth;if(w<100&&el.parentElement)w=el.parentElement.clientWidth-32;return{w:Math.max(w,300),h:el.clientHeight||360}}
 
 // ── PRICE CHART ──────────────────────────────────────────
 let _priceChart=null,_pcS=null,_paS=null,_pvS=null,_pData=[],_pTf=60,_pType='candle';
@@ -952,12 +974,7 @@ function _redrawBurnChart(){
 
 // ── RESIZE ──────────────────────────────────────────
 let _burnRateChart=null,_burnRateSeries=null,_burnRateMaSeries=null,_burnRateTf='day',_burnRange='90d';
-window.addEventListener('resize',()=>{
-  if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
-  if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
-  if(_burnRateChart){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h})}
-  if(_sqzChart){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h})}
-});
+window.addEventListener('resize',()=>_resizeAllCharts());
 
 // ═══════════════════════════════════════════════════════════════
 //  PRICE RATING — Technical Indicators from candle data
@@ -1669,10 +1686,10 @@ function _tryInitCharts(){
       computeRainbowFlow();computeQuantumFlow();
     }
   })();
-  _initSqzChart();
+  // Only init charts on the VISIBLE tab (Overview)
   _initAfChart();_startAfLive();
-  _initBurnChart();_initBurnRateChart();
   _initRingHover();
+  // Burns + Charts tab charts are deferred to showPage() lazy-init
 }
 setTimeout(_tryInitCharts,1500);
 </script>
