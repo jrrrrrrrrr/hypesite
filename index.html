@@ -234,6 +234,18 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
   </div>
+
+  <!-- AF Live Monitor -->
+  <div class="af-live">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats">
+      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
+      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
+      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
+      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
+    </div>
+    <div class="chart-wrap" id="afWrap" style="height:260px"></div>
+  </div>
 </div>
 
 <!-- ══ CHARTS TAB ══════════════════════════════════════════════ -->
@@ -323,22 +335,11 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ BURNS TAB ═══════════════════════════════════════════════ -->
 <div class="page" id="page-burns">
-  <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr)">
+  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned2">—</div><div class="mc-sub" id="mBurnedSub2">—</div></div>
     <div class="metric-card"><div class="mc-label">AF HYPE (burned by vote)</div><div class="mc-value fire" id="burnAfHype">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
     <div class="metric-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="burnFees">—</div><div class="mc-sub">HyperCore + HyperEVM</div></div>
-  </div>
-
-  <!-- AF Live Monitor -->
-  <div class="af-live">
-    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
-    <div class="af-live-stats">
-      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
-      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
-      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
-      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
-    </div>
-    <div class="chart-wrap" id="afWrap" style="height:280px"></div>
+    <div class="metric-card"><div class="mc-label">USD Value Burned</div><div class="mc-value green" id="burnUsdTotal">—</div><div class="mc-sub">at current price</div></div>
   </div>
 
   <!-- Live Burn Tracker -->
@@ -348,7 +349,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
       <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
       <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
-      <div class="af-stat"><div class="lbl">USD Value</div><div class="val green" id="burnLiveUsd">—</div></div>
+      <div class="af-stat"><div class="lbl">Session</div><div class="val green" id="burnLiveSession">+0 HYPE</div></div>
     </div>
     <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
   </div>
@@ -357,10 +358,17 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div class="af-live">
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">🔥 Burn Rate History</span><span class="chart-meta" id="burnRateMeta">Estimating…</span></div>
-      <div class="tf-btns">
-        <button class="tf-btn" id="brHour" onclick="setBurnTf('hour',this)">Hourly</button>
-        <button class="tf-btn active" id="brDay" onclick="setBurnTf('day',this)">Daily</button>
-        <button class="tf-btn" id="brWeek" onclick="setBurnTf('week',this)">Weekly</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="tf-btns">
+          <button class="tf-btn" id="br30d" onclick="setBurnRange('30d',this)">30d</button>
+          <button class="tf-btn active" id="br90d" onclick="setBurnRange('90d',this)">90d</button>
+          <button class="tf-btn" id="brAll" onclick="setBurnRange('all',this)">All</button>
+        </div>
+        <div class="tf-btns">
+          <button class="tf-btn" id="brHour" onclick="setBurnTf('hour',this)">Hourly</button>
+          <button class="tf-btn active" id="brDay" onclick="setBurnTf('day',this)">Daily</button>
+          <button class="tf-btn" id="brWeek" onclick="setBurnTf('week',this)">Weekly</button>
+        </div>
       </div>
     </div>
     <div class="af-live-stats" style="margin-bottom:8px">
@@ -649,6 +657,7 @@ function renderAll(){
     set('burnAfHype',F.hype(D.afHype)+' HYPE');
     if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price));
     set('burnFees',F.hype(D.feesBurned)+' HYPE');
+    if(D.price)set('burnUsdTotal','$'+F.hype(D.totalBurned*D.price));
   }
 
   if(_pData.length>30){computePriceRating();computeSqzMom();computeRainbowFib();computeRainbowFlow();computeQuantumFlow()}
@@ -895,12 +904,12 @@ async function _afLiveTick(){
 function _startAfLive(){if(_afLiveTimer)clearInterval(_afLiveTimer);_afLiveTick();_afLiveTimer=setInterval(_afLiveTick,5000)}
 
 // ── BURN CHART ──────────────────────────────────────────
-let _burnChart=null,_burnSeries=null,_burnPoints=[];
+let _burnChart=null,_burnSeries=null,_burnPoints=[],_burnBaseline=null;
 
 function _initBurnChart(){
   const wrap=$('burnWrap');if(!wrap)return;
   if(_burnChart){try{_burnChart.remove()}catch(e){}_burnChart=null;_burnSeries=null}
-  wrap.innerHTML='';
+  wrap.innerHTML='';_burnBaseline=null;
   const s=_wsz('burnWrap');
   _burnChart=LightweightCharts.createChart(wrap,_lcBase({
     width:s.w,height:s.h,
@@ -908,18 +917,10 @@ function _initBurnChart(){
     timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:true,rightOffset:4}
   }));
   _burnSeries=_burnChart.addAreaSeries({
-    lineColor:'#ff6b2b',topColor:'rgba(255,107,43,0.2)',bottomColor:'rgba(255,107,43,0.01)',
+    lineColor:'#ff6b2b',topColor:'rgba(255,107,43,0.25)',bottomColor:'rgba(255,107,43,0.01)',
     lineWidth:2,priceLineVisible:false,lastValueVisible:true,
     crosshairMarkerVisible:true,crosshairMarkerRadius:4,
-    priceFormat:{type:'custom',formatter:v=>F.hype(v)+' HYPE'}
-  });
-  _burnChart.subscribeCrosshairMove(param=>{
-    if(!param.time||!_burnSeries)return;
-    const d=param.seriesData.get(_burnSeries);
-    if(d){
-      set('burnLiveTotal',F.hype(d.value)+' HYPE');
-      if(D.price)set('burnLiveUsd','$'+F.hype(d.value*D.price));
-    }
+    priceFormat:{type:'custom',formatter:v=>F.f2(v)+' HYPE burned'}
   });
   _redrawBurnChart();
 }
@@ -927,23 +928,30 @@ function _initBurnChart(){
 function _redrawBurnChart(){
   if(!_burnChart||!_burnSeries||!_burnPoints.length)return;
   try{
-    const dedup=arr=>{const seen=new Set(),out=[];for(const p of arr){if(!seen.has(p.time)){seen.add(p.time);out.push(p)}}return out};
-    _burnSeries.setData(dedup(_burnPoints));
-    // Update stats
+    // Show session delta (burns since page load)
+    if(_burnBaseline===null)_burnBaseline=_burnPoints[0].value;
+    const deltaData=[];const seen=new Set();
+    for(const p of _burnPoints){
+      if(seen.has(p.time))continue;seen.add(p.time);
+      deltaData.push({time:p.time,value:Math.max(0,p.value-_burnBaseline)});
+    }
+    _burnSeries.setData(deltaData);
     const last=_burnPoints[_burnPoints.length-1];
+    const sessionBurned=last?last.value-_burnBaseline:0;
     if(last){
       set('burnLiveTotal',F.hype(last.value)+' HYPE');
       set('burnLiveAf',F.hype(D.afHype));
       set('burnLiveFees',F.hype(D.feesBurned));
       if(D.price)set('burnLiveUsd','$'+F.hype(last.value*D.price));
+      set('burnLiveSession','+'+F.f2(sessionBurned)+' HYPE this session');
     }
-    set('burnChartMeta','Live · '+_burnPoints.length+' pts');
+    set('burnChartMeta','Session · '+_burnPoints.length+' pts · +'+F.f2(sessionBurned)+' burned');
     _burnChart.timeScale().fitContent();
   }catch(e){console.warn('burn draw',e)}
 }
 
 // ── RESIZE ──────────────────────────────────────────
-let _burnRateChart=null,_burnRateSeries=null,_burnRateMaSeries=null,_burnRateTf='day';
+let _burnRateChart=null,_burnRateSeries=null,_burnRateMaSeries=null,_burnRateTf='day',_burnRange='90d';
 window.addEventListener('resize',()=>{
   if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
   if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
@@ -1163,8 +1171,15 @@ function _initBurnRateChart(){
 
 function _drawBurnRate(){
   if(!_burnRateChart||!_burnRateSeries)return;
-  const bars=_buildBurnHistory(_burnRateTf);
+  let bars=_buildBurnHistory(_burnRateTf);
   if(!bars.length)return;
+
+  // Apply range filter
+  if(_burnRange!=='all'){
+    const days=_burnRange==='30d'?30:90;
+    const cutoff=Math.floor(Date.now()/1000)-(days*86400);
+    bars=bars.filter(b=>b.time>=cutoff);
+  }
 
   const vals=bars.map(b=>b.value);
   // Exclude last bar (incomplete period) from stats
@@ -1243,7 +1258,14 @@ function _drawBurnRate(){
 
 function setBurnTf(tf,btn){
   _burnRateTf=tf;
-  document.querySelectorAll('[id^="br"]').forEach(b=>{if(b.tagName==='BUTTON')b.classList.remove('active')});
+  document.querySelectorAll('#brHour,#brDay,#brWeek').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  _burnRateMaSeries=null; // force recreate MA on TF change
+  _initBurnRateChart();
+}
+function setBurnRange(range,btn){
+  _burnRange=range;
+  document.querySelectorAll('#br30d,#br90d,#brAll').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   _drawBurnRate();
 }
