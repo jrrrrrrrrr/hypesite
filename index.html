@@ -95,7 +95,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .ri-row{display:grid;grid-template-columns:100px 80px 80px;gap:8px;padding:6px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--surface2)}
 .ri-name{color:var(--text-dim)}.ri-val{color:var(--text-bright);text-align:right}.ri-signal{text-align:right;font-weight:600}
 
-/* Rainbow Fib levels */
+/* Fibonacci Matrix levels */
 .rf-levels{display:flex;flex-direction:column;gap:2px}
 .rf-level{display:grid;grid-template-columns:60px 1fr 70px 60px;gap:4px;padding:4px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;align-items:center}
 .rf-ratio{font-weight:700}.rf-bar{height:6px;border-radius:3px;position:relative}
@@ -181,9 +181,20 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div><div class="mc-label">💰 24h Spot Volume</div><div class="mc-value" id="mVol">—</div><div class="mc-sub">&nbsp;</div></div>
   </div>
 
-  <!-- Supply + AF + Rating in balanced 3-col grid -->
+  <!-- AF Live Monitor — moved above supply -->
+  <div class="af-live" style="margin-top:0;margin-bottom:16px">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats">
+      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
+      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
+      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
+      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
+    </div>
+    <div class="chart-wrap" id="afWrap" style="height:260px"></div>
+  </div>
+
+  <!-- Supply + AF + Rating -->
   <div class="overview-grid">
-    <!-- Supply Breakdown — full width -->
     <div class="metric-card supply-card" style="padding:16px">
       <div class="mc-label" style="margin-bottom:12px">Supply Breakdown</div>
       <div style="display:flex;align-items:center;gap:24px;justify-content:center">
@@ -196,7 +207,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         </div>
       </div>
     </div>
-    <!-- AF Summary — compact -->
     <div class="metric-card" style="padding:16px">
       <div class="mc-label" style="margin-bottom:10px">🏦 Assistance Fund</div>
       <div style="display:flex;flex-direction:column;gap:6px">
@@ -209,7 +219,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:2px" id="afSessionTime">since page load</div>
       </div>
     </div>
-    <!-- Price Rating — compact -->
     <div class="metric-card" style="padding:16px">
       <div class="mc-label" style="margin-bottom:10px">📊 Price Rating</div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
@@ -226,25 +235,38 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
   </div>
 
-  <!-- Platform Stats -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-top:0">
-    <div class="metric-card"><div class="mc-label">Open Interest</div><div class="mc-value" id="psOI" style="font-size:15px">—</div></div>
-    <div class="metric-card"><div class="mc-label">Perp Volume</div><div class="mc-value" id="psVol" style="font-size:15px">—</div></div>
-    <div class="metric-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:15px">—</div></div>
-    <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
-    <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
+  <!-- HYPE Perp Intelligence -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="metric-card"><div class="mc-label">HYPE Funding (Ann.)</div><div class="mc-value" id="psFunding" style="font-size:15px">—</div><div class="mc-sub">1h rate × 8760</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Open Interest</div><div class="mc-value cyan" id="psHypeOI" style="font-size:15px">—</div><div class="mc-sub">perp notional</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Premium</div><div class="mc-value" id="psPremium" style="font-size:15px">—</div><div class="mc-sub">mark vs oracle</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Perp Volume</div><div class="mc-value" id="psHypeVol" style="font-size:15px">—</div><div class="mc-sub">24h notional</div></div>
   </div>
 
-  <!-- AF Live Monitor -->
-  <div class="af-live">
-    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
-    <div class="af-live-stats">
-      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
-      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
-      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
-      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
+  <!-- Platform Stats -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
+    <div class="metric-card"><div class="mc-label">Total Open Interest</div><div class="mc-value" id="psOI" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">24h Perp Volume</div><div class="mc-value" id="psVol" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Spot Tokens</div><div class="mc-value" id="psSpot" style="font-size:15px">—</div></div>
+  </div>
+  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
+    <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Unstake Queue</div><div class="mc-value" id="psQueue" style="font-size:15px">—</div><div class="mc-sub" id="psQueueSub"></div></div>
+    <div class="metric-card"><div class="mc-label">AF Total Value</div><div class="mc-value fire" id="psAfTotal" style="font-size:15px">—</div></div>
+  </div>
+
+  <!-- Top Markets Leaderboards -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0">
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:8px">Top 5 — Open Interest</div>
+      <div id="topOIList"></div>
     </div>
-    <div class="chart-wrap" id="afWrap" style="height:260px"></div>
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:8px">Top 5 — 24h Volume</div>
+      <div id="topVolList"></div>
+    </div>
   </div>
 </div>
 
@@ -269,7 +291,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div class="indicator-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
     <!-- SqzMom Panel -->
     <div class="af-live" style="margin-top:0">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">SQZMOM Rainbow</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
+      <div class="chart-hdr"><div class="left"><span class="chart-title">📡 Squeeze Momentum</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
       <div class="af-live-stats" style="margin-bottom:6px">
         <div class="af-stat"><div class="lbl">Squeeze</div><div class="val" id="sqzState">—</div></div>
         <div class="af-stat"><div class="lbl">Direction</div><div class="val" id="sqzDir">—</div></div>
@@ -278,9 +300,9 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       </div>
       <div class="chart-wrap" id="sqzWrap" style="height:180px"></div>
     </div>
-    <!-- Rainbow Fib Panel -->
+    <!-- Fibonacci Matrix Panel -->
     <div class="af-live" style="margin-top:0">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">Rainbow Fib Retracement</span><span class="chart-meta" id="rfMeta">—</span></div></div>
+      <div class="chart-hdr"><div class="left"><span class="chart-title">📐 Fibonacci Matrix</span><span class="chart-meta" id="rfMeta">—</span></div></div>
       <div class="af-live-stats" style="margin-bottom:6px">
         <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfTrend">—</div></div>
         <div class="af-stat"><div class="lbl">Price Zone</div><div class="val" id="rfZone">—</div></div>
@@ -289,9 +311,9 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       </div>
       <div class="rf-levels" id="rfLevels"></div>
     </div>
-    <!-- RainbowFlow Panel -->
+    <!-- Momentum Pulse Panel -->
     <div class="af-live" style="margin-top:0">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">🌈 RainbowFlow</span><span class="chart-meta" id="rfwMeta">—</span></div></div>
+      <div class="chart-hdr"><div class="left"><span class="chart-title">🔬 Momentum Pulse</span><span class="chart-meta" id="rfwMeta">—</span></div></div>
       <div class="af-live-stats" style="margin-bottom:6px">
         <div class="af-stat"><div class="lbl">Score</div><div class="val" id="rfwScore">—</div></div>
         <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfwTrend">—</div></div>
@@ -299,9 +321,9 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div class="af-stat"><div class="lbl">Volume</div><div class="val" id="rfwVol">—</div></div>
       </div>
     </div>
-    <!-- QuantumFlow Panel -->
+    <!-- Composite Signal Panel -->
     <div class="af-live" style="margin-top:0">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">⚡ QuantumFlow Fusion</span><span class="chart-meta" id="qffMeta">—</span></div></div>
+      <div class="chart-hdr"><div class="left"><span class="chart-title">⚡ Composite Signal</span><span class="chart-meta" id="qffMeta">—</span></div></div>
       <div class="af-live-stats" style="margin-bottom:6px">
         <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="qffScore">—</div></div>
         <div class="af-stat"><div class="lbl">Ribbon</div><div class="val" id="qffRibbon">—</div></div>
@@ -424,7 +446,9 @@ const D={price:null,priceChg:null,vol24:null,circSupply:null,
   feesBurned:0,afHype:0,totalBurned:0,
   staked:null,apr:null,validators:[],queue:[],holders:[],
   afUsdc:0,afOrders:[],afBid:null,afBidSz:null,
-  fees24:null,feesRecent:[],allMids:{},markets:[],totalOI:0,totalPerpVol:0};
+  fees24:null,feesRecent:[],allMids:{},markets:[],totalOI:0,totalPerpVol:0,
+  hypeFunding:null,hypePremium:null,hypeOI:null,hypeVol:null,
+  spotMarkets:0,topOI:[],topVol:[]};
 
 const F={
   c:n=>{if(n==null)return'—';n=+n;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toFixed(2)},
@@ -576,7 +600,17 @@ async function fAfOrders(){
 
 async function fDelegations(){try{const d=await hs('/delegations');if(Array.isArray(d)&&d.length){const tot=d.reduce((s,v)=>s+parseFloat(v.amount||v.stake||0),0);if(tot>0&&!D.staked)D.staked=tot}}catch(e){}}
 async function fQueue(){const d=await hs('/unstakingQueue');if(Array.isArray(d))D.queue=d}
-async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const[meta,ctxs]=d;let tOI=0,tVol=0;D.markets=(meta.universe||[]).map((u,i)=>{const c=ctxs[i];if(!c)return null;const mid=parseFloat(c.midPx||c.markPx||0);const oi=parseFloat(c.openInterest||0)*mid;const vol=parseFloat(c.dayNtlVlm||0);tOI+=oi;tVol+=vol;return{name:u.name,mid,oi,vol}}).filter(Boolean);D.totalOI=tOI;D.totalPerpVol=tVol}}catch(e){}}
+async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const[meta,ctxs]=d;let tOI=0,tVol=0;D.markets=(meta.universe||[]).map((u,i)=>{const c=ctxs[i];if(!c)return null;const mid=parseFloat(c.midPx||c.markPx||0);const oi=parseFloat(c.openInterest||0)*mid;const vol=parseFloat(c.dayNtlVlm||0);const funding=parseFloat(c.funding||0);const premium=parseFloat(c.premium||0);tOI+=oi;tVol+=vol;
+      // HYPE-specific metrics
+      if(u.name==='HYPE'){D.hypeFunding=funding;D.hypePremium=premium;D.hypeOI=oi;D.hypeVol=vol}
+      return{name:u.name,mid,oi,vol,funding,premium}}).filter(Boolean);
+    D.totalOI=tOI;D.totalPerpVol=tVol;
+    // Top 5 by OI and Volume
+    D.topOI=[...D.markets].sort((a,b)=>b.oi-a.oi).slice(0,5);
+    D.topVol=[...D.markets].sort((a,b)=>b.vol-a.vol).slice(0,5);
+  }}catch(e){}}
+
+async function fSpotCount(){try{const d=await hl({type:'spotMeta'});if(d?.tokens)D.spotMarkets=d.tokens.length;else if(d?.universe)D.spotMarkets=d.universe.length}catch(e){}}
 
 async function fFeesBurned(){
   // Try tokenDetails first for precise fee burns
@@ -590,7 +624,7 @@ async function fFeesBurned(){
 // ═══════════════════════════════════════════════════════════════
 async function loadAll(){
   const btn=$('refreshBtn');btn.textContent='⟳ …';
-  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fPerpStats()]);
+  await Promise.allSettled([fPrice(),fSpot(),fStaking(),fAfBal(),fAfOrders(),fDelegations(),fQueue(),fPerpStats(),fSpotCount()]);
   if(!D.feesBurned)await fFeesBurned();
   // Compute total burned = AF HYPE (formally burned by vote) + on-chain fee burns
   D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
@@ -650,7 +684,32 @@ function renderAll(){
   if(D.totalOI)set('psOI',F.usd(D.totalOI));
   if(D.totalPerpVol)set('psVol',F.usd(D.totalPerpVol));
   set('psMarkets',D.markets.length||'—');
+  set('psSpot',D.spotMarkets||'—');
   set('psVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
+
+  // HYPE-specific perp metrics
+  if(D.hypeFunding!=null){
+    const annFund=(D.hypeFunding*8*365*100);
+    const fEl=$('psFunding');if(fEl){fEl.textContent=(annFund>=0?'+':'')+annFund.toFixed(2)+'%';fEl.style.color=annFund>0?'var(--green)':annFund<0?'var(--red)':'var(--text-dim)'}
+  }
+  if(D.hypeOI)set('psHypeOI',F.usd(D.hypeOI));
+  if(D.hypePremium!=null){
+    const pPct=(D.hypePremium*100);
+    const pEl=$('psPremium');if(pEl){pEl.textContent=(pPct>=0?'+':'')+pPct.toFixed(4)+'%';pEl.style.color=pPct>0.01?'var(--green)':pPct<-0.01?'var(--red)':'var(--text-dim)'}
+  }
+
+  // Top OI + Top Volume mini leaderboards
+  _renderMiniBoard('topOIList',D.topOI,'oi');
+  _renderMiniBoard('topVolList',D.topVol,'vol');
+
+  // HYPE perp volume
+  if(D.hypeVol)set('psHypeVol',F.usd(D.hypeVol));
+  // Queue summary on overview
+  const qtTotal=D.queue.reduce((s,e)=>{let a=0;if(e.amount)a=parseFloat(e.amount);else if(e.nHype){const n=parseFloat(e.nHype);a=n>1e15?n/1e18:n}else if(e.hype)a=parseFloat(e.hype);else if(e.value)a=parseFloat(e.value);if(a>1e12)a=a/1e18;return s+a},0);
+  set('psQueue',F.c(qtTotal)+' HYPE');
+  set('psQueueSub',D.queue.length+' pending');
+  // AF total value
+  if(D.afHype&&D.price){const tv=D.afHype*D.price+D.afUsdc;set('psAfTotal',F.usd(tv))}
 
   // Staking page
   if(D.staked){
@@ -682,7 +741,7 @@ function renderAll(){
     if(D.price)set('burnUsdTotal','$'+F.hype(D.totalBurned*D.price));
   }
 
-  if(_pData.length>30){computePriceRating();computeSqzMom();computeRainbowFib();computeRainbowFlow();computeQuantumFlow()}
+  if(_pData.length>30){computePriceRating();computeSqzMom();computeFibMatrix();computeMomentumPulse();computeCompositeSignal()}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -750,6 +809,15 @@ function _initRingHover(){
 // ═══════════════════════════════════════════════════════════════
 //  TABLES
 // ═══════════════════════════════════════════════════════════════
+function _renderMiniBoard(id,items,field){
+  const el=$(id);if(!el||!items.length)return;
+  el.innerHTML=items.map((m,i)=>{
+    const val=field==='oi'?F.usd(m.oi):F.usd(m.vol);
+    const pct=field==='oi'?(m.oi/D.totalOI*100).toFixed(1):(m.vol/D.totalPerpVol*100).toFixed(1);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;padding:2px 0;${i===0?'color:var(--text-bright)':'color:var(--text-dim)'}"><span style="min-width:50px">${m.name}</span><span style="flex:1;margin:0 8px;height:3px;background:var(--border);border-radius:2px;position:relative"><span style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${i===0?'var(--accent)':'var(--text-muted)'};border-radius:2px"></span></span><span style="min-width:60px;text-align:right">${val}</span></div>`;
+  }).join('');
+}
+
 function renderValidators(){
   const el=$('validatorList');if(!el||!D.validators.length)return;
   const s=[...D.validators].sort((a,b)=>(b._stakeHype||0)-(a._stakeHype||0));
@@ -1288,7 +1356,7 @@ function setBurnRange(range,btn){
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  SQUEEZE MOMENTUM RAINBOW — Ported from PineScript v2.3
+//  SQUEEZE MOMENTUM — Ported from PineScript v2.3
 // ═══════════════════════════════════════════════════════════════
 let _sqzChart=null,_sqzSeries=null;
 function _initSqzChart(){
@@ -1402,9 +1470,9 @@ function computeSqzMom(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  RAINBOW FIB RETRACEMENT — Ported from PineScript v1.0
+//  FIBONACCI MATRIX — Ported from PineScript v1.0
 // ═══════════════════════════════════════════════════════════════
-function computeRainbowFib(){
+function computeFibMatrix(){
   if(!_pData||_pData.length<20)return;
   const swingLen=10;
   const highs=_pData.map(c=>c.high),lows=_pData.map(c=>c.low),closes=_pData.map(c=>c.close);
@@ -1494,9 +1562,9 @@ function computeRainbowFib(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  RAINBOWFLOW — Ported from PineScript v1.0
+//  MOMENTUM PULSE — Ported from PineScript v1.0
 // ═══════════════════════════════════════════════════════════════
-function computeRainbowFlow(){
+function computeMomentumPulse(){
   if(_pData.length<30)return;
   const d=_pData, n=d.length, P=14;
   const closes=d.map(c=>c.close),highs=d.map(c=>c.high),lows=d.map(c=>c.low),vols=d.map(c=>c.volume||0),opens=d.map(c=>c.open);
@@ -1524,7 +1592,7 @@ function computeRainbowFlow(){
   let raw=rsiNorm*0.7+rocNorm*0.3;
   raw=Math.max(-1,Math.min(1,raw));
 
-  // Rainbow color: 8 stops
+  // Gradient color: 8 stops
   const stops=['#ff1744','#ff6d00','#ffd600','#ffffff','#00e5ff','#00e676','#e040fb','#f8bbd0'];
   const t=(raw+1)/2;const seg=t*7;const idx=Math.min(6,Math.floor(seg));
   const scoreDisp=Math.round(raw*100);
@@ -1561,13 +1629,13 @@ function computeRainbowFlow(){
   }
   let signalStr='';
   if(topSig)signalStr='🔴 TOP';else if(bottomSig)signalStr='🟢 BOTTOM';
-  set('rfwMeta','Score '+scoreDisp+(signalStr?' · '+signalStr:''));
+  set('rfwMeta','Pulse '+scoreDisp+(signalStr?' · '+signalStr:''));
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  QUANTUMFLOW FUSION — Ported from PineScript v2.3
+//  COMPOSITE SIGNAL — Ported from PineScript v2.3
 // ═══════════════════════════════════════════════════════════════
-function computeQuantumFlow(){
+function computeCompositeSignal(){
   if(_pData.length<50)return;
   const d=_pData, n=d.length, P=14;
   const closes=d.map(c=>c.close),highs=d.map(c=>c.high),lows=d.map(c=>c.low),vols=d.map(c=>c.volume||0),opens=d.map(c=>c.open);
@@ -1682,8 +1750,8 @@ function _tryInitCharts(){
   (async()=>{
     const ok=await _fetchCandles(60);
     if(ok){
-      computePriceRating();computeSqzMom();computeRainbowFib();
-      computeRainbowFlow();computeQuantumFlow();
+      computePriceRating();computeSqzMom();computeFibMatrix();
+      computeMomentumPulse();computeCompositeSignal();
     }
   })();
   // Only init charts on the VISIBLE tab (Overview)
