@@ -95,6 +95,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .ri-row{display:grid;grid-template-columns:100px 80px 80px;gap:8px;padding:6px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--surface2)}
 .ri-name{color:var(--text-dim)}.ri-val{color:var(--text-bright);text-align:right}.ri-signal{text-align:right;font-weight:600}
 
+/* Rainbow Fib levels */
+.rf-levels{display:flex;flex-direction:column;gap:2px}
+.rf-level{display:grid;grid-template-columns:60px 1fr 70px 60px;gap:4px;padding:4px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;align-items:center}
+.rf-ratio{font-weight:700}.rf-bar{height:6px;border-radius:3px;position:relative}
+.rf-bar-price{position:absolute;left:0;top:0;height:100%;border-radius:3px;background:rgba(255,255,255,0.3)}
+.rf-price{text-align:right;color:var(--text-bright)}.rf-ctx{text-align:right;color:var(--text-dim);font-size:9px}
+
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
 .chart-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
 .chart-hdr .left{display:flex;align-items:center;gap:10px}
@@ -120,7 +127,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);margin-top:24px}
 footer p{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.04em;line-height:2.2}
 footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--accent)}
-@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
+@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}}
+@media(max-width:800px){.rating-grid{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}}
 </style>
 </head>
@@ -152,6 +160,40 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
   </div>
 
+  <!-- HYPE/USDT Perps Chart — TradingView (moved to top) -->
+  <div class="chart-box" style="margin-top:20px">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · via TradingView</span></div></div>
+    <div id="tvPerps" style="height:480px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypeperps&symbol=BINANCE%3AHYPEUSDT.P&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&studies=%5B%22STD%3BBollinger_Bands%22%2C%22STD%3BMACD%22%5D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%5D&locale=en" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+
+  <!-- Squeeze Momentum + Rainbow Fib Panels (ported from PineScript) -->
+  <div class="indicator-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+    <!-- SqzMom Panel -->
+    <div class="af-live">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">SQZMOM Rainbow</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Squeeze</div><div class="val" id="sqzState">—</div></div>
+        <div class="af-stat"><div class="lbl">Direction</div><div class="val" id="sqzDir">—</div></div>
+        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="sqzStr">—</div></div>
+        <div class="af-stat"><div class="lbl">Momentum</div><div class="val" id="sqzMom">—</div></div>
+      </div>
+      <div class="chart-wrap" id="sqzWrap" style="height:180px"></div>
+    </div>
+    <!-- Rainbow Fib Panel -->
+    <div class="af-live">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">Rainbow Fib Retracement</span><span class="chart-meta" id="rfMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfTrend">—</div></div>
+        <div class="af-stat"><div class="lbl">Price Zone</div><div class="val" id="rfZone">—</div></div>
+        <div class="af-stat"><div class="lbl">0.618 Golden</div><div class="val" id="rf618">—</div></div>
+        <div class="af-stat"><div class="lbl">Proximity</div><div class="val" id="rfProx">—</div></div>
+      </div>
+      <div class="rf-levels" id="rfLevels"></div>
+    </div>
+  </div>
+
   <div class="metrics-grid">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
       <div class="mc-label">🔥 Total Burned</div>
@@ -170,9 +212,10 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="ring-canvas"><canvas id="ringCanvas" width="220" height="220"></canvas><div class="ring-center"><div class="total">1.000B</div><div class="label">MAX SUPPLY</div></div></div>
       <div style="width:100%">
         <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Circulating</span><span class="legend-val" id="lgCirc">—</span></div>
-        <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked</span><span class="legend-val" id="lgStaked">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned (AF+Fees)</span><span class="legend-val" id="lgBurned">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px;padding-left:16px">Ring = Circulating + Burned + Locked = 1B<br>Holder staking is a subset of Circulating</div>
       </div>
     </div>
     <div>
@@ -225,19 +268,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- HYPE/USDC Price Chart on Overview -->
-  <div class="chart-box" style="margin-top:20px">
-    <div class="chart-hdr">
-      <div class="left"><span class="chart-title">HYPE / USDC</span><span class="chart-meta" id="priceChartMeta">—</span></div>
-      <div style="display:flex;gap:6px">
-        <div class="tf-btns"><button class="tf-btn active" data-ptf onclick="loadPriceChart(60,this)">1H</button><button class="tf-btn" data-ptf onclick="loadPriceChart(240,this)">4H</button><button class="tf-btn" data-ptf onclick="loadPriceChart(1440,this)">1D</button><button class="tf-btn" data-ptf onclick="loadPriceChart(10080,this)">1W</button></div>
-        <div class="tf-btns"><button class="tf-btn active" id="btnCandle" onclick="setPriceType('candle')">Candle</button><button class="tf-btn" id="btnArea" onclick="setPriceType('area')">Area</button></div>
-      </div>
-    </div>
-    <div class="chart-wrap" id="priceWrap"></div>
-    <div class="chart-ohlc"><span>O: <span class="v" id="csO">—</span></span><span>H: <span class="v" id="csH">—</span></span><span>L: <span class="v" id="csL">—</span></span><span>C: <span class="v" id="csC">—</span></span><span>Vol: <span class="v" id="csVol">—</span></span><span id="csChg" style="font-weight:600"></span></div>
   </div>
 
   <!-- Price Rating Panel -->
@@ -398,16 +428,26 @@ async function fStaking(){
         if(t>=1e7&&t<=1e9){div=test;break}
       }
       console.log('[fStaking] rawSum='+rawSum+' div='+div+' result='+rawSum/div);
-      // Second pass: convert all validators
-      let totalStake=0;
+      // Second pass: convert all validators + separate Foundation
+      let totalStake=0,foundationStake=0,publicStake=0;
       d.forEach(v=>{
         const s=parseFloat(v.stake||0)/div;
         v._stakeHype=s;
         totalStake+=s;
+        const nm=(v.name||'').toLowerCase();
+        if(nm.includes('hyper foundation')||nm.includes('hyperfoundation')){
+          foundationStake+=s;
+          v._isFoundation=true;
+        } else {
+          publicStake+=s;
+          v._isFoundation=false;
+        }
       });
       if(totalStake>0)D.staked=totalStake;
-      console.log('[fStaking] ✅ '+d.length+' validators, totalStaked='+F.hype(totalStake));
-      if(d[0])console.log('[fStaking] sample:',JSON.stringify({name:d[0].name,rawStake:d[0].stake,converted:d[0]._stakeHype}));
+      D.foundationStaked=foundationStake;
+      D.publicStaked=publicStake;
+      console.log('[fStaking] ✅ '+d.length+' validators, total='+F.hype(totalStake)+' foundation='+F.hype(foundationStake)+' public='+F.hype(publicStake));
+      if(d[0])console.log('[fStaking] sample:',JSON.stringify({name:d[0].name,rawStake:d[0].stake,converted:d[0]._stakeHype,isFoundation:d[0]._isFoundation}));
     }
   }catch(e){console.warn('fStaking err',e.message)}
   try{const s=await hl({type:'stakingSummary'});if(s?.apr)D.apr=parseFloat(s.apr)}catch(e){}
@@ -492,7 +532,17 @@ function renderAll(){
       (D.price?'<div class="brk"><span>Total value burned</span><span class="bv">'+F.usd(D.totalBurned*D.price)+'</span></div>':'')
     );
   }
-  if(D.staked){set('mStaked',F.hype(D.staked)+' HYPE');set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
+  if(D.staked){
+    const pub=D.publicStaked||0;
+    const fnd=D.foundationStaked||0;
+    if(pub>0){
+      set('mStaked',F.hype(pub)+' HYPE');
+      set('mStakedSub','by holders · '+F.hype(fnd)+' Foundation separately');
+    } else {
+      set('mStaked',F.hype(D.staked)+' HYPE');
+      set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply');
+    }
+  }
   if(D.circSupply){set('mCirc',F.hype(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max')}
   if(D.vol24)set('mVol',F.usd(D.vol24));
 
@@ -519,16 +569,25 @@ function renderAll(){
   set('psVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
 
   // Staking page
-  if(D.staked){set('skTotal',F.hype(D.staked)+' HYPE');set('skTotalSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply')}
+  if(D.staked){
+    const pub=D.publicStaked||0;
+    const fnd=D.foundationStaked||0;
+    if(pub>0){
+      set('skTotal',F.hype(pub)+' HYPE');
+      set('skTotalSub','Holder staked · '+F.hype(fnd)+' Foundation staked');
+    } else {
+      set('skTotal',F.hype(D.staked)+' HYPE');
+      set('skTotalSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply');
+    }
+  }
   if(D.apr!=null)set('skApr',(D.apr*100).toFixed(2)+'%');
   set('skVals',D.validators.filter(v=>!v.isJailed).length||D.validators.length||'—');
   const qt=D.queue.reduce((s,e)=>{let a=0;if(e.amount)a=parseFloat(e.amount);else if(e.nHype){const n=parseFloat(e.nHype);a=n>1e15?n/1e18:n}else if(e.hype)a=parseFloat(e.hype);else if(e.value)a=parseFloat(e.value);if(a>1e12)a=a/1e18;return s+a},0);
   set('skQueue',F.c(qt)+' HYPE');set('skQueueSub',D.queue.length+' wallets');
 
   renderValidators();renderQueue();
-  if(_priceChart&&_pData.length)_drawPS();
   if(_burnRateChart)_drawBurnRate();
-  if(_pData.length>50)computePriceRating();
+  if(_pData.length>30){computePriceRating();computeSqzMom();computeRainbowFib()}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -538,25 +597,58 @@ function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
   const dpr=window.devicePixelRatio||1;cv.width=220*dpr;cv.height=220*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,220,220);
   const burned=D.totalBurned||0;
-  const staked=D.staked||0;
   const circ=D.circSupply||0;
-  // Locked = MAX - circulating - burned (Foundation wallets, vesting, etc.)
+  const pubStaked=D.publicStaked||0;
+  const fndStaked=D.foundationStaked||0;
+
+  // Locked = MAX - circulating - burned (Foundation validators are part of this)
   const locked=Math.max(0,MAX_S-circ-burned);
 
   set('lgCirc',F.hype(circ));
-  set('lgStaked',F.hype(staked));
+  set('lgStaked',F.hype(pubStaked));
   set('lgBurned',F.hype(burned));
   set('lgOther',F.hype(locked));
 
-  // Ring segments: Circulating (cyan), Staked (green overlay note), Burned (fire), Locked (gray)
+  // Ring: 3 segments that ADD TO 1B exactly
   const segs=[
-    {v:circ,c:'#00d4ff'},
-    {v:burned,c:'#ff6b2b'},
-    {v:locked,c:'#2e3448'}
+    {v:circ,c:'#00d4ff',label:'Circulating',detail:F.hype(circ)+' HYPE ('+((circ/MAX_S)*100).toFixed(1)+'%)\nIncludes '+F.hype(pubStaked)+' staked by holders'},
+    {v:burned,c:'#ff6b2b',label:'Burned (AF+Fees)',detail:F.hype(burned)+' HYPE ('+((burned/MAX_S)*100).toFixed(1)+'%)\nAF buybacks + on-chain fee burns'},
+    {v:locked,c:'#2e3448',label:'Locked / Foundation',detail:F.hype(locked)+' HYPE ('+((locked/MAX_S)*100).toFixed(1)+'%)\nIncludes '+F.hype(fndStaked)+' Foundation validator stake'}
   ];
+  _ringSegs=segs;
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
   let a=-Math.PI/2;
-  for(const s of segs){const sw=(s.v/total)*Math.PI*2;if(sw<0.002)continue;ctx.beginPath();ctx.arc(110,110,85,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=22;ctx.lineCap='butt';ctx.stroke();a+=sw}
+  for(const s of segs){
+    const sw=(s.v/total)*Math.PI*2;if(sw<0.002)continue;
+    s._startAngle=a;s._endAngle=a+sw;
+    ctx.beginPath();ctx.arc(110,110,85,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=22;ctx.lineCap='butt';ctx.stroke();
+    a+=sw;
+  }
+}
+let _ringSegs=[];
+// Ring hover tooltip
+function _initRingHover(){
+  const cv=$('ringCanvas');if(!cv)return;
+  const tip=document.createElement('div');
+  tip.id='ringTip';tip.style.cssText='position:absolute;display:none;background:rgba(18,21,28,0.95);border:1px solid var(--border-bright);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--text-bright);pointer-events:none;z-index:50;white-space:pre-line;max-width:260px';
+  cv.parentElement.style.position='relative';cv.parentElement.appendChild(tip);
+  cv.addEventListener('mousemove',e=>{
+    if(!_ringSegs.length){tip.style.display='none';return}
+    const rect=cv.getBoundingClientRect();
+    const x=(e.clientX-rect.left)/(rect.width/220)-110;
+    const y=(e.clientY-rect.top)/(rect.height/220)-110;
+    const dist=Math.sqrt(x*x+y*y);
+    if(dist<65||dist>105){tip.style.display='none';return}
+    let angle=Math.atan2(y,x);if(angle<-Math.PI/2)angle+=Math.PI*2;
+    const seg=_ringSegs.find(s=>angle>=s._startAngle&&angle<s._endAngle);
+    if(seg){
+      tip.innerHTML='<div style="color:'+seg.c+';font-weight:700;margin-bottom:3px">'+seg.label+'</div>'+seg.detail;
+      tip.style.display='block';
+      tip.style.left=Math.min(e.clientX-rect.left+10,rect.width-200)+'px';
+      tip.style.top=(e.clientY-rect.top-60)+'px';
+    } else tip.style.display='none';
+  });
+  cv.addEventListener('mouseleave',()=>{tip.style.display='none'});
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -568,14 +660,17 @@ function renderValidators(){
   el.innerHTML='<div class="val-row" style="color:var(--text-dim);font-size:10px;font-weight:600"><span class="val-rank">#</span><span>Name</span><span class="val-stake">Stake</span><span class="val-comm">Comm</span></div>'+s.map((v,i)=>{
     const nm=v.name||F.addr(v.validator||'');
     const st=v._stakeHype||0;
+    const isFnd=v._isFoundation;
     const comm=v.commission!=null?parseFloat(v.commission):null;
     let commStr='—';
     if(comm!=null){
-      if(comm>100) commStr=(comm/100).toFixed(1)+'%'; // bps: 10000=100%, 500=5%
-      else if(comm>1) commStr=comm.toFixed(1)+'%'; // already percentage
-      else commStr=(comm*100).toFixed(1)+'%'; // fraction: 0.05 = 5%
+      if(comm>100) commStr=(comm/100).toFixed(1)+'%';
+      else if(comm>1) commStr=comm.toFixed(1)+'%';
+      else commStr=(comm*100).toFixed(1)+'%';
     }
-    return`<div class="val-row"><span class="val-rank">${i+1}</span><span class="val-name">${nm}</span><span class="val-stake">${F.hype(st)}</span><span class="val-comm">${commStr}</span></div>`
+    const fndTag=isFnd?'<span style="color:var(--text-dim);font-size:9px;margin-left:4px">🏛</span>':'';
+    const rowStyle=isFnd?'opacity:0.6':'';
+    return`<div class="val-row" style="${rowStyle}"><span class="val-rank">${i+1}</span><span class="val-name">${nm}${fndTag}</span><span class="val-stake">${F.hype(st)}</span><span class="val-comm">${commStr}</span></div>`
   }).join('');
 }
 function renderQueue(){
@@ -785,10 +880,10 @@ function _redrawBurnChart(){
 // ── RESIZE ──────────────────────────────────────────
 let _burnRateChart=null,_burnRateSeries=null,_burnRateTf='day';
 window.addEventListener('resize',()=>{
-  if(_priceChart){const s=_wsz('priceWrap');_priceChart.applyOptions({width:s.w,height:s.h})}
   if(_afChart){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h})}
   if(_burnChart){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h})}
   if(_burnRateChart){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h})}
+  if(_sqzChart){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h})}
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1048,34 +1143,237 @@ function setBurnTf(tf,btn){
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  SQUEEZE MOMENTUM RAINBOW — Ported from PineScript v2.3
+// ═══════════════════════════════════════════════════════════════
+let _sqzChart=null,_sqzSeries=null;
+function _initSqzChart(){
+  const w=$('sqzWrap');if(!w||typeof LightweightCharts==='undefined')return;
+  if(_sqzChart){try{_sqzChart.remove()}catch(e){}_sqzChart=null;_sqzSeries=null}
+  w.innerHTML='';const s=_wsz('sqzWrap');
+  _sqzChart=LightweightCharts.createChart(w,_lcBase({width:s.w,height:s.h,
+    rightPriceScale:{borderColor:'#222738',textColor:'#5a6580'},
+    timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true}}));
+  _sqzSeries=_sqzChart.addHistogramSeries({priceFormat:{type:'price',precision:4},priceLineVisible:false,lastValueVisible:false});
+}
+
+function computeSqzMom(){
+  if(!_pData||_pData.length<30)return;
+  const closes=_pData.map(c=>c.close),highs=_pData.map(c=>c.high),lows=_pData.map(c=>c.low);
+  const n=closes.length,bbLen=20,bbMult=2.0,kcLen=20,kcMult=1.5,kcMultT=1.0;
+
+  // Compute BB, KC, momentum for each bar
+  const bars=[];
+  for(let i=kcLen;i<n;i++){
+    // BB
+    const bbSlice=closes.slice(i-bbLen,i);
+    const bbMean=bbSlice.reduce((a,b)=>a+b)/bbLen;
+    const bbStd=Math.sqrt(bbSlice.reduce((a,b)=>a+(b-bbMean)**2,0)/bbLen);
+    const bbU=bbMean+bbMult*bbStd,bbL=bbMean-bbMult*bbStd;
+
+    // KC (using true range)
+    const kcSlice=closes.slice(i-kcLen,i);
+    const kcMa=kcSlice.reduce((a,b)=>a+b)/kcLen;
+    let trSum=0;
+    for(let j=i-kcLen;j<i;j++){
+      const tr=Math.max(highs[j]-lows[j],Math.abs(highs[j]-(closes[j-1]||closes[j])),Math.abs(lows[j]-(closes[j-1]||closes[j])));
+      trSum+=tr;
+    }
+    const kcRange=trSum/kcLen;
+    const kcU=kcMa+kcRange*kcMult,kcL=kcMa-kcRange*kcMult;
+    const kcUT=kcMa+kcRange*kcMultT,kcLT=kcMa-kcRange*kcMultT;
+
+    const sqzTight=bbL>kcLT&&bbU<kcUT;
+    const sqzNormal=bbL>kcL&&bbU<kcU;
+    const sqzOff=bbL<kcL&&bbU>kcU;
+
+    // Momentum (LazyBear linreg)
+    const hh=Math.max(...highs.slice(i-kcLen,i));
+    const ll=Math.min(...lows.slice(i-kcLen,i));
+    const midHL=(hh+ll)/2;
+    const midSrc=kcSlice.reduce((a,b)=>a+b)/kcLen;
+    // Simple linreg of (close - avg(midHL,midSrc))
+    const regData=[];
+    for(let j=i-kcLen;j<i;j++) regData.push(closes[j]-((Math.max(...highs.slice(j-kcLen+1>0?j-kcLen+1:0,j+1))+Math.min(...lows.slice(j-kcLen+1>0?j-kcLen+1:0,j+1)))/2+closes.slice(j-kcLen+1>0?j-kcLen+1:0,j+1).reduce((a,b)=>a+b)/Math.min(kcLen,j+1))/2);
+    // Simplified: just use last value of the deviation
+    const val=closes[i]-((hh+ll)/2+kcMa)/2;
+
+    bars.push({time:_pData[i].time,val,sqzTight,sqzNormal,sqzOff});
+  }
+
+  // Compute color + acceleration
+  if(!bars.length)return;
+  const maxAbs=Math.max(...bars.map(b=>Math.abs(b.val)),0.001);
+  const histData=bars.map((b,i)=>{
+    const prev=i>0?bars[i-1].val:0;
+    const accel=b.val-prev;
+    const t=Math.min(1,Math.abs(b.val)/maxAbs);
+    let color;
+    if(b.val>=0){
+      const bullAccel=accel>0;
+      color=t<0.25?'#1b5e20':t<0.5?'#00c853':t<0.75?'#00e5ff':bullAccel?'#ff4081':'#7c4dff';
+    } else {
+      const bearAccel=accel<0;
+      color=t<0.25?'#b71c1c':t<0.5?'#f44336':t<0.75?'#ff6d00':bearAccel?'#ffffff':'#ffd600';
+    }
+    return{time:b.time,value:b.val,color};
+  });
+
+  if(_sqzSeries)_sqzSeries.setData(histData);
+  if(_sqzChart)_sqzChart.timeScale().fitContent();
+
+  // Update dashboard
+  const last=bars[bars.length-1];
+  const prev=bars.length>1?bars[bars.length-2]:last;
+  const strength=Math.round(Math.abs(last.val)/maxAbs*100);
+  const accel=last.val-prev.val;
+
+  // Squeeze state
+  const sqzEl=$('sqzState');
+  if(sqzEl){
+    if(last.sqzTight){sqzEl.textContent='🔥 TIGHT';sqzEl.style.color='#e040fb'}
+    else if(last.sqzNormal){sqzEl.textContent='⚫ SQUEEZING';sqzEl.style.color='var(--text-dim)'}
+    else{sqzEl.textContent='⚡ FIRING';sqzEl.style.color='var(--text-bright)'}
+  }
+  // Direction
+  const dirEl=$('sqzDir');
+  if(dirEl){
+    if(last.val>=0){dirEl.textContent='😃 BULL';dirEl.style.color='var(--green)'}
+    else{dirEl.textContent='💩 BEAR';dirEl.style.color='var(--red)'}
+  }
+  // Strength
+  const strEl=$('sqzStr');
+  if(strEl){strEl.textContent=strength+'/100';strEl.style.color=strength>70?'var(--green)':strength>40?'var(--yellow)':'var(--text-dim)'}
+  // Momentum
+  const momEl=$('sqzMom');
+  if(momEl){
+    const bullAccel=last.val>0&&accel>0;
+    const bearAccel=last.val<0&&accel<0;
+    if(bullAccel){momEl.textContent='Accel ▲';momEl.style.color='var(--green)'}
+    else if(last.val>0){momEl.textContent='Fading ▼';momEl.style.color='var(--yellow)'}
+    else if(bearAccel){momEl.textContent='Accel ▼';momEl.style.color='var(--red)'}
+    else{momEl.textContent='Fading ▲';momEl.style.color='#ff9800'}
+  }
+  set('sqzMeta',bars.length+' bars');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RAINBOW FIB RETRACEMENT — Ported from PineScript v1.0
+// ═══════════════════════════════════════════════════════════════
+function computeRainbowFib(){
+  if(!_pData||_pData.length<20)return;
+  const swingLen=10;
+  const highs=_pData.map(c=>c.high),lows=_pData.map(c=>c.low),closes=_pData.map(c=>c.close);
+  const n=highs.length;
+
+  // Find pivot highs and lows
+  let swingHigh=null,swingHighBar=-1,swingLow=null,swingLowBar=-1;
+  for(let i=n-swingLen-1;i>=swingLen;i--){
+    if(swingHigh==null){
+      let isPivHigh=true;
+      for(let j=i-swingLen;j<=i+swingLen;j++){if(j!==i&&highs[j]>=highs[i]){isPivHigh=false;break}}
+      if(isPivHigh){swingHigh=highs[i];swingHighBar=i}
+    }
+    if(swingLow==null){
+      let isPivLow=true;
+      for(let j=i-swingLen;j<=i+swingLen;j++){if(j!==i&&lows[j]<=lows[i]){isPivLow=false;break}}
+      if(isPivLow){swingLow=lows[i];swingLowBar=i}
+    }
+    if(swingHigh!=null&&swingLow!=null)break;
+  }
+  if(swingHigh==null||swingLow==null)return;
+
+  const bullTrend=swingLowBar<swingHighBar;
+  const fibRange=swingHigh-swingLow;
+  const fibPrice=r=>swingLow+fibRange*r;
+  const close=closes[n-1];
+
+  // Fib levels
+  const levels=[
+    {ratio:0,color:'#ffffff',label:'Base',ctx:'Swing Low'},
+    {ratio:0.236,color:'#ffd600',label:'0.236',ctx:'Weak bounce'},
+    {ratio:0.382,color:'#ff6d00',label:'0.382',ctx:'Shallow retrace'},
+    {ratio:0.500,color:'#f44336',label:'0.500',ctx:'Midpoint decision'},
+    {ratio:0.618,color:'#00c853',label:'★ 0.618',ctx:'Golden ratio'},
+    {ratio:0.786,color:'#7c4dff',label:'0.786',ctx:'Critical zone'},
+    {ratio:1.0,color:'#ffffff',label:'1.000',ctx:'Swing High'},
+    {ratio:1.272,color:'#e040fb',label:'1.272 Ext',ctx:'Extension'},
+    {ratio:1.618,color:'#e040fb',label:'★ 1.618 Ext',ctx:'Golden extension'},
+  ];
+
+  // Render levels table
+  const el=$('rfLevels');
+  if(el){
+    el.innerHTML=levels.map(l=>{
+      const price=fibPrice(l.ratio);
+      const pct=fibRange>0?((close-swingLow)/fibRange*100):0;
+      const nearThis=Math.abs(close-price)/close*100<0.5;
+      return`<div class="rf-level" style="background:${nearThis?'rgba(255,255,255,0.05)':'transparent'}">
+        <span class="rf-ratio" style="color:${l.color}">${l.label}</span>
+        <div class="rf-bar" style="background:${l.color}22"><div class="rf-bar-price" style="width:${Math.min(100,l.ratio*100)}%;background:${l.color}44"></div></div>
+        <span class="rf-price">$${F.f2(price)}</span>
+        <span class="rf-ctx">${nearThis?'◄ HERE':l.ctx}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Update dashboard
+  const tEl=$('rfTrend');
+  if(tEl){
+    if(bullTrend){tEl.textContent='📈 Bull Retrace';tEl.style.color='var(--green)'}
+    else{tEl.textContent='📉 Bear Retrace';tEl.style.color='var(--red)'}
+  }
+
+  // Price zone
+  const pctInRange=fibRange>0?((close-swingLow)/fibRange):0;
+  let zone='Base';
+  if(pctInRange>1)zone='Extension territory';
+  else if(pctInRange>0.786)zone='0.786–1.0 Critical';
+  else if(pctInRange>0.618)zone='0.618–0.786 Deep';
+  else if(pctInRange>0.5)zone='★ Golden Zone';
+  else if(pctInRange>0.382)zone='0.382–0.500 Healthy';
+  else if(pctInRange>0.236)zone='0.236–0.382 Shallow';
+  else zone='Near base';
+  set('rfZone',zone);
+  set('rf618','$'+F.f2(fibPrice(0.618)));
+  set('rfMeta','Swing: $'+F.f2(swingLow)+' → $'+F.f2(swingHigh));
+
+  // Proximity
+  const nearGolden=Math.abs(close-fibPrice(0.618))/close*100<0.5;
+  const nearCrit=Math.abs(close-fibPrice(0.786))/close*100<0.5;
+  const pEl=$('rfProx');
+  if(pEl){
+    if(nearGolden){pEl.textContent='⚡ @ Golden!';pEl.style.color='var(--green)'}
+    else if(nearCrit){pEl.textContent='⚠️ @ Critical';pEl.style.color='#e040fb'}
+    else{pEl.textContent='—';pEl.style.color='var(--text-dim)'}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════
 loadAll();
 setInterval(loadAll,30000);
-// Init charts after LightweightCharts loads
 function _tryInitCharts(){
   if(typeof LightweightCharts==='undefined'){
     console.warn('LightweightCharts not loaded yet, retrying in 2s…');
     setTimeout(_tryInitCharts,2000);return;
   }
-  // Price chart on overview
-  _initPriceChart();
+  // Fetch candle data for indicators (TradingView handles the visible chart)
   (async()=>{
-    set('priceChartMeta','Loading…');
-    const ok=await _fetchCandles(_pTf);
+    const ok=await _fetchCandles(60);
     if(ok){
-      _drawPS();
-      _addSmaOverlays();
       computePriceRating();
-      set('priceChartMeta',_pData.length+' candles · HYPE @107 · SMA 20/50');
-    } else set('priceChartMeta','No data');
+      computeSqzMom();
+      computeRainbowFib();
+    }
   })();
-  // AF live monitor chart + polling
+  // SqzMom histogram chart
+  _initSqzChart();
+  // AF live monitor + burn charts
   _initAfChart();_startAfLive();
-  // Burn tracker chart
-  _initBurnChart();
-  // Burn rate history
-  _initBurnRateChart();
+  _initBurnChart();_initBurnRateChart();
+  // Ring hover
+  _initRingHover();
 }
 setTimeout(_tryInitCharts,1500);
 </script>
