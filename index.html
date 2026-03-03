@@ -40,7 +40,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .section-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px}
 
 .hero{text-align:center;padding:40px 0 28px}
-.hero-fire{font-size:44px;margin-bottom:6px;filter:drop-shadow(0 0 24px rgba(255,107,43,0.4));animation:fl 3s ease-in-out infinite}
+.hero-fire{margin-bottom:6px;animation:fl 3s ease-in-out infinite}
+.hero-cat-svg{filter:drop-shadow(0 0 20px rgba(167,139,250,0.5)) drop-shadow(0 0 40px rgba(0,212,255,0.2))}
 @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .hero-tagline{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;color:var(--text-muted);margin-bottom:20px}
 .hero-price{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;margin-bottom:4px}
@@ -234,7 +235,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 <!-- ══ OVERVIEW ════════════════════════════════════════════════ -->
 <div class="page active" id="page-overview">
   <div class="hero">
-    <div class="hero-fire">🔥</div>
+    <div class="hero-fire"><svg class="hero-cat-svg" viewBox="0 0 80 80" width="72" height="72"><defs><linearGradient id="heroC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="40%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient><filter id="heroGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#heroGlow)"><path d="M15 25L20 7.5c0-1.2 1.5-1.8 2.2-.8L30 16h20l7.8-9.3c.7-1 2.2-.4 2.2.8L65 25c5 6 5 14 0 20-3.7 5-10 8.7-17.5 10v3.7c0 2-1.7 3.7-3.7 3.7h-7.6c-2 0-3.7-1.7-3.7-3.7V55C25.7 53.7 19 50 15.5 45c-5-6-5-14 0-20z" fill="url(#heroC)" opacity="0.9"/><circle cx="30" cy="34" r="6" fill="#08090c"/><circle cx="50" cy="34" r="6" fill="#08090c"/><circle cx="32" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite"/></circle><circle cx="52" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite"/></circle><ellipse cx="40" cy="44" rx="3" ry="2" fill="#ff6b9d"/><path d="M35 47q5 3.5 10 0" stroke="#08090c" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M32 42l-7 2.5M32 44.5l-7 0M32 47l-6-2M48 42l7 2.5M48 44.5l7 0M48 47l6-2" stroke="#08090c" stroke-width="0.8" opacity="0.25"/></g></svg></div>
     <div class="hero-tagline">HYPER SOUND MONEY — MAX SUPPLY FIXED · FEES BURNED</div>
     <div class="hero-price"><span class="dollar">$</span><span id="heroPrice">—</span></div>
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
