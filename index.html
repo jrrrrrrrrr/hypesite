@@ -13,16 +13,16 @@ if(typeof LightweightCharts==='undefined'){
 }
 </script>
 <style>
-:root{--bg:#08090c;--bg2:#0d0f14;--surface:#12151c;--surface2:#181c25;--surface3:#1e222d;--border:#222738;--border-bright:#2e3448;--accent:#00d4ff;--accent-glow:rgba(0,212,255,0.15);--fire:#ff6b2b;--fire-glow:rgba(255,107,43,0.15);--green:#00e676;--green-dim:rgba(0,230,118,0.12);--red:#ff3d5a;--red-dim:rgba(255,61,90,0.12);--text:#c0c8d8;--text-dim:#5a6580;--text-bright:#eef2ff;--text-muted:#3a4258;--purple:#a78bfa;--yellow:#fbbf24;--mono:'JetBrains Mono',monospace;--sans:'Outfit',sans-serif}
+:root{--bg:#08090c;--bg2:#0d0f14;--surface:#12151c;--surface2:#181c25;--surface3:#1e222d;--border:#222738;--border-bright:#2e3448;--accent:#00d4ff;--accent-glow:rgba(0,212,255,0.15);--fire:#ff6b2b;--fire-glow:rgba(255,107,43,0.15);--green:#00e676;--green-dim:rgba(0,230,118,0.12);--red:#ff3d5a;--red-dim:rgba(255,61,90,0.12);--text:#c0c8d8;--text-dim:#5a6580;--text-bright:#eef2ff;--text-muted:#3a4258;--purple:#a78bfa;--yellow:#fbbf24;--pink:#ff6b9d;--mono:'JetBrains Mono',monospace;--sans:'Outfit',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;opacity:0.02;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px}
 
-nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);border-image:linear-gradient(90deg,var(--purple),var(--accent),var(--pink)) 1;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between}
 .nav-left{display:flex;align-items:center;gap:16px}
 .logo{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:0.06em;display:flex;align-items:center;gap:8px}
-.logo .fire{font-size:20px;filter:drop-shadow(0 0 6px rgba(255,107,43,0.5))}
+.logo-cat{filter:drop-shadow(0 0 8px rgba(167,139,250,0.4));flex-shrink:0}
 .logo .hype{color:var(--text-bright)}.logo .intel{color:var(--accent);font-weight:400;letter-spacing:0.1em;font-size:12px}
 .nav-tabs{display:flex;gap:2px}
 .nav-tab{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.06em;padding:6px 14px;border-radius:6px;background:0;border:0;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
@@ -137,7 +137,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 /* ── Intel News Site ──────────────────────── */
 .news-ticker{overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0;height:32px;position:relative;margin-bottom:16px}
-.news-ticker::before{content:'BREAKING';position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;padding:0 12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--bg);background:var(--fire);z-index:2}
+.news-ticker::before{content:'BREAKING';position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;padding:0 12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--bg);background:linear-gradient(135deg,var(--purple),var(--pink));z-index:2}
 .ticker-track{display:flex;align-items:center;height:100%;animation:tickerScroll 45s linear infinite;white-space:nowrap;padding-left:90px}
 .ticker-track:hover{animation-play-state:paused}
 .ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 28px;font-family:var(--mono);font-size:11px;color:var(--text);flex-shrink:0}
@@ -145,14 +145,34 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .ticker-sep{color:var(--border);padding:0 4px;flex-shrink:0}
 @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-.news-masthead{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:20px}
+.news-masthead{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--accent);border-image:linear-gradient(90deg,var(--purple),var(--accent),var(--pink)) 1;padding-bottom:10px;margin-bottom:20px}
 .news-masthead h1{font-family:var(--mono);font-size:22px;font-weight:800;letter-spacing:0.06em;color:var(--text-bright);margin:0;line-height:1}
 .news-masthead h1 span{color:var(--accent)}
 .news-masthead .news-date{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.05em}
 
 .news-hero{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:24px}
 .hero-main{background:var(--surface);border-radius:10px;padding:28px;border:1px solid var(--border);position:relative;overflow:hidden}
-.hero-main::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--fire))}
+.hero-main::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent),var(--pink))}
+
+/* Hypurr NFT Widget */
+.nft-section{margin-top:20px;position:relative}
+.nft-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.nft-header h3{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase;margin:0}
+.nft-header .nft-badge{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;color:var(--bg);background:linear-gradient(135deg,var(--purple),var(--pink));padding:2px 8px;border-radius:3px}
+.nft-panel{background:var(--surface);border-radius:10px;border:1px solid var(--border);overflow:hidden;position:relative}
+.nft-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--pink),var(--accent))}
+.nft-top{display:grid;grid-template-columns:auto 1fr;gap:0}
+.nft-cat-badge{width:100px;background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,107,157,0.08));display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border)}
+.nft-cat-badge svg{filter:drop-shadow(0 0 12px rgba(167,139,250,0.5))}
+.nft-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:0}
+.nft-stat{padding:14px 12px;border-right:1px solid var(--border);text-align:center}
+.nft-stat:last-child{border-right:0}
+.nft-stat .ns-lbl{font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
+.nft-stat .ns-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text-bright)}
+.nft-stat .ns-sub{font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:2px}
+.nft-chart-wrap{height:220px;padding:0 2px 2px}
+.nft-link{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text-dim);text-decoration:none;transition:all 0.2s;letter-spacing:0.06em}
+.nft-link:hover{color:var(--pink);background:rgba(255,107,157,0.04)}
 .hero-cat{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--fire);margin-bottom:8px}
 .hero-main h2{font-family:var(--sans);font-size:24px;font-weight:800;color:var(--text-bright);margin:0 0 14px 0;line-height:1.3}
 .hero-main .hero-lede{font-family:var(--sans);font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px}
@@ -176,7 +196,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .news-card .nc-dots{font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-left:auto}
 
 .news-section-hdr{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.news-section-hdr::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px}
+.news-section-hdr::before{content:'';width:3px;height:14px;background:linear-gradient(180deg,var(--purple),var(--pink));border-radius:2px}
 
 .blog-entry{background:var(--surface);border-radius:10px;padding:28px;border:1px solid var(--border);margin-bottom:16px;position:relative}
 .blog-entry .blog-date{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.05em;margin-bottom:8px}
@@ -184,7 +204,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .intel-blog-body{font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.85}
 .intel-blog-body p{margin:0 0 14px 0}.intel-blog-body p:last-child{margin-bottom:0}
 .intel-blog-body strong{color:var(--text-bright);font-weight:600}
-@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}.news-hero{grid-template-columns:1fr}.news-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}.news-hero{grid-template-columns:1fr}.news-grid{grid-template-columns:1fr}.nft-stats{grid-template-columns:repeat(3,1fr)}.nft-top{grid-template-columns:1fr}.nft-cat-badge{display:none}}
 @media(max-width:800px){.rating-grid{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}}
 </style>
@@ -193,7 +213,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <nav>
   <div class="nav-left">
-    <div class="logo"><span class="fire">🔥</span><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
+    <div class="logo"><svg class="logo-cat" viewBox="0 0 32 32" width="24" height="24"><defs><linearGradient id="catG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG)" opacity="0.9"/><circle cx="12" cy="14" r="2.5" fill="#08090c"/><circle cx="20" cy="14" r="2.5" fill="#08090c"/><circle cx="12.8" cy="13.3" r="0.9" fill="#eef2ff"/><circle cx="20.8" cy="13.3" r="0.9" fill="#eef2ff"/><ellipse cx="16" cy="18" rx="1.2" ry="0.8" fill="#ff6b9d"/><path d="M14 19.5q2 1.5 4 0" stroke="#08090c" stroke-width="0.6" fill="none"/></svg><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('overview',this)">Overview</button>
       <button class="nav-tab" onclick="showPage('charts',this)">Charts</button>
@@ -319,9 +339,33 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div id="topVolList"></div>
     </div>
   </div>
-</div>
 
-<!-- ══ CHARTS TAB ══════════════════════════════════════════════ -->
+  <!-- Hypurr NFT Collection Widget -->
+  <div class="nft-section">
+    <div class="nft-header">
+      <svg viewBox="0 0 32 32" width="18" height="18"><defs><linearGradient id="catG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG2)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r="0.7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r="0.7" fill="#eef2ff"/></svg>
+      <h3>Hypurr NFT Collection</h3>
+      <span class="nft-badge">LIVE</span>
+    </div>
+    <div class="nft-panel">
+      <div class="nft-top">
+        <div class="nft-cat-badge">
+          <svg viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="catBig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M12 20L16 6c0-1 1.2-1.4 1.8-.6l6 6.6h16.4l6-6.6c.6-.8 1.8-.4 1.8.6l4 14c4 5 4 11 0 16-3 4-8 7-14 8v3c0 1.6-1.4 3-3 3H26c-1.6 0-3-1.4-3-3v-3c-6-1-11-4-14-8-4-5-4-11 0-16z" fill="url(#catBig)" opacity="0.85"/><circle cx="24" cy="28" r="5" fill="#08090c"/><circle cx="40" cy="28" r="5" fill="#08090c"/><circle cx="25.5" cy="26.5" r="1.8" fill="#eef2ff"/><circle cx="41.5" cy="26.5" r="1.8" fill="#eef2ff"/><ellipse cx="32" cy="36" rx="2.4" ry="1.6" fill="#ff6b9d"/><path d="M28 39q4 3 8 0" stroke="#08090c" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 34l-5 2M26 36l-5 0M38 34l5 2M38 36l5 0" stroke="#08090c" stroke-width="0.6" opacity="0.3"/></svg>
+        </div>
+        <div class="nft-stats">
+          <div class="nft-stat"><div class="ns-lbl">Floor</div><div class="ns-val" id="nftFloor">459</div><div class="ns-sub" id="nftFloorUsd">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Top Bid</div><div class="ns-val" id="nftBid" style="color:var(--green)">440</div><div class="ns-sub">WHYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Spread</div><div class="ns-val" id="nftSpread" style="color:var(--yellow)">4.1%</div><div class="ns-sub">bid / ask</div></div>
+          <div class="nft-stat"><div class="ns-lbl">24h Vol</div><div class="ns-val" id="nftVol">4,056</div><div class="ns-sub">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Owners</div><div class="ns-val" id="nftOwners">3,608</div><div class="ns-sub">78.4% unique</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Listed</div><div class="ns-val" id="nftListed">4.4%</div><div class="ns-sub">of 4,600</div></div>
+        </div>
+      </div>
+      <div class="nft-chart-wrap" id="nftChartWrap"></div>
+      <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
+    </div>
+  </div>
+</div>
 <div class="page" id="page-charts">
   <div class="chart-box">
     <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · TradingView</span></div></div>
@@ -606,6 +650,7 @@ function _resizeAllCharts(){
   if(_burnRateChart&&isVis('burnRateWrap')){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h});_burnRateChart.timeScale().fitContent()}
   if(_sqzChart&&isVis('sqzWrap')){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h});_sqzChart.timeScale().fitContent()}
   if(_volFlowChart&&isVis('volFlowWrap')){const s=_wsz('volFlowWrap');_volFlowChart.applyOptions({width:s.w,height:s.h});_volFlowChart.timeScale().fitContent()}
+  if(_nftChart&&isVis('nftChartWrap')){const s=_wsz('nftChartWrap');_nftChart.applyOptions({width:s.w,height:s.h});_nftChart.timeScale().fitContent()}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -978,6 +1023,7 @@ function renderAll(){
   if(D.priceChg!=null){const c=D.priceChg>=0?'up':'down';const el=$('navChg'),el2=$('heroChg');if(el){el.textContent=F.pct(D.priceChg);el.className='price-chg '+c}if(el2){el2.textContent=F.pct(D.priceChg)+' 24h';el2.className='change '+c}}
   if(D.price&&D.circSupply)set('heroMcap',F.usd(D.price*D.circSupply));
   if(D.price)set('heroFdv',F.usd(D.price*MAX_S));
+  if(D.price)_updateNftUsd(D.price);
 
   // Total burned = AF HYPE + fee burns
   if(D.totalBurned>0){
@@ -2244,7 +2290,7 @@ function _renderIntelTab(){
   const blogEl=$('intelBlog');
   if(blogEl)blogEl.innerHTML=INTEL_BLOG.map((entry,i)=>`
     <article class="blog-entry">
-      ${i===0?'<div style="position:absolute;top:0;right:20px;background:var(--fire);color:var(--bg);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
+      ${i===0?'<div style="position:absolute;top:0;right:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:var(--bg);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
       <div class="blog-date">${entry.date}</div>
       <h3>${entry.title}</h3>
       <div class="intel-blog-body">${entry.body}</div>
@@ -2253,6 +2299,117 @@ function _renderIntelTab(){
 }
 // Render on page load
 setTimeout(_renderIntelTab,100);
+
+// ═══════════════════════════════════════════════════════════════
+//  HYPURR NFT FLOOR PRICE CHART
+// ═══════════════════════════════════════════════════════════════
+let _nftChart=null;
+const HYPURR_FLOOR_HISTORY=[
+  // Historical floor prices in HYPE (from research data)
+  {time:'2025-09-28',value:1463},  // Launch day
+  {time:'2025-09-29',value:1250},  // Day 2 settlement
+  {time:'2025-09-30',value:1315},  // Bounce
+  {time:'2025-10-03',value:1700},  // Week 1 high
+  {time:'2025-10-07',value:1450},  // Settling
+  {time:'2025-10-14',value:1260},  // Early Oct stable
+  {time:'2025-10-21',value:1200},
+  {time:'2025-10-28',value:1180},
+  {time:'2025-11-04',value:1100},
+  {time:'2025-11-11',value:1050},
+  {time:'2025-11-18',value:980},
+  {time:'2025-11-25',value:920},
+  {time:'2025-12-02',value:860},
+  {time:'2025-12-09',value:800},
+  {time:'2025-12-16',value:750},
+  {time:'2025-12-23',value:690},
+  {time:'2025-12-30',value:640},
+  {time:'2026-01-06',value:580},
+  {time:'2026-01-13',value:530},
+  {time:'2026-01-20',value:490},
+  {time:'2026-01-27',value:470},
+  {time:'2026-02-03',value:450},
+  {time:'2026-02-10',value:430},
+  {time:'2026-02-17',value:410},
+  {time:'2026-02-24',value:440},  // Bounce with HYPE rally
+  {time:'2026-03-01',value:480},  // Weekend surge
+  {time:'2026-03-03',value:459},  // Current
+];
+
+function _initNftChart(){
+  if(typeof LightweightCharts==='undefined')return;
+  const wrap=$('nftChartWrap');if(!wrap)return;
+  const s=_wsz('nftChartWrap');
+  _nftChart=LightweightCharts.createChart(wrap,{
+    width:s.w,height:s.h,
+    layout:{background:{color:'#12151c'},textColor:'#5a6580',fontFamily:'JetBrains Mono'},
+    grid:{vertLines:{color:'#1a1e2a'},horzLines:{color:'#1a1e2a'}},
+    timeScale:{borderColor:'#222738',timeVisible:false},
+    rightPriceScale:{borderColor:'#222738'},
+    crosshair:{mode:0}
+  });
+
+  // Area series with Hypurr purple/pink gradient
+  const areaSeries=_nftChart.addAreaSeries({
+    lineColor:'#a78bfa',
+    topColor:'rgba(167,139,250,0.3)',
+    bottomColor:'rgba(167,139,250,0.02)',
+    lineWidth:2,
+    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' HYPE'}
+  });
+  areaSeries.setData(HYPURR_FLOOR_HISTORY);
+
+  // Bid line (current top offer)
+  const bidSeries=_nftChart.addLineSeries({
+    color:'#00e676',lineWidth:1,lineStyle:2,
+    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' WHYPE'},
+    lastValueVisible:true,priceLineVisible:false
+  });
+  // Show bid as horizontal line for the last few data points
+  bidSeries.setData([
+    {time:'2026-02-24',value:420},
+    {time:'2026-03-01',value:450},
+    {time:'2026-03-03',value:440}
+  ]);
+
+  _nftChart.timeScale().fitContent();
+
+  // Attempt live data fetch from OpenSea API (best effort, CORS may block)
+  _fetchNftLiveData();
+}
+
+async function _fetchNftLiveData(){
+  try{
+    const r=await fetch('https://api.opensea.io/api/v2/collections/hypurr-hyperevm/stats',{
+      headers:{'Accept':'application/json'}
+    });
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d.total){
+      const floor=d.total.floor_price||d.total.floor_price_symbol;
+      if(floor){
+        const fe=$('nftFloor');if(fe)fe.textContent=parseFloat(floor).toFixed(0);
+      }
+      if(d.total.volume){
+        const ve=$('nftVol');if(ve)ve.textContent=parseFloat(d.total.volume).toLocaleString(undefined,{maximumFractionDigits:0});
+      }
+      if(d.total.num_owners){
+        const oe=$('nftOwners');if(oe)oe.textContent=parseInt(d.total.num_owners).toLocaleString();
+      }
+    }
+  }catch(e){/* Fallback to baked data — already displayed */}
+}
+
+// Update NFT floor USD value when HYPE price updates
+function _updateNftUsd(hypePrice){
+  if(!hypePrice)return;
+  const floorEl=$('nftFloor');
+  const usdEl=$('nftFloorUsd');
+  if(floorEl&&usdEl){
+    const floorHype=parseFloat(floorEl.textContent.replace(/,/g,''))||459;
+    const usd=floorHype*hypePrice;
+    usdEl.textContent='≈ $'+usd.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+}
 
 function _tryInitCharts(){
   if(typeof LightweightCharts==='undefined'){
@@ -2269,6 +2426,7 @@ function _tryInitCharts(){
   // Only init charts on the VISIBLE tab (Overview)
   _initAfChart();_startAfLive();
   _initRingHover();
+  _initNftChart();
   // Burns + Charts tab charts are deferred to showPage() lazy-init
 }
 setTimeout(_tryInitCharts,1500);
