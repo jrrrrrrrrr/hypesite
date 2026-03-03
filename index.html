@@ -114,9 +114,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .chart-ohlc{display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:8px;flex-wrap:wrap}
 .chart-ohlc .v{color:var(--text-bright)}
 
-.trade-row{display:grid;grid-template-columns:56px 1fr 72px 56px;gap:6px;padding:5px 0;border-bottom:1px solid rgba(34,39,56,0.4);font-family:var(--mono);font-size:11px;align-items:center;animation:fadeIn 0.25s ease}
+.trade-row{display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:5px 0;border-bottom:1px solid rgba(34,39,56,0.4);font-family:var(--mono);font-size:11px;align-items:center;animation:fadeIn 0.25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
-.trade-coin{color:var(--text-bright);font-weight:600}.trade-buy{color:var(--green)}.trade-sell{color:var(--red)}.trade-size{color:var(--text-dim);text-align:right}.trade-time{color:var(--text-muted);font-size:10px;text-align:right}
+.trade-coin{color:var(--text-bright);font-weight:600}.trade-buy{color:var(--green)}.trade-sell{color:var(--red)}.trade-size{color:var(--text-dim);text-align:right}.trade-time{color:var(--text-muted);font-size:10px;text-align:right}.trade-usd{color:var(--text);text-align:right;font-weight:500}.trade-side{font-weight:600;font-size:10px}
 
 .staking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
 .val-row{display:grid;grid-template-columns:24px 1fr 90px 70px;gap:6px;padding:6px 0;border-bottom:1px solid rgba(34,39,56,0.35);font-family:var(--mono);font-size:11px;align-items:center}
@@ -422,9 +422,33 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ LIVE TRADES ═════════════════════════════════════════════ -->
 <div class="page" id="page-trades">
-  <div class="section-title">Live Trade Feed</div>
-  <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:14px">Real-time via WebSocket — BTC · ETH · HYPE · SOL · DOGE</p>
-  <div class="data-table" style="max-height:calc(100vh - 220px)"><div id="liveTrades" style="min-height:200px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
+  <!-- Flow Summary -->
+  <div class="af-live-stats" style="margin-bottom:12px">
+    <div class="af-stat"><div class="lbl">Net Flow (5m)</div><div class="val" id="tfNet" style="font-size:18px">—</div></div>
+    <div class="af-stat"><div class="lbl">Buy Volume</div><div class="val green" id="tfBuy">—</div></div>
+    <div class="af-stat"><div class="lbl">Sell Volume</div><div class="val" id="tfSell" style="color:var(--red)">—</div></div>
+    <div class="af-stat"><div class="lbl">Buy/Sell Ratio</div><div class="val" id="tfRatio">—</div></div>
+    <div class="af-stat"><div class="lbl">Trades (5m)</div><div class="val" id="tfCount">—</div></div>
+    <div class="af-stat"><div class="lbl">Pressure</div><div class="val" id="tfPressure" style="font-size:16px">—</div></div>
+  </div>
+
+  <!-- Per-coin flow breakdown -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:12px" id="coinFlowCards"></div>
+
+  <!-- Volume chart -->
+  <div class="af-live" style="margin-top:0;margin-bottom:12px">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">📊 Volume Flow</span><span class="chart-meta" id="volFlowMeta">Collecting…</span></div></div>
+    <div class="chart-wrap" id="volFlowWrap" style="height:200px"></div>
+  </div>
+
+  <!-- Filtered trade feed -->
+  <div class="af-live" style="margin-top:0">
+    <div class="chart-hdr">
+      <div class="left"><span class="chart-title">🔎 Filtered Trade Feed</span><span class="chart-meta" id="tradeFeedMeta">Connecting…</span></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">Minimums: BTC ≥0.25 · ETH ≥0.5 · HYPE ≥10 · SOL ≥1 · FARTCOIN ≥1000 — updates every 500ms</div>
+    <div style="max-height:400px;overflow-y:auto"><div id="liveTrades" style="min-height:100px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
+  </div>
 </div>
 
 <footer>
@@ -478,6 +502,9 @@ function showPage(id,btn){
     if(id==='charts'){
       if(!_sqzChart&&typeof LightweightCharts!=='undefined'){_initSqzChart();if(_pData.length>30)computeSqzMom()}
     }
+    if(id==='trades'){
+      if(!_volFlowChart&&typeof LightweightCharts!=='undefined'){_initVolFlowChart()}
+    }
     _resizeAllCharts();
   })})},50);
 }
@@ -487,6 +514,7 @@ function _resizeAllCharts(){
   if(_burnChart&&isVis('burnWrap')){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h});_burnChart.timeScale().fitContent()}
   if(_burnRateChart&&isVis('burnRateWrap')){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h});_burnRateChart.timeScale().fitContent()}
   if(_sqzChart&&isVis('sqzWrap')){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h});_sqzChart.timeScale().fitContent()}
+  if(_volFlowChart&&isVis('volFlowWrap')){const s=_wsz('volFlowWrap');_volFlowChart.applyOptions({width:s.w,height:s.h});_volFlowChart.timeScale().fitContent()}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -496,22 +524,232 @@ async function hl(body){const r=await fetch(HL,{method:'POST',headers:{'Content-
 async function hs(path){try{const r=await fetch(HS+path);if(!r.ok)return null;return r.json()}catch(e){return null}}
 
 // ═══════════════════════════════════════════════════════════════
-//  WEBSOCKET
+//  WEBSOCKET + TRADE INTELLIGENCE
 // ═══════════════════════════════════════════════════════════════
 const WS_URL='wss://api.hyperliquid.xyz/ws';
-let _ws=null,_wsR=0,_wsT=null,_liveTrades=[];
-const WS_COINS=['BTC','ETH','HYPE','SOL','DOGE'];
+let _ws=null,_wsR=0,_wsT=null;
+
+// Coins and minimum trade sizes (in coin units)
+const WS_COINS=['BTC','ETH','HYPE','SOL','FARTCOIN'];
+const MIN_SZ={BTC:0.25,ETH:0.5,HYPE:10,SOL:1,FARTCOIN:1000};
+
+// Trade buffers
+let _liveTrades=[];        // Filtered trades for display (max 40)
+let _pendingTrades=[];     // Buffer for throttled rendering
+let _allTrades5m=[];       // ALL trades in last 5 min for aggregation
+let _volBuckets=[];        // 1-min volume buckets for chart {time,buyVol,sellVol}
+let _renderTimer=null;
+let _volFlowChart=null,_volBuySeries=null,_volSellSeries=null;
+
 function _wsConnect(){
   if(_ws&&(_ws.readyState===0||_ws.readyState===1))return;
   try{_ws=new WebSocket(WS_URL);
-    _ws.onopen=()=>{_wsR=0;_wsStatus('connected');_ws.send(JSON.stringify({method:'subscribe',subscription:{type:'allMids'}}));WS_COINS.forEach(c=>_ws.send(JSON.stringify({method:'subscribe',subscription:{type:'trades',coin:c}})))};
-    _ws.onmessage=evt=>{try{const m=JSON.parse(evt.data);if(m.channel==='allMids'&&m.data?.mids){const px=parseFloat(m.data.mids['@107']||m.data.mids['HYPE']||0);if(px){D.price=px;set('navPrice','$'+F.f2(px));set('heroPrice',F.f2(px))}D.allMids=m.data.mids}else if(m.channel==='trades'&&Array.isArray(m.data)){m.data.forEach(t=>_liveTrades.unshift({coin:t.coin||'?',side:t.side||'?',px:parseFloat(t.px||0),sz:parseFloat(t.sz||0),time:t.time||Date.now()}));if(_liveTrades.length>60)_liveTrades.length=60;_renderTrades()}}catch(e){}};
-    _ws.onclose=()=>{_wsStatus('off');_wsReconn()};_ws.onerror=()=>{_wsStatus('error')};
+    _ws.onopen=()=>{_wsR=0;_wsStatus('connected');
+      _ws.send(JSON.stringify({method:'subscribe',subscription:{type:'allMids'}}));
+      WS_COINS.forEach(c=>_ws.send(JSON.stringify({method:'subscribe',subscription:{type:'trades',coin:c}})));
+    };
+    _ws.onmessage=evt=>{try{const m=JSON.parse(evt.data);
+      if(m.channel==='allMids'&&m.data?.mids){
+        const px=parseFloat(m.data.mids['@107']||m.data.mids['HYPE']||0);
+        if(px){D.price=px;set('navPrice','$'+F.f2(px));set('heroPrice',F.f2(px))}
+        D.allMids=m.data.mids;
+      } else if(m.channel==='trades'&&Array.isArray(m.data)){
+        _processTrades(m.data);
+      }
+    }catch(e){}};
+    _ws.onclose=()=>{_wsStatus('off');_wsReconn()};
+    _ws.onerror=()=>{_wsStatus('error')};
   }catch(e){_wsStatus('error');_wsReconn()}
 }
+
+function _processTrades(trades){
+  const now=Date.now();
+  for(const t of trades){
+    const coin=t.coin||'?';
+    const sz=parseFloat(t.sz||0);
+    const px=parseFloat(t.px||0);
+    const side=t.side||'?';
+    const time=t.time||now;
+    const usd=sz*px;
+    const rec={coin,side,px,sz,time,usd};
+
+    // ALL trades go to 5m aggregation (no filter)
+    _allTrades5m.push(rec);
+
+    // Add to volume buckets
+    _addToVolBucket(rec);
+
+    // Only display trades meeting minimum size
+    const min=MIN_SZ[coin];
+    if(min&&sz>=min){
+      _pendingTrades.push(rec);
+    }
+  }
+
+  // Prune 5m buffer
+  const cutoff=now-300000;
+  _allTrades5m=_allTrades5m.filter(t=>t.time>=cutoff);
+
+  // Throttle rendering to every 500ms
+  if(!_renderTimer){
+    _renderTimer=setTimeout(()=>{
+      _flushTrades();
+      _renderTimer=null;
+    },500);
+  }
+}
+
+function _addToVolBucket(t){
+  const bucketTime=Math.floor(t.time/60000)*60; // 1-min buckets (unix seconds)
+  let bucket=_volBuckets.find(b=>b.time===bucketTime);
+  if(!bucket){
+    bucket={time:bucketTime,buyVol:0,sellVol:0};
+    _volBuckets.push(bucket);
+    _volBuckets.sort((a,b)=>a.time-b.time);
+    if(_volBuckets.length>120)_volBuckets.shift(); // keep 2 hours
+  }
+  if(t.side==='B')bucket.buyVol+=t.usd;
+  else bucket.sellVol+=t.usd;
+}
+
+function _flushTrades(){
+  // Merge pending into display list
+  for(const t of _pendingTrades){
+    _liveTrades.unshift(t);
+  }
+  _pendingTrades=[];
+  if(_liveTrades.length>40)_liveTrades.length=40;
+
+  _renderTrades();
+  _renderFlowStats();
+  _renderCoinFlow();
+  _renderVolChart();
+}
+
+function _renderTrades(){
+  const el=$('liveTrades');if(!el)return;
+  if(!_liveTrades.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Waiting for trades…</div>';return}
+  // Header
+  const hdr='<div style="display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:4px 0;font-family:var(--mono);font-size:9px;color:var(--text-muted);border-bottom:1px solid var(--border);letter-spacing:0.05em;text-transform:uppercase"><span>Coin</span><span>Side</span><span>Price</span><span style="text-align:right">Size</span><span style="text-align:right">Notional</span><span style="text-align:right">Time</span></div>';
+  el.innerHTML=hdr+_liveTrades.map(t=>{
+    const isBuy=t.side==='B';
+    const sideClass=isBuy?'trade-buy':'trade-sell';
+    const sideText=isBuy?'▲ BUY':'▼ SELL';
+    const pxStr=t.px<1?'$'+F.f4(t.px):'$'+F.f2(t.px);
+    const usdStr='$'+F.c(t.usd);
+    // Highlight large trades
+    const isLarge=t.usd>=50000;
+    const rowStyle=isLarge?'background:rgba('+(isBuy?'0,230,118':'255,61,90')+',0.06)':'';
+    return `<div class="trade-row" style="${rowStyle}"><span class="trade-coin">${t.coin}${isLarge?' 🐋':''}</span><span class="${sideClass} trade-side">${sideText}</span><span style="color:var(--text-dim)">${pxStr}</span><span class="trade-size">${F.c(t.sz)}</span><span class="trade-usd ${sideClass}">${usdStr}</span><span class="trade-time">${F.t(t.time)}</span></div>`;
+  }).join('');
+
+  set('tradeFeedMeta',_liveTrades.length+' trades · '+_allTrades5m.length+' in 5m window');
+}
+
+function _renderFlowStats(){
+  const now=Date.now(),cutoff=now-300000;
+  const recent=_allTrades5m.filter(t=>t.time>=cutoff);
+  let buyVol=0,sellVol=0,buyCount=0,sellCount=0;
+  for(const t of recent){
+    if(t.side==='B'){buyVol+=t.usd;buyCount++}
+    else{sellVol+=t.usd;sellCount++}
+  }
+  const net=buyVol-sellVol;
+  const total=buyVol+sellVol;
+  const ratio=sellVol>0?(buyVol/sellVol):buyVol>0?99:1;
+
+  set('tfBuy','$'+F.c(buyVol));
+  set('tfSell','$'+F.c(sellVol));
+  set('tfCount',(buyCount+sellCount).toString());
+
+  const netEl=$('tfNet');
+  if(netEl){
+    netEl.textContent=(net>=0?'+':'-')+'$'+F.c(Math.abs(net));
+    netEl.style.color=net>0?'var(--green)':net<0?'var(--red)':'var(--text-dim)';
+  }
+  const ratEl=$('tfRatio');
+  if(ratEl){
+    ratEl.textContent=ratio.toFixed(2)+'x';
+    ratEl.style.color=ratio>1.2?'var(--green)':ratio<0.8?'var(--red)':'var(--text-dim)';
+  }
+  const prEl=$('tfPressure');
+  if(prEl){
+    const pct=total>0?(buyVol/total*100):50;
+    let lbl,color;
+    if(pct>65){lbl='🟢 STRONG BUY';color='var(--green)'}
+    else if(pct>55){lbl='📈 Buying';color='var(--green)'}
+    else if(pct<35){lbl='🔴 STRONG SELL';color='var(--red)'}
+    else if(pct<45){lbl='📉 Selling';color='var(--red)'}
+    else{lbl='⟺ Neutral';color='var(--text-dim)'}
+    prEl.textContent=lbl+' ('+pct.toFixed(0)+'%)';prEl.style.color=color;
+  }
+}
+
+function _renderCoinFlow(){
+  const el=$('coinFlowCards');if(!el)return;
+  const now=Date.now(),cutoff=now-300000;
+  const recent=_allTrades5m.filter(t=>t.time>=cutoff);
+  const byC={};
+  WS_COINS.forEach(c=>byC[c]={buy:0,sell:0,count:0});
+  for(const t of recent){
+    if(!byC[t.coin])byC[t.coin]={buy:0,sell:0,count:0};
+    if(t.side==='B')byC[t.coin].buy+=t.usd;
+    else byC[t.coin].sell+=t.usd;
+    byC[t.coin].count++;
+  }
+  el.innerHTML=WS_COINS.map(c=>{
+    const d=byC[c]||{buy:0,sell:0,count:0};
+    const total=d.buy+d.sell;
+    const buyPct=total>0?(d.buy/total*100):50;
+    const net=d.buy-d.sell;
+    const netColor=net>0?'var(--green)':net<0?'var(--red)':'var(--text-dim)';
+    const barGreen=`width:${buyPct}%;background:var(--green);height:100%;border-radius:2px 0 0 2px`;
+    const barRed=`width:${100-buyPct}%;background:var(--red);height:100%;border-radius:0 2px 2px 0`;
+    return `<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${netColor};margin:4px 0">${net>=0?'+':''}$${F.c(Math.abs(net))}</div><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0"><div style="${barGreen}"></div><div style="${barRed}"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px"><span style="color:var(--green)">${buyPct.toFixed(0)}% B</span><span style="color:var(--text-muted)">${d.count}</span><span style="color:var(--red)">${(100-buyPct).toFixed(0)}% S</span></div></div>`;
+  }).join('');
+}
+
+function _initVolFlowChart(){
+  const wrap=$('volFlowWrap');if(!wrap||typeof LightweightCharts==='undefined')return;
+  if(_volFlowChart){try{_volFlowChart.remove()}catch(e){}_volFlowChart=null}
+  wrap.innerHTML='';
+  const s=_wsz('volFlowWrap');
+  _volFlowChart=LightweightCharts.createChart(wrap,_lcBase({
+    width:s.w,height:s.h,
+    rightPriceScale:{borderColor:'#222738',textColor:'#5a6580'},
+    timeScale:{borderColor:'#222738',textColor:'#5a6580',timeVisible:true,secondsVisible:false}
+  }));
+  _volBuySeries=_volFlowChart.addHistogramSeries({
+    color:'rgba(0,230,118,0.6)',priceFormat:{type:'custom',formatter:v=>'$'+F.c(v)},
+    priceLineVisible:false,lastValueVisible:false,priceScaleId:'vol'
+  });
+  _volSellSeries=_volFlowChart.addHistogramSeries({
+    color:'rgba(255,61,90,0.6)',priceFormat:{type:'custom',formatter:v=>'$'+F.c(Math.abs(v))},
+    priceLineVisible:false,lastValueVisible:false,priceScaleId:'vol'
+  });
+}
+
+function _renderVolChart(){
+  if(!_volFlowChart||!_volBuySeries)return;
+  const buys=[],sells=[];
+  const seen=new Set();
+  for(const b of _volBuckets){
+    if(seen.has(b.time))continue;seen.add(b.time);
+    buys.push({time:b.time,value:b.buyVol,color:'rgba(0,230,118,0.6)'});
+    sells.push({time:b.time,value:-b.sellVol,color:'rgba(255,61,90,0.6)'});
+  }
+  try{
+    _volBuySeries.setData(buys);
+    _volSellSeries.setData(sells);
+    _volFlowChart.timeScale().fitContent();
+    const totalBuy=_volBuckets.reduce((s,b)=>s+b.buyVol,0);
+    const totalSell=_volBuckets.reduce((s,b)=>s+b.sellVol,0);
+    set('volFlowMeta','Buy $'+F.c(totalBuy)+' · Sell $'+F.c(totalSell)+' · '+_volBuckets.length+' min');
+  }catch(e){}
+}
+
 function _wsReconn(){if(_wsT)clearTimeout(_wsT);_wsT=setTimeout(_wsConnect,Math.min(30000,1000*Math.pow(2,_wsR)));_wsR++}
 function _wsStatus(s){const d=$('wsDot'),t=$('wsText');if(!d||!t)return;d.className='ws-dot '+(s==='connected'?'connected':s==='error'?'error':'');t.textContent=s==='connected'?'LIVE':s==='error'?'ERR':'OFF'}
-function _renderTrades(){const el=$('liveTrades');if(!el)return;if(!_liveTrades.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Waiting…</div>';return}el.innerHTML=_liveTrades.map(t=>`<div class="trade-row"><span class="trade-coin">${t.coin}</span><span class="${t.side==='B'?'trade-buy':'trade-sell'}">${t.side==='B'?'▲ BUY':'▼ SELL'} $${t.px<1?F.f4(t.px):F.f2(t.px)}</span><span class="trade-size">${F.c(t.sz)}</span><span class="trade-time">${F.t(t.time)}</span></div>`).join('')}
 setTimeout(_wsConnect,500);
 
 // ═══════════════════════════════════════════════════════════════
