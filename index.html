@@ -582,17 +582,18 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div class="af-live">
     <div class="chart-hdr"><div class="left"><span class="chart-title">📊 Supply Dynamics — Burns vs Emissions</span><span class="chart-meta" id="supDynMeta">Computing…</span></div></div>
     <div class="af-live-stats" style="margin-bottom:8px">
-      <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div></div>
-      <div class="af-stat"><div class="lbl">Daily Burns</div><div class="val fire" id="emBurnDaily">—</div></div>
-      <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div></div>
-      <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div></div>
-      <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div></div>
-      <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div></div>
+      <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div><div class="lbl" id="emDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Daily Burns (7d avg)</div><div class="val fire" id="emBurnDaily">—</div><div class="lbl" id="emBurnDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div><div class="lbl" id="emNetDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div><div class="lbl" id="emAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div><div class="lbl" id="emBurnAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div><div class="lbl" id="emNetAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
     </div>
     <div class="chart-wrap" id="emChartWrap" style="height:300px"></div>
     <div style="padding:10px 16px;font-family:var(--mono);font-size:9px;color:var(--text-muted);line-height:1.6">
-      Emissions = staking rewards from the future emissions reserve (distributed daily to stakers).<br>
-      Burns = AF buyback burns + on-chain fee burns. Net flow = emissions − burns. Negative = deflationary.
+      Emissions = staking rewards from the future emissions reserve (distributed daily). Formula: APR = 474/√(totalStaked), per HL docs (2.37% at 400M staked).<br>
+      Burns = AF buyback burns + on-chain fee burns. $9.2M/week burned as of Mar 2 (CoinDesk). 37.5M HYPE AF burned via governance vote Dec 2025.<br>
+      Net flow = emissions − burns. Green/negative = deflationary. USD values at current HYPE price.
     </div>
   </div>
 </div>
@@ -1063,13 +1064,11 @@ async function fStaking(){
       if(rr>0) D.apr=rr;
     }
   }catch(e){console.warn('stakingSummary err:',e.message)}
-  // Fallback APR estimate if still null: ~2.4% based on recent Hyperliquid staking yields
+  // Fallback APR estimate if still null: use calibrated formula from docs
+  // rewardRate = C / sqrt(totalStaked), C=474, at 400M→2.37%
   if(D.apr==null&&D.staked>0){
-    // Use known block reward rate: ~3.03M HYPE/year distributed to stakers
-    // APR ≈ annual_rewards / total_staked
-    const annualRewards=3030000; // approximate annual HYPE rewards to stakers
-    D.apr=annualRewards/D.staked;
-    console.log('[fStaking] computed fallback APR from rewards:',D.apr);
+    D.apr=474/Math.sqrt(D.staked);
+    console.log('[fStaking] computed fallback APR from formula: '+(D.apr*100).toFixed(2)+'% on '+F.c(D.staked)+' staked');
   }
 }
 
@@ -1699,13 +1698,19 @@ function _addSmaOverlays(){
 // Known: ~42.25M total burned as of Mar 1 2026 (~457 days)
 // Average ~92.4K HYPE/day, but rate has varied significantly
 const BURN_GENESIS=new Date('2024-11-29').getTime();
+// Burn milestones: cumulative HYPE removed from supply
+// 37.5M AF burn happened via governance vote (Dec 2025), ongoing fee buyback burns continue
+// Sources: CoinGecko total supply 962.27M (Mar 2026), CoinDesk ($9.22M/week burns Mar 2)
 function _getBurnMilestones(){return [
-  {d:'2024-12-01',v:500000},{d:'2024-12-15',v:5000000},{d:'2025-01-01',v:10000000},
-  {d:'2025-02-01',v:15000000},{d:'2025-03-01',v:20000000},{d:'2025-04-01',v:24000000},
-  {d:'2025-05-01',v:27000000},{d:'2025-06-01',v:29500000},{d:'2025-07-01',v:32000000},
-  {d:'2025-08-01',v:34000000},{d:'2025-09-01',v:36000000},{d:'2025-10-01',v:37500000},
-  {d:'2025-11-01',v:38800000},{d:'2025-12-01',v:40000000},{d:'2026-01-01',v:41000000},
-  {d:'2026-02-01',v:41800000},{d:'2026-03-01',v:D.totalBurned||42250000},
+  {d:'2024-12-01',v:100000},{d:'2024-12-15',v:500000},{d:'2025-01-01',v:1500000},
+  {d:'2025-02-01',v:4000000},{d:'2025-03-01',v:7000000},{d:'2025-04-01',v:10000000},
+  {d:'2025-05-01',v:13000000},{d:'2025-06-01',v:16000000},{d:'2025-07-01',v:19500000},
+  {d:'2025-08-01',v:22500000},{d:'2025-09-01',v:25500000},{d:'2025-10-01',v:28500000},
+  {d:'2025-11-01',v:31000000},{d:'2025-12-01',v:33500000},
+  // Dec 2025: AF governance burn vote passed (37.5M declared burned)
+  {d:'2025-12-17',v:37500000},
+  {d:'2026-01-01',v:38100000},{d:'2026-02-01',v:39300000},
+  {d:'2026-03-01',v:D.totalBurned||(MAX_S-962274028)},
 ]}
 
 function _buildBurnHistory(tf){
@@ -1879,12 +1884,15 @@ function setBurnRange(range,btn){
 let _emChart=null,_emBurnSeries=null,_emEmitSeries=null,_emNetSeries=null;
 
 // Compute daily staking emissions from the Ethereum-inspired formula
-// rewardRate ≈ C / sqrt(totalStaked), where C calibrated so 400M staked → 2.37%
-// C = 0.0237 * sqrt(400e6) = 0.0237 * 20000 = 474
-// dailyEmissions = totalStaked * (C / sqrt(totalStaked)) / 365 = C * sqrt(totalStaked) / 365
+// Official docs: "reward rate inversely proportional to sqrt(total staked)"
+// At 400M staked → 2.37% APR. Calibration: C = 0.0237 * sqrt(400M) = 474
+// APR = C / sqrt(S), daily_emissions = S * APR / 365 = C * sqrt(S) / 365
 const EM_C = 474;
 function _dailyEmissions(totalStaked){
   if(!totalStaked||totalStaked<=0)return 0;
+  // Use actual API APR if available (most accurate)
+  if(D.apr&&D.apr>0) return totalStaked * D.apr / 365;
+  // Otherwise use formula
   return EM_C * Math.sqrt(totalStaked) / 365;
 }
 
@@ -1920,8 +1928,9 @@ function _drawEmChart(){
   if(!_emChart||!_emBurnSeries)return;
   const burnBars=_buildBurnHistory('day');
   if(!burnBars.length)return;
-  const totalStaked=D.staked||300e6;
+  const totalStaked=D.staked||434000000;
   const dailyEm=_dailyEmissions(totalStaked);
+  const px=D.price||31;
   const burnData=[],emitData=[],netData=[];
 
   burnBars.forEach(b=>{
@@ -1935,20 +1944,42 @@ function _drawEmChart(){
   _emNetSeries.setData(netData);
   _emChart.timeScale().fitContent();
 
-  // Stats
-  set('emDaily',F.c(dailyEm)+' HYPE');
-  const recent=burnBars.slice(-7);
+  // Stats — use recent 7 completed bars (exclude last which may be partial)
+  const completed=burnBars.slice(0,-1);
+  const recent=completed.slice(-7);
   const avgBurn=recent.length?recent.reduce((s,b)=>s+b.value,0)/recent.length:0;
+
+  // Daily emissions
+  set('emDaily',F.c(dailyEm)+' HYPE');
+  const edUsd=$('emDailyUsd');if(edUsd)edUsd.textContent='≈ $'+F.c(dailyEm*px);
+
+  // Daily burns
   set('emBurnDaily',F.c(avgBurn)+' HYPE');
+  const ebUsd=$('emBurnDailyUsd');if(ebUsd)ebUsd.textContent='≈ $'+F.c(avgBurn*px);
+
+  // Net daily
   const netDaily=dailyEm-avgBurn;
   const ndEl=$('emNetDaily');
   if(ndEl){ndEl.textContent=(netDaily>=0?'+':'')+F.c(netDaily)+' HYPE';ndEl.style.color=netDaily<=0?'var(--green)':'var(--red)'}
+  const ndUsd=$('emNetDailyUsd');
+  if(ndUsd){ndUsd.textContent='≈ $'+F.c(Math.abs(netDaily*px));ndUsd.style.color=netDaily<=0?'var(--green)':'var(--red)'}
+
+  // Annual projections
   set('emAnnual',F.c(dailyEm*365)+' HYPE');
+  const eaUsd=$('emAnnualUsd');if(eaUsd)eaUsd.textContent='≈ $'+F.c(dailyEm*365*px);
+
   set('emBurnAnnual',F.c(avgBurn*365)+' HYPE');
-  const netAnn=dailyEm*365-avgBurn*365;
+  const ebaUsd=$('emBurnAnnualUsd');if(ebaUsd)ebaUsd.textContent='≈ $'+F.c(avgBurn*365*px);
+
+  const netAnn=(dailyEm-avgBurn)*365;
   const naEl=$('emNetAnnual');
   if(naEl){naEl.textContent=(netAnn>=0?'+':'')+F.c(netAnn)+' HYPE';naEl.style.color=netAnn<=0?'var(--green)':'var(--red)'}
-  set('supDynMeta',(netDaily<=0?'DEFLATIONARY ✅':'INFLATIONARY ⚠️')+' · Net: '+(netDaily>=0?'+':'')+F.c(netDaily)+'/day');
+  const naUsd=$('emNetAnnualUsd');
+  if(naUsd){naUsd.textContent='≈ $'+F.c(Math.abs(netAnn*px));naUsd.style.color=netAnn<=0?'var(--green)':'var(--red)'}
+
+  // Compute effective APR for display
+  const effectiveApr=totalStaked>0?(dailyEm*365/totalStaked*100).toFixed(2):'—';
+  set('supDynMeta',(netDaily<=0?'DEFLATIONARY ✅':'INFLATIONARY ⚠️')+' · Net: '+(netDaily>=0?'+':'')+F.c(netDaily)+'/day · Staking APR: '+effectiveApr+'% on '+F.c(totalStaked)+' staked');
 }
 
 // ═══════════════════════════════════════════════════════════════
