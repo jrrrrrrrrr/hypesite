@@ -150,6 +150,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <button class="nav-tab" onclick="showPage('burns',this)">Burns</button>
       <button class="nav-tab" onclick="showPage('staking',this)">Staking</button>
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
+      <button class="nav-tab" onclick="showPage('intel',this)">Intel</button>
     </div>
   </div>
   <div class="nav-right">
@@ -422,13 +423,24 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ LIVE TRADES ═════════════════════════════════════════════ -->
 <div class="page" id="page-trades">
+  <!-- Window selector -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="section-title" style="margin:0">Trade Flow Intelligence</div>
+    <div class="tf-btns">
+      <button class="tf-btn active" onclick="setFlowWindow(5,this)">5m</button>
+      <button class="tf-btn" onclick="setFlowWindow(15,this)">15m</button>
+      <button class="tf-btn" onclick="setFlowWindow(60,this)">1h</button>
+      <button class="tf-btn" onclick="setFlowWindow(240,this)">4h</button>
+    </div>
+  </div>
+
   <!-- Flow Summary -->
   <div class="af-live-stats" style="margin-bottom:12px">
-    <div class="af-stat"><div class="lbl">Net Flow (5m)</div><div class="val" id="tfNet" style="font-size:18px">—</div></div>
+    <div class="af-stat"><div class="lbl" id="tfNetLbl">Net Flow (5m)</div><div class="val" id="tfNet" style="font-size:18px">—</div></div>
     <div class="af-stat"><div class="lbl">Buy Volume</div><div class="val green" id="tfBuy">—</div></div>
     <div class="af-stat"><div class="lbl">Sell Volume</div><div class="val" id="tfSell" style="color:var(--red)">—</div></div>
     <div class="af-stat"><div class="lbl">Buy/Sell Ratio</div><div class="val" id="tfRatio">—</div></div>
-    <div class="af-stat"><div class="lbl">Trades (5m)</div><div class="val" id="tfCount">—</div></div>
+    <div class="af-stat"><div class="lbl" id="tfCountLbl">Trades (5m)</div><div class="val" id="tfCount">—</div></div>
     <div class="af-stat"><div class="lbl">Pressure</div><div class="val" id="tfPressure" style="font-size:16px">—</div></div>
   </div>
 
@@ -448,6 +460,38 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">Minimums: BTC ≥0.25 · ETH ≥0.5 · HYPE ≥10 · SOL ≥1 · FARTCOIN ≥1000 — updates every 500ms</div>
     <div style="max-height:400px;overflow-y:auto"><div id="liveTrades" style="min-height:100px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
+  </div>
+</div>
+
+<!-- ══ INTEL ════════════════════════════════════════════════════ -->
+<div class="page" id="page-intel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div class="section-title" style="margin:0">🧠 Platform Intel — What's New & Why You Care</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:4px">AI-powered briefing on Hyperliquid updates, translated for perp traders</div>
+    </div>
+    <button class="refresh-btn" id="intelRefreshBtn" onclick="fetchIntel()">🔍 GET LATEST INTEL</button>
+  </div>
+
+  <!-- Loading state -->
+  <div id="intelLoading" style="display:none;text-align:center;padding:40px">
+    <div style="font-size:32px;margin-bottom:12px;animation:fl 1.5s ease-in-out infinite">🧠</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">Scanning Hyperliquid announcements…</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:6px" id="intelStatus">Searching the web</div>
+  </div>
+
+  <!-- Results -->
+  <div id="intelResults"></div>
+
+  <!-- Empty state -->
+  <div id="intelEmpty" class="metric-card" style="padding:32px;text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">📡</div>
+    <div style="font-family:var(--mono);font-size:14px;color:var(--text-bright);margin-bottom:6px">Your AI Intel Briefing</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);max-width:480px;margin:0 auto;line-height:1.8">
+      Hit <strong style="color:var(--accent)">GET LATEST INTEL</strong> to have AI scan the latest Hyperliquid announcements,
+      new features, protocol changes, and ecosystem updates — then break them down in plain English
+      with a focus on what matters for your HYPE perp trading.
+    </div>
   </div>
 </div>
 
@@ -536,10 +580,20 @@ const MIN_SZ={BTC:0.25,ETH:0.5,HYPE:10,SOL:1,FARTCOIN:1000};
 // Trade buffers
 let _liveTrades=[];        // Filtered trades for display (max 40)
 let _pendingTrades=[];     // Buffer for throttled rendering
-let _allTrades5m=[];       // ALL trades in last 5 min for aggregation
+let _allTradesBuffer=[];   // ALL trades kept for up to 4hr
+let _flowWindowMin=5;      // Current window in minutes (5/15/60/240)
 let _volBuckets=[];        // 1-min volume buckets for chart {time,buyVol,sellVol}
 let _renderTimer=null;
 let _volFlowChart=null,_volBuySeries=null,_volSellSeries=null;
+
+function setFlowWindow(mins,btn){
+  _flowWindowMin=mins;
+  if(btn){btn.parentElement.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+  const lbl=mins>=60?(mins/60)+'h':mins+'m';
+  set('tfNetLbl','Net Flow ('+lbl+')');
+  set('tfCountLbl','Trades ('+lbl+')');
+  _renderFlowStats();_renderCoinFlow();
+}
 
 function _wsConnect(){
   if(_ws&&(_ws.readyState===0||_ws.readyState===1))return;
@@ -573,8 +627,8 @@ function _processTrades(trades){
     const usd=sz*px;
     const rec={coin,side,px,sz,time,usd};
 
-    // ALL trades go to 5m aggregation (no filter)
-    _allTrades5m.push(rec);
+    // ALL trades go to buffer (no filter) — keep up to 4hr
+    _allTradesBuffer.push(rec);
 
     // Add to volume buckets
     _addToVolBucket(rec);
@@ -586,9 +640,9 @@ function _processTrades(trades){
     }
   }
 
-  // Prune 5m buffer
-  const cutoff=now-300000;
-  _allTrades5m=_allTrades5m.filter(t=>t.time>=cutoff);
+  // Prune buffer to 4 hours max
+  const cutoff=now-14400000;
+  _allTradesBuffer=_allTradesBuffer.filter(t=>t.time>=cutoff);
 
   // Throttle rendering to every 500ms
   if(!_renderTimer){
@@ -643,12 +697,15 @@ function _renderTrades(){
     return `<div class="trade-row" style="${rowStyle}"><span class="trade-coin">${t.coin}${isLarge?' 🐋':''}</span><span class="${sideClass} trade-side">${sideText}</span><span style="color:var(--text-dim)">${pxStr}</span><span class="trade-size">${F.c(t.sz)}</span><span class="trade-usd ${sideClass}">${usdStr}</span><span class="trade-time">${F.t(t.time)}</span></div>`;
   }).join('');
 
-  set('tradeFeedMeta',_liveTrades.length+' trades · '+_allTrades5m.length+' in 5m window');
+  const wMs=_flowWindowMin*60000;const wCut=Date.now()-wMs;
+  const wCount=_allTradesBuffer.filter(t=>t.time>=wCut).length;
+  const wLbl=_flowWindowMin>=60?(_flowWindowMin/60)+'h':_flowWindowMin+'m';
+  set('tradeFeedMeta',_liveTrades.length+' shown · '+wCount+' in '+wLbl+' window');
 }
 
 function _renderFlowStats(){
-  const now=Date.now(),cutoff=now-300000;
-  const recent=_allTrades5m.filter(t=>t.time>=cutoff);
+  const now=Date.now(),cutoff=now-(_flowWindowMin*60000);
+  const recent=_allTradesBuffer.filter(t=>t.time>=cutoff);
   let buyVol=0,sellVol=0,buyCount=0,sellCount=0;
   for(const t of recent){
     if(t.side==='B'){buyVol+=t.usd;buyCount++}
@@ -687,8 +744,8 @@ function _renderFlowStats(){
 
 function _renderCoinFlow(){
   const el=$('coinFlowCards');if(!el)return;
-  const now=Date.now(),cutoff=now-300000;
-  const recent=_allTrades5m.filter(t=>t.time>=cutoff);
+  const now=Date.now(),cutoff=now-(_flowWindowMin*60000);
+  const recent=_allTradesBuffer.filter(t=>t.time>=cutoff);
   const byC={};
   WS_COINS.forEach(c=>byC[c]={buy:0,sell:0,count:0});
   for(const t of recent){
@@ -1980,6 +2037,130 @@ function computeCompositeSignal(){
 // ═══════════════════════════════════════════════════════════════
 loadAll();
 setInterval(loadAll,30000);
+// ═══════════════════════════════════════════════════════════════
+//  INTEL TAB — AI-powered Hyperliquid news briefing
+// ═══════════════════════════════════════════════════════════════
+let _intelLoaded=false;
+async function fetchIntel(){
+  const loading=$('intelLoading'),results=$('intelResults'),empty=$('intelEmpty'),btn=$('intelRefreshBtn');
+  if(loading)loading.style.display='block';
+  if(results)results.innerHTML='';
+  if(empty)empty.style.display='none';
+  if(btn){btn.disabled=true;btn.textContent='⟳ Scanning…'}
+
+  try{
+    set('intelStatus','Searching for Hyperliquid announcements…');
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`You are a crypto research analyst briefing a HYPE perp trader. Search for the latest Hyperliquid announcements, new features, protocol updates, and ecosystem news from the past 2 weeks.
+
+Search for: "Hyperliquid new features announcements" and "Hyperliquid protocol update 2025"
+
+Then produce a JSON array of briefing items. Each item should have:
+- "title": short headline (max 10 words)
+- "date": approximate date string like "Mar 1" or "~2 weeks ago"
+- "category": one of "FEATURE", "PROTOCOL", "ECOSYSTEM", "TRADING", "GOVERNANCE"
+- "eli5": 1-2 sentence ELI5 explanation a non-technical person would understand
+- "perp_impact": 1 sentence on how this specifically affects someone who perp trades HYPE
+- "signal": one of "BULLISH", "BEARISH", "NEUTRAL", "WATCH" — how this might affect HYPE price
+- "importance": 1-5 scale (5 = game changer, 1 = minor quality of life)
+
+Return ONLY valid JSON array, no markdown, no backticks, no preamble. Aim for 5-10 items, most recent first. If you can't find enough recent news, include important features from the past month.`}]
+      })
+    });
+
+    const data=await resp.json();
+
+    // Extract text from response (may have tool_use blocks mixed in)
+    let jsonText='';
+    if(data.content){
+      for(const block of data.content){
+        if(block.type==='text'&&block.text){
+          jsonText+=block.text;
+        }
+      }
+    }
+
+    set('intelStatus','Parsing briefing…');
+
+    // Clean and parse JSON
+    jsonText=jsonText.replace(/```json|```/g,'').trim();
+    // Find the JSON array
+    const arrStart=jsonText.indexOf('[');
+    const arrEnd=jsonText.lastIndexOf(']');
+    if(arrStart>=0&&arrEnd>arrStart){
+      jsonText=jsonText.substring(arrStart,arrEnd+1);
+    }
+
+    const items=JSON.parse(jsonText);
+    _renderIntel(items);
+    _intelLoaded=true;
+
+  }catch(err){
+    console.error('Intel fetch error:',err);
+    if(results)results.innerHTML=`<div class="metric-card" style="padding:20px;text-align:center"><div style="font-size:24px;margin-bottom:8px">⚠️</div><div style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">Failed to fetch intel: ${err.message}</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:6px">Try again in a moment</div></div>`;
+  }finally{
+    if(loading)loading.style.display='none';
+    if(btn){btn.disabled=false;btn.textContent='🔍 REFRESH INTEL'}
+  }
+}
+
+function _renderIntel(items){
+  const el=$('intelResults');if(!el)return;
+  const catColors={FEATURE:'var(--accent)',PROTOCOL:'var(--purple)',ECOSYSTEM:'var(--yellow)',TRADING:'var(--green)',GOVERNANCE:'var(--fire)'};
+  const sigColors={BULLISH:'var(--green)',BEARISH:'var(--red)',NEUTRAL:'var(--text-dim)',WATCH:'var(--yellow)'};
+  const sigEmoji={BULLISH:'📈',BEARISH:'📉',NEUTRAL:'➖',WATCH:'👀'};
+
+  el.innerHTML=items.map((item,i)=>{
+    const catColor=catColors[item.category]||'var(--text-dim)';
+    const sigColor=sigColors[item.signal]||'var(--text-dim)';
+    const emoji=sigEmoji[item.signal]||'➖';
+    const dots='●'.repeat(item.importance||1)+'○'.repeat(5-(item.importance||1));
+    return `
+    <div class="metric-card" style="padding:16px;margin-bottom:10px;border-left:3px solid ${catColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.1em;color:${catColor};background:${catColor}15;padding:2px 8px;border-radius:3px">${item.category||'UPDATE'}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-left:8px">${item.date||''}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)" title="Importance">${dots}</span>
+          <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:${sigColor}">${emoji} ${item.signal||'NEUTRAL'}</span>
+        </div>
+      </div>
+      <div style="font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text-bright);margin-bottom:6px">${item.title||'Update'}</div>
+      <div style="font-family:var(--sans);font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">${item.eli5||''}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--accent);line-height:1.5;padding:8px 10px;background:rgba(0,212,255,0.04);border-radius:6px;border:1px solid rgba(0,212,255,0.08)">
+        <span style="color:var(--text-muted);font-size:9px;letter-spacing:0.05em">PERP TRADER IMPACT:</span><br>${item.perp_impact||'No direct impact'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Summary bar
+  const bullish=items.filter(i=>i.signal==='BULLISH').length;
+  const bearish=items.filter(i=>i.signal==='BEARISH').length;
+  const neutral=items.filter(i=>i.signal==='NEUTRAL'||i.signal==='WATCH').length;
+  const avgImp=items.length?(items.reduce((s,i)=>s+(i.importance||3),0)/items.length).toFixed(1):'—';
+  const netSigColor=bullish>bearish?'var(--green)':bearish>bullish?'var(--red)':'var(--text-dim)';
+  const netSigText=bullish>bearish?'📈 BULLISH LEAN':bearish>bullish?'📉 BEARISH LEAN':'⟺ MIXED';
+  el.insertAdjacentHTML('afterbegin',`
+    <div class="af-live-stats" style="margin-bottom:16px">
+      <div class="af-stat"><div class="lbl">Items Found</div><div class="val" style="color:var(--text-bright)">${items.length}</div></div>
+      <div class="af-stat"><div class="lbl">Bullish</div><div class="val green">${bullish}</div></div>
+      <div class="af-stat"><div class="lbl">Bearish</div><div class="val" style="color:var(--red)">${bearish}</div></div>
+      <div class="af-stat"><div class="lbl">Neutral/Watch</div><div class="val" style="color:var(--text-dim)">${neutral}</div></div>
+      <div class="af-stat"><div class="lbl">Avg Importance</div><div class="val" style="color:var(--yellow)">${avgImp}/5</div></div>
+      <div class="af-stat"><div class="lbl">Net Signal</div><div class="val" style="color:${netSigColor}">${netSigText}</div></div>
+    </div>
+  `);
+}
+
 function _tryInitCharts(){
   if(typeof LightweightCharts==='undefined'){
     console.warn('LightweightCharts not loaded yet, retrying in 2s…');
