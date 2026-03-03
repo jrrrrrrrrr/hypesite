@@ -134,6 +134,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 footer{text-align:center;padding:40px 24px;border-top:1px solid var(--border);margin-top:24px}
 footer p{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.04em;line-height:2.2}
 footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--accent)}
+.intel-blog-body{font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.8}
+.intel-blog-body p{margin:0 0 12px 0}.intel-blog-body p:last-child{margin-bottom:0}
+.intel-blog-body strong{color:var(--text-bright);font-weight:600}
 @media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}}
 @media(max-width:800px){.rating-grid{grid-template-columns:1fr}}
 @media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}}
@@ -465,33 +468,20 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ INTEL ════════════════════════════════════════════════════ -->
 <div class="page" id="page-intel">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <div>
-      <div class="section-title" style="margin:0">🧠 Platform Intel — What's New & Why You Care</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:4px">AI-powered briefing on Hyperliquid updates, translated for perp traders</div>
-    </div>
-    <button class="refresh-btn" id="intelRefreshBtn" onclick="fetchIntel()">🔍 GET LATEST INTEL</button>
-  </div>
+  <div class="section-title" style="margin-bottom:4px">🧠 Platform Intel — What's New & Why You Care</div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:16px">Curated briefing on Hyperliquid updates · Translated for HYPE perp traders · Updated Mar 3, 2026</div>
 
-  <!-- Loading state -->
-  <div id="intelLoading" style="display:none;text-align:center;padding:40px">
-    <div style="font-size:32px;margin-bottom:12px;animation:fl 1.5s ease-in-out infinite">🧠</div>
-    <div style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">Scanning Hyperliquid announcements…</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:6px" id="intelStatus">Searching the web</div>
-  </div>
+  <!-- Signal summary bar -->
+  <div id="intelSummary"></div>
 
-  <!-- Results -->
-  <div id="intelResults"></div>
+  <!-- Intel cards -->
+  <div id="intelCards"></div>
 
-  <!-- Empty state -->
-  <div id="intelEmpty" class="metric-card" style="padding:32px;text-align:center">
-    <div style="font-size:36px;margin-bottom:12px">📡</div>
-    <div style="font-family:var(--mono);font-size:14px;color:var(--text-bright);margin-bottom:6px">Your AI Intel Briefing</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);max-width:480px;margin:0 auto;line-height:1.8">
-      Hit <strong style="color:var(--accent)">GET LATEST INTEL</strong> to have AI scan the latest Hyperliquid announcements,
-      new features, protocol changes, and ecosystem updates — then break them down in plain English
-      with a focus on what matters for your HYPE perp trading.
-    </div>
+  <!-- ── Daily Blog ────────────────────────────────── -->
+  <div style="margin-top:32px;border-top:1px solid var(--border);padding-top:24px">
+    <div class="section-title" style="margin-bottom:4px">📰 Daily Intelligence Brief</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:16px">In-depth analysis written for HYPE perp traders</div>
+    <div id="intelBlog"></div>
   </div>
 </div>
 
@@ -2038,128 +2028,142 @@ function computeCompositeSignal(){
 loadAll();
 setInterval(loadAll,30000);
 // ═══════════════════════════════════════════════════════════════
-//  INTEL TAB — AI-powered Hyperliquid news briefing
+//  INTEL TAB — Curated Hyperliquid briefing for perp traders
 // ═══════════════════════════════════════════════════════════════
-let _intelLoaded=false;
-async function fetchIntel(){
-  const loading=$('intelLoading'),results=$('intelResults'),empty=$('intelEmpty'),btn=$('intelRefreshBtn');
-  if(loading)loading.style.display='block';
-  if(results)results.innerHTML='';
-  if(empty)empty.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='⟳ Scanning…'}
+const INTEL_DATA=[
+  {title:"Commodity Perps Surge During Geopolitical Crisis",date:"Mar 2",category:"TRADING",
+   eli5:"When US-Iran tensions escalated over the weekend, traditional markets were closed — but Hyperliquid was open. Traders piled into oil, gold, and silver perps. The silver contract alone saw massive volume, and total platform volume hit $6.5B in a single day.",
+   perp_impact:"HYPE rallied 13-20% as platform fees spiked from the commodity trading frenzy. More volume = more fees = more HYPE burns. Weekend geopolitical events are now a direct HYPE catalyst.",
+   signal:"BULLISH",importance:5},
+  {title:"$912M Permanent Burn — AF Tokens Gone Forever",date:"Feb 2026",category:"GOVERNANCE",
+   eli5:"Validators voted (85% consensus) to officially recognize 37.5M HYPE tokens in the Assistance Fund as permanently burned. That's roughly $912M worth of HYPE that can never re-enter circulation.",
+   perp_impact:"This is the single biggest deflationary event in HYPE history. Less supply = more scarcity. The burn removes a massive overhang that traders previously worried could be dumped. Your long positions just got a structural tailwind.",
+   signal:"BULLISH",importance:5},
+  {title:"$316M Token Unlock on March 6",date:"Mar 6",category:"TRADING",
+   eli5:"9.92 million HYPE tokens (~2.7% of circulating supply) unlock on March 6 for core contributors. This is part of the regular vesting schedule that runs through 2027. About $200M unlocks each month.",
+   perp_impact:"Unlocks historically create short-term sell pressure. If you're long HYPE perps, be cautious around the Mar 6 date — consider reducing size or tightening stops. The weekly $9.22M burn partially offsets the dilution but doesn't fully neutralize a $316M unlock.",
+   signal:"BEARISH",importance:4},
+  {title:"HyperEVM Mainnet Launch",date:"Mar 1",category:"PROTOCOL",
+   eli5:"Hyperliquid launched its Ethereum-compatible smart contract layer (HyperEVM) on mainnet. Think of it like adding an app store to a trading terminal — developers can now build lending, borrowing, and DeFi apps directly on Hyperliquid's fast chain, using HYPE for gas fees.",
+   perp_impact:"More apps built on Hyperliquid = more HYPE demand for gas = more ecosystem activity = more fees burned. This is a medium-term structural bullish driver. Watch for new DeFi protocols launching — they'll need to buy HYPE.",
+   signal:"BULLISH",importance:5},
+  {title:"HYPE Up 23.9% YTD — Outperforming Everything",date:"Mar 2",category:"TRADING",
+   eli5:"While Bitcoin is down 23.7% and Ethereum is down 33% year-to-date, HYPE is UP 23.9%. It's matching gold's performance. Hyperliquid's monthly volume exceeded $200B in both January and February while competitors declined sharply.",
+   perp_impact:"HYPE is showing real decoupling from BTC — unusual for any altcoin. The platform profits from volatility in both directions (longs AND shorts pay fees). This means even in a bear market, platform revenue stays strong. Consider this when sizing your positions.",
+   signal:"BULLISH",importance:4},
+  {title:"HIP-3: Permissionless Perp Markets",date:"Late 2025",category:"FEATURE",
+   eli5:"Anyone with 500,000 HYPE (roughly $16M) can now launch their own perpetual futures market on Hyperliquid. Trading fees were also slashed by over 90%. This turns Hyperliquid from a single exchange into a platform where anyone can create an exchange.",
+   perp_impact:"More markets = more total platform volume = more burns. The 90% fee reduction sounds bearish but actually drives way more volume. Also: 500K HYPE locked per new market creates massive buy pressure and supply sinks.",
+   signal:"BULLISH",importance:4},
+  {title:"Weekend Equity & Pre-IPO Perp Trading",date:"2026",category:"FEATURE",
+   eli5:"Hyperliquid now offers perps on US equities (tradeable on weekends!), commodities, forex, and even pre-IPO companies like Anthropic, OpenAI, and SpaceX. Traditional markets close at 4pm Friday — Hyperliquid doesn't.",
+   perp_impact:"This is huge for platform volume growth. Every geopolitical weekend event now drives Hyperliquid volume. It's becoming the 24/7 derivatives venue for everything, not just crypto. More diverse volume = more stable fee revenue = consistent burns.",
+   signal:"BULLISH",importance:4},
+  {title:"Portfolio Margin Pre-Alpha",date:"2025-2026",category:"FEATURE",
+   eli5:"Hyperliquid is testing portfolio margin — instead of each position needing its own collateral, your whole portfolio is evaluated together. If you're long BTC and short ETH, the hedged risk means you need less total margin.",
+   perp_impact:"Directly affects your capital efficiency on HYPE perps. Portfolio margin means you can trade bigger with less collateral, or maintain the same positions with more breathing room. Less likely to get liquidated on correlated positions.",
+   signal:"NEUTRAL",importance:3},
+  {title:"Ripple Integration Announced",date:"Feb 2026",category:"ECOSYSTEM",
+   eli5:"Hyperliquid announced an integration with Ripple, bringing institutional-grade infrastructure connectivity. This signals growing interest from traditional finance players in using Hyperliquid.",
+   perp_impact:"Institutional inflow narrative is powerful for HYPE price. More institutional volume typically means deeper liquidity and tighter spreads on your HYPE perp trades.",
+   signal:"BULLISH",importance:3},
+  {title:"Network Upgrade — Validator Improvements",date:"Mar 1",category:"PROTOCOL",
+   eli5:"A scheduled network upgrade on March 1 improved validator performance with only ~10 minutes of downtime. Since the JELLY incident in early 2025, the team has overhauled the validator process and rebuilt vault TVL to $380M.",
+   perp_impact:"Better infrastructure = less downtime risk during volatile moves. Nothing worse than getting liquidated because the chain went down. The JELLY incident cleanup shows the team takes risk management seriously now.",
+   signal:"NEUTRAL",importance:2}
+];
 
-  try{
-    set('intelStatus','Searching for Hyperliquid announcements…');
+const INTEL_BLOG=[
+  {date:"Mar 3, 2026",title:"The Weekend Warriors: How Hyperliquid Became Retail's Bear Market Playground",
+   body:`<p>Something remarkable happened this past weekend. As US-Iran tensions escalated and traditional markets sat closed, traders didn't just wait for Monday. They went to Hyperliquid.</p>
+<p>Silver perps on Hyperliquid saw volume approaching $750M in a single 24-hour period — on a Sunday. Oil and gold perps surged alongside. Total platform volume hit $6.5B, and HYPE rallied 13-20% while BTC barely moved. This isn't a fluke anymore. It's a structural shift.</p>
+<p><strong>Why this matters for your HYPE perps:</strong> Hyperliquid's fee model collects on both sides of every trade — longs and shorts. When geopolitical chaos drives commodity trading, Hyperliquid captures revenue that traditional venues physically can't (because they're closed). That revenue flows directly into HYPE buybacks and burns. Every weekend crisis is now a potential HYPE catalyst.</p>
+<p>The numbers tell the story: Hyperliquid handled over $200B in monthly volume for both January and February, up from $169B in December. Meanwhile, competitors Aster and Lighter saw their volumes collapse — Aster dropping from $177B to under $100B. Hyperliquid is eating market share while printing record fees.</p>
+<p><strong>The bear market paradox:</strong> HYPE is up 23.9% YTD while BTC is down 23.7% and ETH is down 33%. How? Because Hyperliquid doesn't need prices to go up. It needs volatility and volume. Bear markets provide both in abundance. The 97% fee-to-burn allocation means the deflationary engine actually accelerates during downturns.</p>
+<p><strong>Key levels to watch this week:</strong> HYPE faces resistance at $32-35 (0.618 Fib retracement). The March 6 token unlock ($316M) could create short-term selling pressure. Consider the $30 level as your inflection point — holding above it keeps the bullish structure intact. A break below opens $21 support.</p>`},
 
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:4000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`You are a crypto research analyst briefing a HYPE perp trader. Search for the latest Hyperliquid announcements, new features, protocol updates, and ecosystem news from the past 2 weeks.
+  {date:"Mar 2, 2026",title:"The $912M Burn: Understanding the Biggest Deflationary Event in HYPE History",
+   body:`<p>Let's break down exactly what happened with the Assistance Fund burn and why it matters more than most people realize.</p>
+<p>The Hyper Foundation held 37.5M HYPE tokens in an Assistance Fund wallet (address 0xfefe...fefe). Validators just voted with 85% consensus to permanently recognize these tokens as burned — that's $912M worth of HYPE that can never be sold, traded, or re-enter the market. Ever.</p>
+<p><strong>Why traders were worried before:</strong> That 37.5M HYPE sitting in the AF wallet was a constant source of FUD. "What if they dump it?" was a common bearish thesis. Shorts would reference it as potential sell pressure. That narrative is now dead.</p>
+<p><strong>The burn math for perp traders:</strong> On top of this permanent burn, the protocol burns about $9.22M worth of HYPE per week through its fee buyback mechanism — and that number is growing (up 20.4% from the prior period). At current pace, that's ~$480M annualized in burns against monthly unlocks of ~$200M. The protocol is net deflationary even with ongoing token vesting.</p>
+<p><strong>Practical takeaway:</strong> The supply overhang argument against HYPE just got significantly weaker. If you've been hesitant to take larger long positions because of supply fears, the risk calculus has shifted. The main remaining bearish supply argument is the monthly contributor unlocks — but even those are being partially absorbed by accelerating burns.</p>
+<p><strong>The bigger picture:</strong> Deflationary tokenomics is currently the strongest performing narrative in crypto. Jupiter surged 13% after eliminating all 2026 token emissions. HYPE's burn mechanism is automated and tied to real revenue, making it arguably more sustainable than governance-voted supply cuts.</p>`},
 
-Search for: "Hyperliquid new features announcements" and "Hyperliquid protocol update 2025"
+  {date:"Mar 1, 2026",title:"HyperEVM Goes Live: What an 'App Store for Trading' Means for HYPE",
+   body:`<p>Hyperliquid's Ethereum-compatible virtual machine (HyperEVM) launched on mainnet on March 1. If you only trade HYPE perps and don't care about DeFi, you might think this doesn't affect you. You'd be wrong.</p>
+<p><strong>The ELI5:</strong> Until now, Hyperliquid was just a trading platform. Fast, yes. Onchain order books, yes. But you couldn't build apps on it. HyperEVM changes that — developers can now deploy any Ethereum-style smart contract directly on Hyperliquid's chain. Lending protocols, options platforms, yield strategies, NFT marketplaces — all native to Hyperliquid.</p>
+<p><strong>Why perp traders should care:</strong></p>
+<p>First, gas fees. Every smart contract interaction on HyperEVM uses HYPE as gas. More apps = more HYPE demand = structural buy pressure that has nothing to do with speculation.</p>
+<p>Second, composability. Imagine a lending protocol where you deposit USDC, borrow HYPE, and use it as perp margin — all on the same chain with instant settlement. That's what HyperEVM enables. Your capital efficiency could dramatically improve.</p>
+<p>Third, the WHYPE contract. The team deployed a canonical wrapped HYPE contract so DeFi developers have a standard building block. This is how ecosystems bootstrap — you give builders Lego pieces and they create things you didn't imagine.</p>
+<p><strong>What to watch:</strong> The first wave of HyperEVM apps will likely be lending/borrowing (think Aave-style) and liquid staking. Both create additional HYPE demand. Track new contract deployments on the HyperEVM explorer — early adoption metrics will signal whether this is a real ecosystem or a ghost chain.</p>
+<p><strong>The risk:</strong> HyperEVM is designed to not interfere with the core trading engine's low-latency performance. The team specifically staged the rollout for this reason. But any bugs in the EVM layer could potentially affect confidence even if perps are unaffected technically.</p>`}
+];
 
-Then produce a JSON array of briefing items. Each item should have:
-- "title": short headline (max 10 words)
-- "date": approximate date string like "Mar 1" or "~2 weeks ago"
-- "category": one of "FEATURE", "PROTOCOL", "ECOSYSTEM", "TRADING", "GOVERNANCE"
-- "eli5": 1-2 sentence ELI5 explanation a non-technical person would understand
-- "perp_impact": 1 sentence on how this specifically affects someone who perp trades HYPE
-- "signal": one of "BULLISH", "BEARISH", "NEUTRAL", "WATCH" — how this might affect HYPE price
-- "importance": 1-5 scale (5 = game changer, 1 = minor quality of life)
+function _renderIntelTab(){
+  // Summary bar
+  const bullish=INTEL_DATA.filter(i=>i.signal==='BULLISH').length;
+  const bearish=INTEL_DATA.filter(i=>i.signal==='BEARISH').length;
+  const neutral=INTEL_DATA.filter(i=>i.signal==='NEUTRAL'||i.signal==='WATCH').length;
+  const avgImp=(INTEL_DATA.reduce((s,i)=>s+(i.importance||3),0)/INTEL_DATA.length).toFixed(1);
+  const netSigColor=bullish>bearish?'var(--green)':bearish>bullish?'var(--red)':'var(--text-dim)';
+  const netSigText=bullish>bearish?'📈 BULLISH LEAN':bearish>bullish?'📉 BEARISH LEAN':'⟺ MIXED';
 
-Return ONLY valid JSON array, no markdown, no backticks, no preamble. Aim for 5-10 items, most recent first. If you can't find enough recent news, include important features from the past month.`}]
-      })
-    });
+  const sumEl=$('intelSummary');
+  if(sumEl)sumEl.innerHTML=`<div class="af-live-stats" style="margin-bottom:16px">
+    <div class="af-stat"><div class="lbl">Updates</div><div class="val" style="color:var(--text-bright)">${INTEL_DATA.length}</div></div>
+    <div class="af-stat"><div class="lbl">Bullish</div><div class="val green">${bullish}</div></div>
+    <div class="af-stat"><div class="lbl">Bearish</div><div class="val" style="color:var(--red)">${bearish}</div></div>
+    <div class="af-stat"><div class="lbl">Neutral/Watch</div><div class="val" style="color:var(--text-dim)">${neutral}</div></div>
+    <div class="af-stat"><div class="lbl">Avg Importance</div><div class="val" style="color:var(--yellow)">${avgImp}/5</div></div>
+    <div class="af-stat"><div class="lbl">Net Signal</div><div class="val" style="color:${netSigColor}">${netSigText}</div></div>
+  </div>`;
 
-    const data=await resp.json();
-
-    // Extract text from response (may have tool_use blocks mixed in)
-    let jsonText='';
-    if(data.content){
-      for(const block of data.content){
-        if(block.type==='text'&&block.text){
-          jsonText+=block.text;
-        }
-      }
-    }
-
-    set('intelStatus','Parsing briefing…');
-
-    // Clean and parse JSON
-    jsonText=jsonText.replace(/```json|```/g,'').trim();
-    // Find the JSON array
-    const arrStart=jsonText.indexOf('[');
-    const arrEnd=jsonText.lastIndexOf(']');
-    if(arrStart>=0&&arrEnd>arrStart){
-      jsonText=jsonText.substring(arrStart,arrEnd+1);
-    }
-
-    const items=JSON.parse(jsonText);
-    _renderIntel(items);
-    _intelLoaded=true;
-
-  }catch(err){
-    console.error('Intel fetch error:',err);
-    if(results)results.innerHTML=`<div class="metric-card" style="padding:20px;text-align:center"><div style="font-size:24px;margin-bottom:8px">⚠️</div><div style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">Failed to fetch intel: ${err.message}</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:6px">Try again in a moment</div></div>`;
-  }finally{
-    if(loading)loading.style.display='none';
-    if(btn){btn.disabled=false;btn.textContent='🔍 REFRESH INTEL'}
-  }
-}
-
-function _renderIntel(items){
-  const el=$('intelResults');if(!el)return;
+  // Intel cards
   const catColors={FEATURE:'var(--accent)',PROTOCOL:'var(--purple)',ECOSYSTEM:'var(--yellow)',TRADING:'var(--green)',GOVERNANCE:'var(--fire)'};
   const sigColors={BULLISH:'var(--green)',BEARISH:'var(--red)',NEUTRAL:'var(--text-dim)',WATCH:'var(--yellow)'};
   const sigEmoji={BULLISH:'📈',BEARISH:'📉',NEUTRAL:'➖',WATCH:'👀'};
 
-  el.innerHTML=items.map((item,i)=>{
+  const cardsEl=$('intelCards');
+  if(cardsEl)cardsEl.innerHTML=INTEL_DATA.map(item=>{
     const catColor=catColors[item.category]||'var(--text-dim)';
     const sigColor=sigColors[item.signal]||'var(--text-dim)';
     const emoji=sigEmoji[item.signal]||'➖';
     const dots='●'.repeat(item.importance||1)+'○'.repeat(5-(item.importance||1));
-    return `
-    <div class="metric-card" style="padding:16px;margin-bottom:10px;border-left:3px solid ${catColor}">
+    return `<div class="metric-card" style="padding:16px;margin-bottom:10px;border-left:3px solid ${catColor}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div>
-          <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.1em;color:${catColor};background:${catColor}15;padding:2px 8px;border-radius:3px">${item.category||'UPDATE'}</span>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-left:8px">${item.date||''}</span>
+          <span style="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.1em;color:${catColor};background:${catColor}15;padding:2px 8px;border-radius:3px">${item.category}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-left:8px">${item.date}</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)" title="Importance">${dots}</span>
-          <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:${sigColor}">${emoji} ${item.signal||'NEUTRAL'}</span>
+          <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:${sigColor}">${emoji} ${item.signal}</span>
         </div>
       </div>
-      <div style="font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text-bright);margin-bottom:6px">${item.title||'Update'}</div>
-      <div style="font-family:var(--sans);font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">${item.eli5||''}</div>
+      <div style="font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text-bright);margin-bottom:6px">${item.title}</div>
+      <div style="font-family:var(--sans);font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px">${item.eli5}</div>
       <div style="font-family:var(--mono);font-size:11px;color:var(--accent);line-height:1.5;padding:8px 10px;background:rgba(0,212,255,0.04);border-radius:6px;border:1px solid rgba(0,212,255,0.08)">
-        <span style="color:var(--text-muted);font-size:9px;letter-spacing:0.05em">PERP TRADER IMPACT:</span><br>${item.perp_impact||'No direct impact'}
+        <span style="color:var(--text-muted);font-size:9px;letter-spacing:0.05em">PERP TRADER IMPACT:</span><br>${item.perp_impact}
       </div>
     </div>`;
   }).join('');
 
-  // Summary bar
-  const bullish=items.filter(i=>i.signal==='BULLISH').length;
-  const bearish=items.filter(i=>i.signal==='BEARISH').length;
-  const neutral=items.filter(i=>i.signal==='NEUTRAL'||i.signal==='WATCH').length;
-  const avgImp=items.length?(items.reduce((s,i)=>s+(i.importance||3),0)/items.length).toFixed(1):'—';
-  const netSigColor=bullish>bearish?'var(--green)':bearish>bullish?'var(--red)':'var(--text-dim)';
-  const netSigText=bullish>bearish?'📈 BULLISH LEAN':bearish>bullish?'📉 BEARISH LEAN':'⟺ MIXED';
-  el.insertAdjacentHTML('afterbegin',`
-    <div class="af-live-stats" style="margin-bottom:16px">
-      <div class="af-stat"><div class="lbl">Items Found</div><div class="val" style="color:var(--text-bright)">${items.length}</div></div>
-      <div class="af-stat"><div class="lbl">Bullish</div><div class="val green">${bullish}</div></div>
-      <div class="af-stat"><div class="lbl">Bearish</div><div class="val" style="color:var(--red)">${bearish}</div></div>
-      <div class="af-stat"><div class="lbl">Neutral/Watch</div><div class="val" style="color:var(--text-dim)">${neutral}</div></div>
-      <div class="af-stat"><div class="lbl">Avg Importance</div><div class="val" style="color:var(--yellow)">${avgImp}/5</div></div>
-      <div class="af-stat"><div class="lbl">Net Signal</div><div class="val" style="color:${netSigColor}">${netSigText}</div></div>
-    </div>
-  `);
+  // Blog entries
+  const blogEl=$('intelBlog');
+  if(blogEl)blogEl.innerHTML=INTEL_BLOG.map(entry=>`
+    <article class="metric-card" style="padding:24px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--accent);background:var(--accent-glow);padding:3px 10px;border-radius:4px">${entry.date}</span>
+      </div>
+      <h3 style="font-family:var(--sans);font-size:18px;font-weight:700;color:var(--text-bright);margin:0 0 16px 0;line-height:1.4">${entry.title}</h3>
+      <div class="intel-blog-body">${entry.body}</div>
+    </article>
+  `).join('');
 }
+// Render on page load
+setTimeout(_renderIntelTab,100);
 
 function _tryInitCharts(){
   if(typeof LightweightCharts==='undefined'){
