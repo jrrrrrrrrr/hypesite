@@ -181,6 +181,14 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .mkt-name{font-weight:700;color:var(--text-bright)}
 .mkt-cell{text-align:right;color:var(--text)}
 @media(max-width:700px){.hs-mkt-row{grid-template-columns:60px 1fr 1fr 1fr;font-size:9px}.hs-mkt-row .mkt-cell:nth-child(5),.hs-mkt-row .mkt-cell:nth-child(6),.hs-mkt-hdr .mkt-cell:nth-child(5),.hs-mkt-hdr .mkt-cell:nth-child(6){display:none}}
+.mom-row{display:grid;grid-template-columns:72px 1fr 90px;gap:8px;padding:5px 16px;align-items:center;font-family:var(--mono);font-size:10px;border-top:1px solid rgba(255,255,255,0.03)}
+.mom-name{font-weight:700;color:var(--text-bright)}
+.mom-bar-wrap{height:18px;display:flex;align-items:center;position:relative;gap:0}
+.mom-bar-center{position:absolute;left:50%;width:1px;height:100%;background:var(--border);z-index:1}
+.mom-bar-buy,.mom-bar-sell{height:14px;border-radius:2px;transition:width 0.6s ease;min-width:0}
+.mom-bar-buy{background:linear-gradient(90deg,rgba(0,230,118,0.15),rgba(0,230,118,0.7));position:absolute;right:50%;border-radius:2px 0 0 2px}
+.mom-bar-sell{background:linear-gradient(270deg,rgba(239,68,68,0.15),rgba(239,68,68,0.7));position:absolute;left:50%;border-radius:0 2px 2px 0}
+.mom-net{text-align:right;font-weight:600;font-size:10px;white-space:nowrap}
 .hs-big{padding:16px;text-align:center;border-top:1px solid var(--border)}
 .hs-big .big-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text-bright)}
 .hs-big .big-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px}
@@ -703,10 +711,15 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <!-- On-Chain Intelligence — Market Data -->
   <div class="section-title" style="margin-top:20px">🐱 Market Intelligence</div>
   <div class="hs-grid">
-    <!-- Trending Tokens -->
+    <!-- Top Markets -->
     <div class="hs-panel" style="grid-column:1/-1">
-      <div class="hs-hdr"><span class="hs-live"></span>TOP MARKETS BY VOLUME</div>
+      <div class="hs-hdr"><span class="hs-live"></span>TOP MARKETS BY VOLUME <span style="font-size:8px;color:var(--text-muted);font-weight:400;margin-left:8px">auto-refreshes every 30s</span></div>
       <div id="hsTrending"><div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Loading…</div></div>
+    </div>
+    <!-- 5-Minute Momentum Bars -->
+    <div class="hs-panel" style="grid-column:1/-1">
+      <div class="hs-hdr"><span class="hs-live"></span>5-MINUTE MOMENTUM <span style="font-size:8px;color:var(--text-muted);font-weight:400;margin-left:8px">live from WebSocket trades</span></div>
+      <div id="momentumBars" style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Collecting trade data…</div>
     </div>
     <!-- Active TWAPs -->
     <div class="hs-panel" style="grid-column:1/-1">
@@ -2626,6 +2639,79 @@ function computeCompositeSignal(){
 // ═══════════════════════════════════════════════════════════════
 loadAll();
 setInterval(loadAll,30000);
+
+// ── Auto-refresh: Top Markets every 30s ──
+setInterval(()=>{
+  // Only refresh if Live Trades tab is active
+  const pg=document.querySelector('#page-trades.active');
+  if(pg)fHsTrending();
+},30000);
+
+// ═══════════════════════════════════════════════════════════════
+//  5-MINUTE MOMENTUM BARS — computed from live WebSocket trades
+// ═══════════════════════════════════════════════════════════════
+function _renderMomentumBars(){
+  const el=$('momentumBars');if(!el)return;
+  const now=Date.now();
+  const cutoff5m=now-300000; // 5 minutes
+  const cutoff1m=now-60000;  // 1 minute for "hot" detection
+
+  // Aggregate trades by coin for last 5 minutes
+  const coins={};
+  _allTradesBuffer.forEach(t=>{
+    if(t.time<cutoff5m)return;
+    if(!coins[t.coin])coins[t.coin]={buy:0,sell:0,buy1m:0,sell1m:0,count:0};
+    const c=coins[t.coin];
+    if(t.side==='B'){c.buy+=t.usd;if(t.time>=cutoff1m)c.buy1m+=t.usd}
+    else{c.sell+=t.usd;if(t.time>=cutoff1m)c.sell1m+=t.usd}
+    c.count++;
+  });
+
+  // Convert to sorted array
+  const arr=Object.entries(coins).map(([name,d])=>{
+    const total=d.buy+d.sell;
+    const net=d.buy-d.sell;
+    const ratio=total>0?net/total:0; // -1 to +1
+    const total1m=d.buy1m+d.sell1m;
+    const hot=total1m>total*0.4; // >40% of 5min vol in last 1min = surging
+    return{name,buy:d.buy,sell:d.sell,total,net,ratio,hot,count:d.count};
+  }).filter(c=>c.total>1000); // min $1K to show
+
+  arr.sort((a,b)=>b.total-a.total);
+
+  if(!arr.length){
+    el.innerHTML='<div style="padding:8px 0;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Collecting trade data… bars appear after ~30s of WebSocket activity</div>';
+    return;
+  }
+
+  // Find max total for scaling bars
+  const maxTotal=Math.max(...arr.map(c=>c.total));
+
+  let html='<div class="mom-row" style="border-top:0;color:var(--text-muted);font-size:9px;font-weight:600"><span>Market</span><span style="text-align:center">← SELL | BUY →</span><span style="text-align:right">Net 5m</span></div>';
+
+  html+=arr.slice(0,14).map(c=>{
+    const buyPct=maxTotal>0?(c.buy/maxTotal)*50:0;
+    const sellPct=maxTotal>0?(c.sell/maxTotal)*50:0;
+    const netColor=c.net>=0?'var(--green)':'var(--red)';
+    const netStr=(c.net>=0?'+':'-')+'$'+F.c(Math.abs(c.net));
+    const hotBadge=c.hot?'<span style="color:var(--yellow);font-size:8px;margin-left:4px">🔥</span>':'';
+
+    return`<div class="mom-row">
+      <span class="mom-name">${c.name}${hotBadge}</span>
+      <span class="mom-bar-wrap">
+        <span class="mom-bar-center"></span>
+        <span class="mom-bar-sell" style="width:${sellPct}%"></span>
+        <span class="mom-bar-buy" style="width:${buyPct}%"></span>
+      </span>
+      <span class="mom-net" style="color:${netColor}">${netStr}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=html;
+}
+
+// Update momentum bars every 3 seconds
+setInterval(_renderMomentumBars,3000);
 // ═══════════════════════════════════════════════════════════════
 //  INTEL TAB — Curated Hyperliquid briefing for perp traders
 // ═══════════════════════════════════════════════════════════════
