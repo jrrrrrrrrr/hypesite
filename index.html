@@ -174,6 +174,13 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .hs-row .tk-name{color:var(--text-bright);font-weight:600}
 .hs-row .tk-price{color:var(--text);text-align:right}
 .hs-row .tk-chg{text-align:right;font-weight:600;min-width:60px}
+.hs-mkt-row{display:grid;grid-template-columns:72px 1fr 1fr 1fr 1fr 80px;gap:2px;padding:6px 16px;font-family:var(--mono);font-size:10px;border-top:1px solid var(--border);align-items:center;transition:background 0.15s}
+.hs-mkt-row:hover{background:rgba(0,212,255,0.04)}
+.hs-mkt-hdr{border-top:0;color:var(--text-muted);font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:0.04em}
+.hs-mkt-hdr:hover{background:none}
+.mkt-name{font-weight:700;color:var(--text-bright)}
+.mkt-cell{text-align:right;color:var(--text)}
+@media(max-width:700px){.hs-mkt-row{grid-template-columns:60px 1fr 1fr 1fr;font-size:9px}.hs-mkt-row .mkt-cell:nth-child(5),.hs-mkt-row .mkt-cell:nth-child(6),.hs-mkt-hdr .mkt-cell:nth-child(5),.hs-mkt-hdr .mkt-cell:nth-child(6){display:none}}
 .hs-big{padding:16px;text-align:center;border-top:1px solid var(--border)}
 .hs-big .big-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text-bright)}
 .hs-big .big-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px}
@@ -697,7 +704,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div class="section-title" style="margin-top:20px">🐱 Market Intelligence</div>
   <div class="hs-grid">
     <!-- Trending Tokens -->
-    <div class="hs-panel">
+    <div class="hs-panel" style="grid-column:1/-1">
       <div class="hs-hdr"><span class="hs-live"></span>TOP MARKETS BY VOLUME</div>
       <div id="hsTrending"><div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Loading…</div></div>
     </div>
@@ -2918,88 +2925,96 @@ async function fHsTrending(){
       const prev=parseFloat(c.prevDayPx||0);
       const vol=parseFloat(c.dayNtlVlm||0);
       const oi=parseFloat(c.openInterest||0)*px;
-      if(!px||!prev||vol<100000)return;
+      const funding=parseFloat(c.funding||0)*100;
+      if(!px||!prev||vol<50000)return;
       const chg=((px-prev)/prev)*100;
-      tokens.push({name,px,chg,vol,oi});
+      tokens.push({name,px,chg,vol,oi,funding});
     });
-    // Sort by 24h volume
     tokens.sort((a,b)=>b.vol-a.vol);
     const el=$('hsTrending');if(!el)return;
     if(!tokens.length){el.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">No data</div>';return}
-    el.innerHTML=tokens.slice(0,14).map(t=>{
+    // Header row
+    let html='<div class="hs-mkt-row hs-mkt-hdr"><span class="mkt-name">Market</span><span class="mkt-cell">Price</span><span class="mkt-cell">24h %</span><span class="mkt-cell">24h Vol</span><span class="mkt-cell">Open Interest</span><span class="mkt-cell">Funding</span></div>';
+    html+=tokens.slice(0,16).map(t=>{
       const chgColor=t.chg>=0?'var(--green)':'var(--red)';
       const chgStr=(t.chg>=0?'+':'')+t.chg.toFixed(2)+'%';
       const pxStr=t.px>=1000?'$'+F.c(t.px):t.px>=1?'$'+t.px.toFixed(2):'$'+t.px.toFixed(4);
-      return`<div class="hs-row"><span class="tk-name">${t.name}</span><span class="tk-price">${pxStr}</span><span class="tk-chg" style="color:${chgColor}">${chgStr}</span></div>`;
+      const fundColor=t.funding>=0?'var(--green)':'var(--red)';
+      const fundStr=(t.funding>=0?'+':'')+t.funding.toFixed(4)+'%';
+      return`<div class="hs-mkt-row"><span class="mkt-name">${t.name}</span><span class="mkt-cell">${pxStr}</span><span class="mkt-cell" style="color:${chgColor}">${chgStr}</span><span class="mkt-cell">$${F.c(t.vol)}</span><span class="mkt-cell">$${F.c(t.oi)}</span><span class="mkt-cell" style="color:${fundColor}">${fundStr}</span></div>`;
     }).join('');
+    el.innerHTML=html;
   }catch(e){console.warn('fHsTrending:',e.message)}
 }
 
 // ── Active TWAPs (from HypurrScan API) ──
 async function fHsTwaps(){
   try{
-    // Fetch HYPE TWAPs for buy pressure calculation
-    const hypeData=await hs('/twap/HYPE');
-    let hypeBuyTotal=0,hypeSellTotal=0,hypeCount=0;
+    // First get current prices for value calculation
+    const prices={};
+    try{
+      const md=await hl({type:'metaAndAssetCtxs'});
+      if(Array.isArray(md)&&md.length>=2){
+        const u=md[0]?.universe||[];const c=md[1]||[];
+        c.forEach((ctx,i)=>{
+          if(ctx&&u[i])prices[u[i].name]=parseFloat(ctx.markPx||0);
+        });
+      }
+    }catch(e){}
+    if(!prices.HYPE)prices.HYPE=D.price||31;
+
     const allTwaps=[];
-    if(Array.isArray(hypeData)){
-      hypeData.forEach(t=>{
+    let hypeBuyTotal=0,hypeSellTotal=0,hypeCount=0;
+
+    // Fetch TWAPs across many popular tokens
+    const twapTokens=['HYPE','PURR','BTC','ETH','SOL','XRP','DOGE','SUI','LINK','AVAX','ARB','OP','TIA','SEI','INJ','ONDO','WIF','BONK','PEPE','FARTCOIN','JUP','PAXG','kPEPE','kBONK'];
+    const fetches=twapTokens.map(tk=>hs('/twap/'+tk).then(data=>({tk,data})).catch(()=>({tk,data:null})));
+    const results=await Promise.allSettled(fetches);
+
+    results.forEach(r=>{
+      if(r.status!=='fulfilled'||!r.value)return;
+      const{tk,data}=r.value;
+      if(!Array.isArray(data))return;
+      data.forEach(t=>{
         if(t.ended)return;
         const tw=t.action?.twap;if(!tw)return;
-        const isBuy=tw.b;
+        const isBuy=!!tw.b;
         const size=parseFloat(tw.s||0);
         const dur=tw.m||0;
         const startMs=t.time||0;
         const endMs=startMs+dur*60*1000;
-        const now=Date.now();
-        const minsLeft=Math.max(0,(endMs-now)/60000);
-        const price=D.price||31;
+        const minsLeft=Math.max(0,(endMs-Date.now())/60000);
+        if(minsLeft<=0)return; // already expired
+        const price=prices[tk]||D.price||31;
         const val=size*price;
-        if(isBuy)hypeBuyTotal+=val;else hypeSellTotal+=val;
-        hypeCount++;
-        allTwaps.push({side:isBuy?'BUY':'SELL',token:'HYPE',val,amount:size,minsLeft,time:startMs});
+
+        if(tk==='HYPE'){
+          if(isBuy)hypeBuyTotal+=val;else hypeSellTotal+=val;
+          hypeCount++;
+        }
+        allTwaps.push({side:isBuy?'BUY':'SELL',token:tk,val,amount:size,minsLeft,time:startMs});
       });
-    }
-    // Net pressure
-    const net1h=hypeBuyTotal-hypeSellTotal;
+    });
+
+    // Update HYPE buy pressure widgets
+    const net=hypeBuyTotal-hypeSellTotal;
     const el1=$('hsTwap1h');if(el1){
-      const sign=net1h>=0?'+':'';
-      el1.textContent=sign+'$'+F.c(Math.abs(net1h));
-      el1.style.color=net1h>=0?'var(--green)':'var(--red)';
+      el1.textContent=(net>=0?'+':'-')+'$'+F.c(Math.abs(net));
+      el1.style.color=net>=0?'var(--green)':'var(--red)';
     }
     const el24=$('hsTwap24h');if(el24){
       el24.textContent=el1?el1.textContent:'—';
-      el24.style.color=net1h>=0?'var(--green)':'var(--red)';
+      el24.style.color=net>=0?'var(--green)':'var(--red)';
     }
-    const elC=$('hsTwapCount');if(elC)elC.textContent='Active HYPE TWAPs: '+hypeCount;
+    const elC=$('hsTwapCount');if(elC)elC.textContent='Active HYPE TWAPs: '+hypeCount+' · All tokens: '+allTwaps.length;
 
-    // Also fetch top TWAPs across all tokens for the table
-    // Use a few popular tokens
-    const topTokens=['HYPE','PURR','BTC','ETH','SOL'];
-    for(const tk of topTokens){
-      if(tk==='HYPE')continue; // already fetched
-      try{
-        const td=await hs('/twap/'+tk);
-        if(!Array.isArray(td))continue;
-        td.forEach(t=>{
-          if(t.ended)return;
-          const tw=t.action?.twap;if(!tw)return;
-          const size=parseFloat(tw.s||0);
-          const dur=tw.m||0;
-          const startMs=t.time||0;
-          const endMs=startMs+dur*60*1000;
-          const minsLeft=Math.max(0,(endMs-Date.now())/60000);
-          allTwaps.push({side:tw.b?'BUY':'SELL',token:tk,val:size*(D.price||31),amount:size,minsLeft,time:startMs});
-        });
-      }catch(e){}
-    }
-    // Sort by value descending and render top 10
+    // Sort by value and render top 15
     allTwaps.sort((a,b)=>b.val-a.val);
     const tEl=$('hsTwapTable');if(!tEl)return;
     if(!allTwaps.length){tEl.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">No active TWAPs found</div>';return}
-    tEl.innerHTML=allTwaps.slice(0,10).map(t=>{
+    tEl.innerHTML=allTwaps.slice(0,15).map(t=>{
       const sideColor=t.side==='BUY'?'var(--green)':'var(--red)';
-      const timeStr=t.minsLeft>60?Math.floor(t.minsLeft/60)+'h '+Math.floor(t.minsLeft%60)+'m':Math.floor(t.minsLeft)+'m left';
+      const timeStr=t.minsLeft>60?Math.floor(t.minsLeft/60)+'h '+Math.floor(t.minsLeft%60)+'m':Math.floor(t.minsLeft)+'m';
       return`<div class="hs-twap-row"><span class="tw-side" style="color:${sideColor}">${t.side}</span><span class="tw-token">${t.token}</span><span class="tw-val">$${F.c(t.val)}</span><span class="tw-val">${F.c(t.amount)}</span><span class="tw-time">${timeStr}</span></div>`;
     }).join('');
   }catch(e){console.warn('fHsTwaps:',e.message)}
