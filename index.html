@@ -2947,36 +2947,88 @@ async function fHsTrending(){
 
 // ── Spot Stables ──
 async function fHsStables(){
+  // Try HypurrScan endpoints for accurate on-chain deposit data
+  try{
+    // Try /stats first, then /dashboard
+    let dashData=await hs('/stats');
+    if(!dashData)dashData=await hs('/dashboard');
+    if(dashData){
+      // HypurrScan may return stables data in different shapes
+      let stableObj=dashData.spotStables||dashData.stables||dashData.spot_stables;
+      if(stableObj){
+        const totalEl=$('hsStablesTotal');
+        const rawTotal=stableObj.total||stableObj.totalValue||0;
+        if(totalEl&&rawTotal>0)totalEl.textContent='$'+F.c(rawTotal);
+        const el=$('hsStables');if(!el)return;
+        const tokens=stableObj.tokens||stableObj.items||[];
+        if(tokens.length){
+          tokens.sort((a,b)=>(b.value||b.amount||0)-(a.value||a.amount||0));
+          el.innerHTML=tokens.map(s=>{
+            const v=s.value||s.amount||0;
+            const ch=s.change||s.pctChange||0;
+            const chgColor=ch>=0?'var(--green)':'var(--red)';
+            const chgStr=(ch>=0?'+':'')+ch.toFixed(2)+'%';
+            return`<div class="hs-stable-row"><span class="tk-name">${s.name||s.token||s.symbol}</span><span class="tk-price">${'$'+F.c(v)}</span><span class="tk-chg" style="color:${chgColor}">${chgStr}</span></div>`;
+          }).join('');
+          return;
+        }
+      }
+      // Maybe the data is flat — look for known stable fields
+      const stableNames=['USDC','USDH','USDT','USDT0','USDE'];
+      const found=[];let total=0;
+      for(const key of Object.keys(dashData)){
+        const upper=key.toUpperCase().replace(/[^A-Z0-9]/g,'');
+        const match=stableNames.find(s=>upper.includes(s));
+        if(match&&typeof dashData[key]==='number'){
+          found.push({name:match,val:dashData[key],chg:0});
+          total+=dashData[key];
+        }
+      }
+      if(found.length){
+        found.sort((a,b)=>b.val-a.val);
+        const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent='$'+F.c(total);
+        const el=$('hsStables');if(!el)return;
+        el.innerHTML=found.map(s=>`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">${'$'+F.c(s.val)}</span><span class="tk-chg" style="color:var(--text-dim)">—</span></div>`).join('');
+        return;
+      }
+    }
+  }catch(e){console.warn('fHsStables HypurrScan:',e.message)}
+
+  // Fallback: use Hyperliquid spotClearinghouseState or spotMeta
   try{
     const d=await hl({type:'spotMetaAndAssetCtxs'});
     if(!Array.isArray(d)||d.length<2)return;
     const meta=d[0]?.tokens||[];const ctxs=d[1]||[];
-    const stables=['USDC','USDH','USDT','USDT0','USDE'];
+    const stableNames=['USDC','USDH','USDT','USDT0','USDE'];
     const found=[];let total=0;
     ctxs.forEach((c,i)=>{
       if(!c)return;
       const name=meta[i]?.name||c.coin||'';
-      const matched=stables.find(s=>name.toUpperCase()===s||name.toUpperCase()===s+'0');
-      if(!matched&&!stables.includes(name))return;
-      // Use total supply * price as proxy for deposits, or circulatingSupply
-      const circ=parseFloat(c.circulatingSupply||c.totalSupply||0);
+      if(!stableNames.some(s=>name.toUpperCase()===s))return;
       const px=parseFloat(c.midPx||c.markPx||1);
-      const val=circ*px;
+      // Use totalSupply from the spot context — but this is on-chain HL supply, not global
+      let val=parseFloat(c.totalSupply||0)*px;
+      // Sanity check: Hyperliquid stables should be sub-$2B each
+      if(val>2e9)val=0; // Skip if implausible
       if(val<1000)return;
       const prev=parseFloat(c.prevDayPx||px);
       const chg=prev>0?((px-prev)/prev)*100:0;
-      found.push({name:name,val,chg});
+      found.push({name,val,chg});
       total+=val;
     });
     found.sort((a,b)=>b.val-a.val);
-    const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent='$'+F.c(total);
-    const el=$('hsStables');if(!el)return;
-    el.innerHTML=found.map(s=>{
-      const chgColor=s.chg>=0?'var(--green)':'var(--red)';
-      const chgStr=(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%';
-      return`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">${'$'+F.c(s.val)}</span><span class="tk-chg" style="color:${chgColor}">${chgStr}</span></div>`;
-    }).join('');
-  }catch(e){console.warn('fHsStables:',e.message)}
+    if(found.length){
+      const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent='$'+F.c(total);
+      const el=$('hsStables');if(!el)return;
+      el.innerHTML=found.map(s=>{
+        const chgColor=s.chg>=0?'var(--green)':'var(--red)';
+        const chgStr=(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%';
+        return`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">${'$'+F.c(s.val)}</span><span class="tk-chg" style="color:${chgColor}">${chgStr}</span></div>`;
+      }).join('');
+    } else {
+      const el=$('hsStables');if(el)el.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Stablecoin data unavailable</div>';
+    }
+  }catch(e){console.warn('fHsStables fallback:',e.message)}
 }
 
 // ── Active TWAPs (from HypurrScan API) ──
