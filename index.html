@@ -891,11 +891,14 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <!-- Light support note -->
   <div style="text-align:center;padding:20px;margin-top:16px;font-family:var(--sans);font-size:12px;color:var(--text-dim);line-height:1.7">
     <p style="margin:0 0 8px">HYPE Intelligence is free, independent, and built by one person. Referral links above help keep it running at no extra cost to you.</p>
-    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
       <a href="https://app.hyperliquid.xyz/join/HYPESITE" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="hyperliquid" data-umami-event-location="ecosystem" style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none;padding:5px 14px;border:1px solid rgba(0,212,255,0.3);border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.3)'">Trade on Hyperliquid ↗</a>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">or donate:</span>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="navigator.clipboard.writeText('6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'solana',location:'ecosystem'});this.textContent='Copied!';setTimeout(()=>this.textContent='SOL',2000)" title="6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1">SOL</span>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="navigator.clipboard.writeText('0x9816E9067f49e20BD60186a68955C317380a7b78');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'evm',location:'ecosystem'});this.textContent='Copied!';setTimeout(()=>this.textContent='EVM',2000)" title="0x9816E9067f49e20BD60186a68955C317380a7b78">EVM</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);line-height:2">
+      <span style="color:var(--text-dim)">Donate SOL:</span>
+      <span style="color:var(--accent);cursor:pointer;opacity:0.7" onclick="navigator.clipboard.writeText('6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'solana',location:'ecosystem'});var e=this;e.dataset.orig=e.textContent;e.textContent='Copied ✓';setTimeout(()=>e.textContent=e.dataset.orig,2000)">6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1</span><br>
+      <span style="color:var(--text-dim)">Donate EVM:</span>
+      <span style="color:var(--accent);cursor:pointer;opacity:0.7" onclick="navigator.clipboard.writeText('0x9816E9067f49e20BD60186a68955C317380a7b78');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'evm',location:'ecosystem'});var e=this;e.dataset.orig=e.textContent;e.textContent='Copied ✓';setTimeout(()=>e.textContent=e.dataset.orig,2000)">0x9816E9067f49e20BD60186a68955C317380a7b78</span>
     </div>
   </div>
 </div>
@@ -908,7 +911,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <!-- Masthead -->
   <div class="news-masthead">
     <h1>HYPE <span>INTELLIGENCE</span></h1>
-    <div class="news-date">MARCH 3, 2026 · CURATED FOR PERP TRADERS</div>
+    <div class="news-date">MARCH 4, 2026 · WEEKLY BRIEF · CURATED FOR PERP TRADERS</div>
   </div>
 
   <!-- Signal summary -->
@@ -932,10 +935,12 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 <footer>
   <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 20px;margin-bottom:10px">
     <a href="https://app.hyperliquid.xyz/join/HYPESITE" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="hyperliquid" data-umami-event-location="footer" style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none;padding:4px 12px;border:1px solid rgba(0,212,255,0.3);border-radius:6px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(0,212,255,0.08)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.3)';this.style.background='none'">Trade on Hyperliquid ↗</a>
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">·</span>
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Donate:</span>
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim);cursor:pointer" onclick="navigator.clipboard.writeText('6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'solana',location:'footer'});this.textContent='SOL ✓';setTimeout(()=>this.textContent='SOL',2000)" title="Copy Solana address">SOL</span>
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim);cursor:pointer" onclick="navigator.clipboard.writeText('0x9816E9067f49e20BD60186a68955C317380a7b78');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'evm',location:'footer'});this.textContent='EVM ✓';setTimeout(()=>this.textContent='EVM',2000)" title="Copy EVM address">EVM</span>
+  </div>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);line-height:2;margin-bottom:8px">
+    <span style="color:var(--text-dim)">Donate SOL:</span>
+    <span id="footSol" style="color:var(--accent);cursor:pointer;opacity:0.7;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" onclick="navigator.clipboard.writeText('6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'solana',location:'footer'});var e=this;e.dataset.orig=e.textContent;e.textContent='Copied ✓';setTimeout(()=>e.textContent=e.dataset.orig,2000)">6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1</span><br>
+    <span style="color:var(--text-dim)">Donate EVM:</span>
+    <span id="footEvm" style="color:var(--accent);cursor:pointer;opacity:0.7;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" onclick="navigator.clipboard.writeText('0x9816E9067f49e20BD60186a68955C317380a7b78');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'evm',location:'footer'});var e=this;e.dataset.orig=e.textContent;e.textContent='Copied ✓';setTimeout(()=>e.textContent=e.dataset.orig,2000)">0x9816E9067f49e20BD60186a68955C317380a7b78</span>
   </div>
   <p>Hype Intelligence — Independent HYPE Token Analytics</p>
   <p>Data: <a href="https://api.hyperliquid.xyz" target="_blank">Hyperliquid API</a> · <a href="https://hypurrscan.io" target="_blank">HypurrScan</a> · Not affiliated with Hyper Foundation</p>
@@ -2624,74 +2629,69 @@ setInterval(loadAll,30000);
 //  INTEL TAB — Curated Hyperliquid briefing for perp traders
 // ═══════════════════════════════════════════════════════════════
 const INTEL_DATA=[
-  {title:"Commodity Perps Surge During Geopolitical Crisis",date:"Mar 2",category:"TRADING",
-   eli5:"When US-Iran tensions escalated over the weekend, traditional markets were closed — but Hyperliquid was open. Traders piled into oil, gold, and silver perps. The silver contract alone saw massive volume, and total platform volume hit $6.5B in a single day.",
-   perp_impact:"HYPE rallied 13-20% as platform fees spiked from the commodity trading frenzy. More volume = more fees = more HYPE burns. Weekend geopolitical events are now a direct HYPE catalyst.",
+  {title:"$316M Core Contributor Unlock — March 6",date:"Mar 6",category:"TRADING",
+   eli5:"9.92 million HYPE tokens (~1% of total supply, ~2.7% of circulating) unlock on March 6 for core contributors. This is part of the monthly vesting schedule running through 2027. Each month releases roughly $200M+ in HYPE to the team.",
+   perp_impact:"Historically, Hyperliquid unlocks have produced smaller-than-expected selling — many contributors restake rather than dump. But $316M is the largest single unlock yet. If you're long, consider tightening stops around Mar 6. The weekly $9.22M burn partially offsets dilution but won't fully neutralize a $316M event. Watch the $28-30 support zone — that's your line in the sand.",
+   signal:"BEARISH",importance:5},
+  {title:"HyperEVM Mainnet Is Live — Smart Contracts on Hyperliquid",date:"Mar 1",category:"PROTOCOL",
+   eli5:"Hyperliquid launched its Ethereum-compatible smart contract layer (HyperEVM) on mainnet March 1 after a brief ~10 minute network upgrade. Developers can now deploy Solidity contracts directly on HL's fast chain. The team also shipped a canonical WHYPE wrapper contract for DeFi builders.",
+   perp_impact:"Every smart contract call on HyperEVM burns HYPE as gas. More apps = more structural demand that's independent of speculation. Early HyperEVM apps will likely be lending/borrowing and liquid staking — both create new HYPE sinks. Watch TVL growth on HyperEVM over the next 30 days to gauge adoption speed. New DEX pools (WHYPE-UBTC, USDH-WHYPE) already launched with 100%+ APYs.",
    signal:"BULLISH",importance:5},
-  {title:"$912M Permanent Burn — AF Tokens Gone Forever",date:"Feb 2026",category:"GOVERNANCE",
-   eli5:"Validators voted (85% consensus) to officially recognize 37.5M HYPE tokens in the Assistance Fund as permanently burned. That's roughly $912M worth of HYPE that can never re-enter circulation.",
-   perp_impact:"This is the single biggest deflationary event in HYPE history. Less supply = more scarcity. The burn removes a massive overhang that traders previously worried could be dumped. Your long positions just got a structural tailwind.",
+  {title:"$912M Assistance Fund Burn — Governance Vote Passed",date:"Dec 2025",category:"GOVERNANCE",
+   eli5:"Validators voted 85% in favor of permanently burning 37.5M HYPE tokens held in the Assistance Fund. This was the single largest deflationary event in HYPE history, removing ~$912M from circulation forever. The tokens were at a keyless system address — already inaccessible, but now formally removed from total supply.",
+   perp_impact:"The biggest supply overhang FUD just got eliminated. Before this vote, bears could argue the AF tokens might someday re-enter the market. That narrative is dead. Total supply dropped from 1B to ~962M. If you've been hesitant to size up long positions because of supply fears, the risk calculus has permanently shifted.",
    signal:"BULLISH",importance:5},
-  {title:"$316M Token Unlock on March 6",date:"Mar 6",category:"TRADING",
-   eli5:"9.92 million HYPE tokens (~2.7% of circulating supply) unlock on March 6 for core contributors. This is part of the regular vesting schedule that runs through 2027. About $200M unlocks each month.",
-   perp_impact:"Unlocks historically create short-term sell pressure. If you're long HYPE perps, be cautious around the Mar 6 date — consider reducing size or tightening stops. The weekly $9.22M burn partially offsets the dilution but doesn't fully neutralize a $316M unlock.",
-   signal:"BEARISH",importance:4},
-  {title:"HyperEVM Mainnet Launch",date:"Mar 1",category:"PROTOCOL",
-   eli5:"Hyperliquid launched its Ethereum-compatible smart contract layer (HyperEVM) on mainnet. Think of it like adding an app store to a trading terminal — developers can now build lending, borrowing, and DeFi apps directly on Hyperliquid's fast chain, using HYPE for gas fees.",
-   perp_impact:"More apps built on Hyperliquid = more HYPE demand for gas = more ecosystem activity = more fees burned. This is a medium-term structural bullish driver. Watch for new DeFi protocols launching — they'll need to buy HYPE.",
+  {title:"Hyperliquid Becomes the Weekend Trading Venue",date:"Mar 2",category:"TRADING",
+   eli5:"When US-Iran tensions escalated over the weekend, COMEX gold futures were closed. But Hyperliquid was open. Traders piled into commodity perps — silver alone saw massive volume. Total platform volume hit $6.5B in a single day, and HYPE rallied 13-20% while BTC barely moved. Platform 24h fees hit $2.8M.",
+   perp_impact:"This is a structural shift. Hyperliquid is becoming the 24/7 derivatives venue for everything — not just crypto. Every geopolitical weekend event is now a HYPE catalyst because it drives volume → fees → burns. The platform profits from volatility in either direction. HYPE's 23.9% YTD gain vs BTC's -23.7% proves real decoupling.",
    signal:"BULLISH",importance:5},
-  {title:"HYPE Up 23.9% YTD — Outperforming Everything",date:"Mar 2",category:"TRADING",
-   eli5:"While Bitcoin is down 23.7% and Ethereum is down 33% year-to-date, HYPE is UP 23.9%. It's matching gold's performance. Hyperliquid's monthly volume exceeded $200B in both January and February while competitors declined sharply.",
-   perp_impact:"HYPE is showing real decoupling from BTC — unusual for any altcoin. The platform profits from volatility in both directions (longs AND shorts pay fees). This means even in a bear market, platform revenue stays strong. Consider this when sizing your positions.",
+  {title:"HYPE Up 19% Weekly — Outperforming All L1s",date:"Mar 4",category:"TRADING",
+   eli5:"HYPE is trading at ~$32.84 with a 19.2% gain over 7 days, ranking 3rd among all L1 tokens for weekly performance. It's up 88% year-over-year while the L1 category average is down 23%. Market cap has reached $8.4B with $6.2B TVL on the platform. Open interest sits at $1.23B.",
+   perp_impact:"The $32-35 zone is the key resistance band — it aligns with the 0.618 Fibonacci retracement from the September 2025 ATH of $59.30. RSI is at 57, not overbought yet. A clean break above $35 opens $40-44. Failure here with the Mar 6 unlock could retest $28. The higher low structure from $21 → $28 is intact — that's your bull case.",
    signal:"BULLISH",importance:4},
-  {title:"HIP-3: Permissionless Perp Markets",date:"Late 2025",category:"FEATURE",
-   eli5:"Anyone with 500,000 HYPE (roughly $16M) can now launch their own perpetual futures market on Hyperliquid. Trading fees were also slashed by over 90%. This turns Hyperliquid from a single exchange into a platform where anyone can create an exchange.",
-   perp_impact:"More markets = more total platform volume = more burns. The 90% fee reduction sounds bearish but actually drives way more volume. Also: 500K HYPE locked per new market creates massive buy pressure and supply sinks.",
+  {title:"$9.22M Burned This Week — 20.4% Increase",date:"Mar 2",category:"TRADING",
+   eli5:"Hyperliquid's buyback-and-burn engine removed $9.22M worth of HYPE in the past 7 days — a 20.4% increase from the prior week. That's an annualized burn rate of ~$480M. Weekly fees exceeded $13M. The protocol allocates 97% of trading fees to token buybacks, making it one of the most aggressive burn mechanisms in crypto.",
+   perp_impact:"Burns are accelerating because volume is growing. At current pace, the annual burn (~$480M) exceeds the annual unlock schedule (~$200M/month × 12 = $2.4B... but only ~50% historically sells). The burn-to-unlock ratio is the key metric — right now it's covering roughly 20% of unlocks, which is meaningful but not fully offsetting.",
    signal:"BULLISH",importance:4},
-  {title:"Weekend Equity & Pre-IPO Perp Trading",date:"2026",category:"FEATURE",
-   eli5:"Hyperliquid now offers perps on US equities (tradeable on weekends!), commodities, forex, and even pre-IPO companies like Anthropic, OpenAI, and SpaceX. Traditional markets close at 4pm Friday — Hyperliquid doesn't.",
-   perp_impact:"This is huge for platform volume growth. Every geopolitical weekend event now drives Hyperliquid volume. It's becoming the 24/7 derivatives venue for everything, not just crypto. More diverse volume = more stable fee revenue = consistent burns.",
-   signal:"BULLISH",importance:4},
-  {title:"Portfolio Margin Pre-Alpha",date:"2025-2026",category:"FEATURE",
-   eli5:"Hyperliquid is testing portfolio margin — instead of each position needing its own collateral, your whole portfolio is evaluated together. If you're long BTC and short ETH, the hedged risk means you need less total margin.",
-   perp_impact:"Directly affects your capital efficiency on HYPE perps. Portfolio margin means you can trade bigger with less collateral, or maintain the same positions with more breathing room. Less likely to get liquidated on correlated positions.",
-   signal:"NEUTRAL",importance:3},
-  {title:"Ripple Integration Announced",date:"Feb 2026",category:"ECOSYSTEM",
-   eli5:"Hyperliquid announced an integration with Ripple, bringing institutional-grade infrastructure connectivity. This signals growing interest from traditional finance players in using Hyperliquid.",
-   perp_impact:"Institutional inflow narrative is powerful for HYPE price. More institutional volume typically means deeper liquidity and tighter spreads on your HYPE perp trades.",
+  {title:"Staking Tiers: Fee Discounts for HYPE Stakers",date:"2025-2026",category:"FEATURE",
+   eli5:"Hyperliquid introduced 6 staking tiers that give trading fee discounts based on how much HYPE you stake. Wood tier (10+ HYPE) gets 5% off. Diamond tier (500K+ HYPE) gets 40% off. This incentivizes staking and creates a demand sink — traders who actively use the platform benefit from holding and staking HYPE.",
+   perp_impact:"Staking tiers create sticky demand. Active traders now have a financial incentive to stake rather than sell HYPE. If you trade frequently on HL, check your tier — the Diamond 40% discount on a high-volume account saves thousands per month. The more HYPE locked in staking tiers, the less available for selling.",
    signal:"BULLISH",importance:3},
-  {title:"Network Upgrade — Validator Improvements",date:"Mar 1",category:"PROTOCOL",
-   eli5:"A scheduled network upgrade on March 1 improved validator performance with only ~10 minutes of downtime. Since the JELLY incident in early 2025, the team has overhauled the validator process and rebuilt vault TVL to $380M.",
-   perp_impact:"Better infrastructure = less downtime risk during volatile moves. Nothing worse than getting liquidated because the chain went down. The JELLY incident cleanup shows the team takes risk management seriously now.",
+  {title:"DEX Market Share Surge: 10.2% of All Perp Volume",date:"2026",category:"ECOSYSTEM",
+   eli5:"DEX perpetual futures market share rose from 2% to 10.2% over the past year. Hyperliquid is the only DEX in the global top 10 perps exchanges, recording $1.59 trillion in 6-month volume. DEX spot share also grew to 13.6%. The shift from CEX to DEX is accelerating — Hyperliquid is the primary beneficiary.",
+   perp_impact:"This isn't just a HYPE story — it's a macro DeFi thesis. The Bybit hack ($1.3B lost) demonstrated CEX custodial risk. Every major CEX security incident pushes more volume to self-custodial platforms like Hyperliquid. If DEX perp share reaches 15-20% in 2026, HYPE's current valuation is significantly underpriced.",
+   signal:"BULLISH",importance:3},
+  {title:"Shielded Trading Integration Coming",date:"Mar 2026",category:"FEATURE",
+   eli5:"Hyperliquid is integrating shielded trading support through Silhouette, and Avail is building a stealth product with a Hyperliquid solver. This would let traders execute orders with privacy — hiding trade size, direction, or timing from other market participants.",
+   perp_impact:"Privacy in perp trading is a whale feature. Large traders currently leak information through on-chain order flow. Shielded trading would make Hyperliquid significantly more attractive to institutional and high-net-worth traders who currently prefer CEXs for privacy. Watch for announcement details — this could be a major volume driver.",
+   signal:"WATCH",importance:3},
+  {title:"Arthur Hayes Projects $150 HYPE Target",date:"Mar 2026",category:"TRADING",
+   eli5:"BitMEX co-founder Arthur Hayes publicly stated a $150 price target for HYPE, citing its role as a macro trading venue and volatility hedge. He specifically highlighted the platform's commodity perp volume during geopolitical events as a unique value proposition among crypto assets.",
+   perp_impact:"Celebrity price targets should always be taken with skepticism — Hayes has his own positioning. But the thesis is sound: Hyperliquid's revenue model benefits from volatility regardless of direction, which is genuinely unique among L1 tokens. The $150 target implies ~4.7x from current price and would put HYPE at ~$39B fully diluted. Not impossible in a bull cycle, but requires sustained volume growth.",
    signal:"NEUTRAL",importance:2}
 ];
 
 const INTEL_BLOG=[
-  {date:"Mar 3, 2026",title:"The Weekend Warriors: How Hyperliquid Became Retail's Bear Market Playground",
-   body:`<p>Something remarkable happened this past weekend. As US-Iran tensions escalated and traditional markets sat closed, traders didn't just wait for Monday. They went to Hyperliquid.</p>
-<p>Silver perps on Hyperliquid saw volume approaching $750M in a single 24-hour period — on a Sunday. Oil and gold perps surged alongside. Total platform volume hit $6.5B, and HYPE rallied 13-20% while BTC barely moved. This isn't a fluke anymore. It's a structural shift.</p>
-<p><strong>Why this matters for your HYPE perps:</strong> Hyperliquid's fee model collects on both sides of every trade — longs and shorts. When geopolitical chaos drives commodity trading, Hyperliquid captures revenue that traditional venues physically can't (because they're closed). That revenue flows directly into HYPE buybacks and burns. Every weekend crisis is now a potential HYPE catalyst.</p>
-<p>The numbers tell the story: Hyperliquid handled over $200B in monthly volume for both January and February, up from $169B in December. Meanwhile, competitors Aster and Lighter saw their volumes collapse — Aster dropping from $177B to under $100B. Hyperliquid is eating market share while printing record fees.</p>
-<p><strong>The bear market paradox:</strong> HYPE is up 23.9% YTD while BTC is down 23.7% and ETH is down 33%. How? Because Hyperliquid doesn't need prices to go up. It needs volatility and volume. Bear markets provide both in abundance. The 97% fee-to-burn allocation means the deflationary engine actually accelerates during downturns.</p>
-<p><strong>Key levels to watch this week:</strong> HYPE faces resistance at $32-35 (0.618 Fib retracement). The March 6 token unlock ($316M) could create short-term selling pressure. Consider the $30 level as your inflection point — holding above it keeps the bullish structure intact. A break below opens $21 support.</p>`},
+  {date:"Mar 4, 2026",title:"The March 6 Unlock: How to Trade the Biggest HYPE Supply Event of the Month",
+   body:`<p>In two days, 9.92 million HYPE tokens — worth roughly $316M at current prices — unlock for core contributors. This represents about 1% of total supply and 2.7% of circulating supply. It's the largest single unlock event Hyperliquid has faced, and the market is watching closely.</p>
+<p><strong>The bull case for ignoring it:</strong> Historical data from Tokenomist shows Hyperliquid unlocks have produced "smaller-than-projected releases" — meaning not all unlocked tokens actually sell. Many contributors restake or hold. Meanwhile, the protocol burned $9.22M in HYPE last week alone (up 20.4% week-over-week), and that burn rate is accelerating with growing platform volume. At an annualized ~$480M burn rate, the protocol is genuinely eating into supply.</p>
+<p><strong>The bear case for caution:</strong> $316M is $316M. Even if only 30-40% sells immediately, that's $95-126M of real sell pressure hitting a market with $300M in daily volume. The timing is also tricky — HYPE just rallied 19% in a week and is sitting at $32-33, right at the 0.618 Fibonacci retracement from the $59.30 ATH. Resistance + unlock = potential for a pullback.</p>
+<p><strong>The trade setup:</strong> If you're long, the $30 level is your pivot. HYPE holding above $30 through the unlock would be extremely bullish — it would confirm that buy-side demand (from burns, staking, and new EVM activity) is absorbing the unlock. A break below $28 opens the door to $21 support. For shorts, the risk/reward of fading a 19% weekly rally into a major unlock is tempting, but the burn velocity makes this a dangerous short beyond a few days.</p>
+<p><strong>What we're watching:</strong> On-chain staking flows in the 48 hours after unlock. If a significant portion of the unlocked HYPE flows into validators rather than exchanges, the sell pressure narrative collapses. Also watch open interest changes — if OI drops significantly going into March 6, it means leveraged longs are de-risking, which actually makes the post-unlock bounce more likely.</p>`},
 
-  {date:"Mar 2, 2026",title:"The $912M Burn: Understanding the Biggest Deflationary Event in HYPE History",
-   body:`<p>Let's break down exactly what happened with the Assistance Fund burn and why it matters more than most people realize.</p>
-<p>The Hyper Foundation held 37.5M HYPE tokens in an Assistance Fund wallet (address 0xfefe...fefe). Validators just voted with 85% consensus to permanently recognize these tokens as burned — that's $912M worth of HYPE that can never be sold, traded, or re-enter the market. Ever.</p>
-<p><strong>Why traders were worried before:</strong> That 37.5M HYPE sitting in the AF wallet was a constant source of FUD. "What if they dump it?" was a common bearish thesis. Shorts would reference it as potential sell pressure. That narrative is now dead.</p>
-<p><strong>The burn math for perp traders:</strong> On top of this permanent burn, the protocol burns about $9.22M worth of HYPE per week through its fee buyback mechanism — and that number is growing (up 20.4% from the prior period). At current pace, that's ~$480M annualized in burns against monthly unlocks of ~$200M. The protocol is net deflationary even with ongoing token vesting.</p>
-<p><strong>Practical takeaway:</strong> The supply overhang argument against HYPE just got significantly weaker. If you've been hesitant to take larger long positions because of supply fears, the risk calculus has shifted. The main remaining bearish supply argument is the monthly contributor unlocks — but even those are being partially absorbed by accelerating burns.</p>
-<p><strong>The bigger picture:</strong> Deflationary tokenomics is currently the strongest performing narrative in crypto. Jupiter surged 13% after eliminating all 2026 token emissions. HYPE's burn mechanism is automated and tied to real revenue, making it arguably more sustainable than governance-voted supply cuts.</p>`},
+  {date:"Mar 2, 2026",title:"HyperEVM Is Live: Why This Changes Everything for HYPE's Value Proposition",
+   body:`<p>On March 1, Hyperliquid completed a network upgrade with approximately 10 minutes of downtime and launched HyperEVM on mainnet. For most traders, this probably felt like a non-event. The trading interface looks the same. Your perps still execute in sub-second. But under the hood, this is arguably the most important upgrade since Hyperliquid's launch.</p>
+<p><strong>What actually changed:</strong> Before HyperEVM, Hyperliquid was just a trading platform — fast and excellent at what it does, but limited. Now developers can deploy any Ethereum-compatible smart contract directly on the Hyperliquid chain. Lending protocols, options platforms, yield strategies, NFT marketplaces, stablecoins — all native to Hyperliquid's high-performance infrastructure. The team deployed a canonical WHYPE (wrapped HYPE) contract to give builders a standard building block, and new DEX pools like WHYPE-UBTC and USDH-WHYPE already launched with 100%+ APYs.</p>
+<p><strong>Why perp traders should care — the gas demand angle:</strong> Every smart contract interaction on HyperEVM costs HYPE as gas. This creates a new category of structural demand that has nothing to do with speculation or trading volume. As DeFi apps launch and grow, gas consumption creates a persistent buy-and-burn pressure on HYPE that operates independently of market sentiment. This is the same mechanism that made ETH valuable during DeFi summer — except Hyperliquid's chain is orders of magnitude faster.</p>
+<p><strong>The first wave is already building:</strong> Expect lending/borrowing protocols (Aave-style) and liquid staking (Lido-style) to be the first meaningful HyperEVM applications. Both create additional HYPE demand — lending needs collateral, liquid staking locks supply. Track new contract deployments on the HyperEVM explorer. The first 30 days of deployment metrics will signal whether this is a real ecosystem launch or a ghost chain.</p>
+<p><strong>The risk nobody's talking about:</strong> HyperEVM is designed to not interfere with HyperCore's trading engine performance. But it's new production code on a chain handling billions in daily derivatives volume. Any EVM-related bugs could impact confidence even if perps are technically unaffected. The team staged the rollout carefully, but the intersection of smart contract complexity and high-frequency trading is uncharted territory. Position accordingly.</p>`},
 
-  {date:"Mar 1, 2026",title:"HyperEVM Goes Live: What an 'App Store for Trading' Means for HYPE",
-   body:`<p>Hyperliquid's Ethereum-compatible virtual machine (HyperEVM) launched on mainnet on March 1. If you only trade HYPE perps and don't care about DeFi, you might think this doesn't affect you. You'd be wrong.</p>
-<p><strong>The ELI5:</strong> Until now, Hyperliquid was just a trading platform. Fast, yes. Onchain order books, yes. But you couldn't build apps on it. HyperEVM changes that — developers can now deploy any Ethereum-style smart contract directly on Hyperliquid's chain. Lending protocols, options platforms, yield strategies, NFT marketplaces — all native to Hyperliquid.</p>
-<p><strong>Why perp traders should care:</strong></p>
-<p>First, gas fees. Every smart contract interaction on HyperEVM uses HYPE as gas. More apps = more HYPE demand = structural buy pressure that has nothing to do with speculation.</p>
-<p>Second, composability. Imagine a lending protocol where you deposit USDC, borrow HYPE, and use it as perp margin — all on the same chain with instant settlement. That's what HyperEVM enables. Your capital efficiency could dramatically improve.</p>
-<p>Third, the WHYPE contract. The team deployed a canonical wrapped HYPE contract so DeFi developers have a standard building block. This is how ecosystems bootstrap — you give builders Lego pieces and they create things you didn't imagine.</p>
-<p><strong>What to watch:</strong> The first wave of HyperEVM apps will likely be lending/borrowing (think Aave-style) and liquid staking. Both create additional HYPE demand. Track new contract deployments on the HyperEVM explorer — early adoption metrics will signal whether this is a real ecosystem or a ghost chain.</p>
-<p><strong>The risk:</strong> HyperEVM is designed to not interfere with the core trading engine's low-latency performance. The team specifically staged the rollout for this reason. But any bugs in the EVM layer could potentially affect confidence even if perps are unaffected technically.</p>`}
+  {date:"Mar 1, 2026",title:"Weekend Warriors: How Geopolitical Chaos Made Hyperliquid the Go-To Derivatives Venue",
+   body:`<p>When US-Iran tensions escalated on Saturday and traditional markets were closed, traders didn't wait for Monday. They went to Hyperliquid. Silver perps saw massive volume in a single 24-hour period. Oil and gold perps surged alongside. Total platform volume hit $6.5 billion, 24-hour fees reached $2.8 million, and HYPE rallied 13-20% — all while Bitcoin barely moved.</p>
+<p><strong>This isn't a one-off:</strong> Hyperliquid now offers perpetual futures on S&P 500, Tesla, Nvidia, gold, silver, oil, and pre-IPO companies. When COMEX gold futures are closed for a 48-hour weekend window, there is literally no traditional venue for expressing macro risk. Hyperliquid fills that gap. The platform processed over $200B in monthly volume for both January and February, up from $169B in December — while competitors like Aster saw volumes collapse from $177B to under $100B.</p>
+<p><strong>The fee model is the cheat code:</strong> Hyperliquid collects fees on both sides of every trade — longs and shorts. It doesn't care which direction the market moves. Volatility is the product. With 97% of fees flowing into HYPE buyback-and-burns, every geopolitical weekend event literally burns HYPE supply. The bear market accelerates the deflationary engine because fearful markets are volatile markets.</p>
+<p><strong>The numbers that matter:</strong> HYPE is up 23.9% year-to-date while BTC is down 23.7% and ETH is down 33%. It's matching gold's performance in a bear market. DEX perpetual market share grew from 2% to 10.2% over the past year, and Hyperliquid is the only DEX in the global top 10 perps exchanges. This is genuine product-market fit, not narrative-driven price action.</p>
+<p><strong>What to watch:</strong> The Fear & Greed Index is at 10 — extreme fear. In this environment, deflationary tokenomics is the only narrative working in crypto. Jupiter surged 13% after halting all 2026 emissions. Chiliz announced buybacks and burns. The market is rewarding protocols that credibly reduce supply. Hyperliquid does this automatically through trading volume, which means the burn rate accelerates precisely when the market is most volatile and fearful.</p>`}
 ];
 
 function _renderIntelTab(){
