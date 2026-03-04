@@ -1221,7 +1221,7 @@ function _renderCoinFlow(){
   }
   // Sort by total volume, pin HYPE first, then top 5 others
   const hype=Object.entries(byC).find(([c])=>c==='HYPE');
-  const others=Object.entries(byC).filter(([c])=>c!=='HYPE').map(([c,d])=>({c,...d,total:d.buy+d.sell})).filter(x=>x.total>100).sort((a,b)=>b.total-a.total).slice(0,5);
+  const others=Object.entries(byC).filter(([c])=>c!=='HYPE').map(([c,d])=>({c,...d,total:d.buy+d.sell})).filter(x=>x.total>100).sort((a,b)=>b.total-a.total).slice(0,6);
   const sorted=[];
   if(hype){const d=hype[1];sorted.push({c:'HYPE',...d,total:d.buy+d.sell})}
   else sorted.push({c:'HYPE',buy:0,sell:0,count:0,total:0});
