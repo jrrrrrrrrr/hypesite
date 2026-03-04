@@ -2947,127 +2947,39 @@ async function fHsTrending(){
 
 // ── Spot Stables ──
 async function fHsStables(){
-  // Primary: HypurrScan /spotUSDC endpoint (accurate on-chain deposits)
+  // Simple approach: query Hyperliquid spotMeta for USDC and USDH only
+  // These are the two native/primary stables on HL with reliable totalSupply
   try{
-    const d=await hs('/spotUSDC');
-    if(d){
-      console.log('[fHsStables] /spotUSDC raw:',JSON.stringify(d).slice(0,500));
-      const totalEl=$('hsStablesTotal');
-      const el=$('hsStables');
-      // Response could be: {total, tokens:[...]} or [{name,value},...] or {USDC:xxx,...} or a number
-      if(typeof d==='number'&&d>0){
-        // Single USDC value
-        if(totalEl)totalEl.textContent='$'+F.c(d);
-        if(el)el.innerHTML=`<div class="hs-stable-row"><span class="tk-name">USDC</span><span class="tk-price">$${F.c(d)}</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>`;
-        return;
-      }
-      if(Array.isArray(d)){
-        // Array of objects or array of values
-        let total=0;const items=[];
-        d.forEach(item=>{
-          if(typeof item==='object'&&item!==null){
-            const name=item.name||item.symbol||item.token||item.coin||'USDC';
-            const val=parseFloat(item.value||item.amount||item.tvl||item.total||0);
-            const chg=parseFloat(item.change||item.pctChange||item.dayChange||0);
-            if(val>100){items.push({name,val,chg});total+=val}
-          } else if(typeof item==='number'){
-            items.push({name:'USDC',val:item,chg:0});total+=item;
-          }
-        });
-        if(items.length){
-          items.sort((a,b)=>b.val-a.val);
-          if(totalEl)totalEl.textContent='$'+F.c(total);
-          if(el)el.innerHTML=items.map(s=>{
-            const cc=s.chg>=0?'var(--green)':'var(--red)';
-            return`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">$${F.c(s.val)}</span><span class="tk-chg" style="color:${s.chg===0?'var(--text-muted)':cc}">${s.chg===0?'—':(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%'}</span></div>`;
-          }).join('');
-          return;
-        }
-      }
-      if(typeof d==='object'&&!Array.isArray(d)){
-        // Object — could be {total:X, tokens:[]} or {USDC:X, USDH:Y, ...}
-        let total=0;const items=[];
-        if(d.total||d.totalValue||d.tvl){
-          total=parseFloat(d.total||d.totalValue||d.tvl||0);
-        }
-        const tokenArr=d.tokens||d.items||d.stables||[];
-        if(tokenArr.length){
-          tokenArr.forEach(s=>{
-            const name=s.name||s.symbol||s.token||'?';
-            const val=parseFloat(s.value||s.amount||s.tvl||0);
-            const chg=parseFloat(s.change||s.pctChange||0);
-            if(val>100){items.push({name,val,chg});if(!total)total+=val}
-          });
-        } else {
-          // Try flat keys: {USDC: 771000000, USDH: 34000000, ...}
-          for(const[k,v]of Object.entries(d)){
-            if(typeof v==='number'&&v>100&&k!=='total'&&k!=='timestamp'){
-              items.push({name:k.toUpperCase(),val:v,chg:0});
-              if(!total)total+=v;
-            }
-          }
-        }
-        if(items.length){
-          items.sort((a,b)=>b.val-a.val);
-          if(totalEl)totalEl.textContent='$'+F.c(total);
-          if(el)el.innerHTML=items.map(s=>{
-            const cc=s.chg>=0?'var(--green)':'var(--red)';
-            return`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">$${F.c(s.val)}</span><span class="tk-chg" style="color:${s.chg===0?'var(--text-muted)':cc}">${s.chg===0?'—':(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%'}</span></div>`;
-          }).join('');
-          return;
-        } else if(total>0){
-          if(totalEl)totalEl.textContent='$'+F.c(total);
-          return;
-        }
-      }
+    const d=await hl({type:'spotMetaAndAssetCtxs'});
+    if(!Array.isArray(d)||d.length<2)return;
+    const meta=d[0]?.tokens||[];const ctxs=d[1]||[];
+    const found=[];let total=0;
+    ctxs.forEach((c,i)=>{
+      if(!c)return;
+      const name=(meta[i]?.name||c.coin||'').replace('@','').toUpperCase();
+      if(name!=='USDC'&&name!=='USDH')return;
+      const px=parseFloat(c.midPx||c.markPx||1);
+      const supply=parseFloat(c.totalSupply||0);
+      const val=supply*px;
+      if(val<100||val>2e9)return; // sanity: skip if 0 or global supply leak
+      const prev=parseFloat(c.prevDayPx||px);
+      const chg=prev>0?((px-prev)/prev)*100:0;
+      found.push({name,val,chg});
+      total+=val;
+    });
+    found.sort((a,b)=>b.val-a.val);
+    const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent=total>0?'$'+F.c(total):'—';
+    const el=$('hsStables');if(!el)return;
+    if(found.length){
+      el.innerHTML=found.map(s=>{
+        const cc=s.chg>=0?'var(--green)':'var(--red)';
+        const chgStr=(s.chg>=0?'+':'')+s.chg.toFixed(2)+'%';
+        return`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">$${F.c(s.val)}</span><span class="tk-chg" style="color:${cc}">${chgStr}</span></div>`;
+      }).join('');
+    } else {
+      el.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">No data</div>';
     }
-  }catch(e){console.warn('[fHsStables] /spotUSDC:',e.message)}
-
-  // Fallback: DeFiLlama stablecoincharts
-  try{
-    const r=await fetch('https://stablecoins.llama.fi/stablecoincharts/Hyperliquid');
-    if(r.ok){
-      const data=await r.json();
-      if(Array.isArray(data)&&data.length){
-        const latest=data[data.length-1];
-        const total=parseFloat(latest?.totalCirculatingUSD?.peggedUSD||0);
-        if(total>0){
-          const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent='$'+F.c(total);
-          // Get per-token breakdown
-          try{
-            const sr=await fetch('https://stablecoins.llama.fi/stablecoins?includePrices=false');
-            if(sr.ok){
-              const sd=await sr.json();
-              const hlStables=[];
-              (sd.peggedAssets||[]).forEach(s=>{
-                const hlData=s.chainCirculating?.Hyperliquid;
-                if(hlData){
-                  const val=parseFloat(hlData.current?.peggedUSD||0);
-                  if(val>1000)hlStables.push({name:s.symbol,val,chg:0});
-                }
-              });
-              if(hlStables.length){
-                hlStables.sort((a,b)=>b.val-a.val);
-                const el=$('hsStables');
-                if(el)el.innerHTML=hlStables.map(s=>`<div class="hs-stable-row"><span class="tk-name">${s.name}</span><span class="tk-price">$${F.c(s.val)}</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>`).join('');
-              }
-            }
-          }catch(e2){}
-          return;
-        }
-      }
-    }
-  }catch(e){console.warn('[fHsStables] DeFiLlama:',e.message)}
-
-  // Final fallback
-  const totalEl=$('hsStablesTotal');if(totalEl)totalEl.textContent='~$860M';
-  const el=$('hsStables');if(!el)return;
-  el.innerHTML=`
-    <div class="hs-stable-row"><span class="tk-name">USDC</span><span class="tk-price" style="color:var(--text-dim)">~$772M</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>
-    <div class="hs-stable-row"><span class="tk-name">USDH</span><span class="tk-price" style="color:var(--text-dim)">~$35M</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>
-    <div class="hs-stable-row"><span class="tk-name">USDE</span><span class="tk-price" style="color:var(--text-dim)">~$28M</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>
-    <div class="hs-stable-row"><span class="tk-name">USDT</span><span class="tk-price" style="color:var(--text-dim)">~$25M</span><span class="tk-chg" style="color:var(--text-muted)">—</span></div>
-    <div style="font-size:8px;color:var(--text-muted);padding:6px 0">Estimated · <a href="https://hypurrscan.io/dashboard" target="_blank" style="color:var(--accent)">HypurrScan</a></div>`;
+  }catch(e){console.warn('fHsStables:',e.message)}
 }
 
 // ── Active TWAPs (from HypurrScan API) ──
