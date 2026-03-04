@@ -690,8 +690,8 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="af-stat"><div class="lbl">Pressure</div><div class="val" id="tfPressure" style="font-size:16px">—</div></div>
   </div>
 
-  <!-- Per-coin flow breakdown -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:12px" id="coinFlowCards"></div>
+  <!-- Per-coin flow breakdown — dynamic top coins by volume -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:12px" id="coinFlowCards"></div>
 
   <!-- Volume chart -->
   <div class="af-live" style="margin-top:0;margin-bottom:12px">
@@ -704,7 +704,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">🔎 Filtered Trade Feed</span><span class="chart-meta" id="tradeFeedMeta">Connecting…</span></div>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">Minimums: BTC ≥0.25 · ETH ≥0.5 · HYPE ≥10 · SOL ≥1 · FARTCOIN ≥1000 — updates every 500ms</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">Tracking 25 perp markets · Dynamic size filters · Updates every 500ms</div>
     <div style="max-height:400px;overflow-y:auto"><div id="liveTrades" style="min-height:100px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
   </div>
 
@@ -1040,8 +1040,8 @@ const WS_URL='wss://api.hyperliquid.xyz/ws';
 let _ws=null,_wsR=0,_wsT=null;
 
 // Coins and minimum trade sizes (in coin units)
-const WS_COINS=['BTC','ETH','HYPE','SOL','FARTCOIN'];
-const MIN_SZ={BTC:0.25,ETH:0.5,HYPE:10,SOL:1,FARTCOIN:1000};
+let WS_COINS=['BTC','ETH','HYPE','SOL','FARTCOIN','XRP','DOGE','SUI','AVAX','LINK','PAXG','PEPE','WIF','ARB','OP','TIA','BONK','INJ','SEI','ONDO','JUP','PUMP','PENGU','XAU','XAG'];
+const MIN_SZ={BTC:0.1,ETH:0.25,HYPE:5,SOL:0.5,FARTCOIN:500,XRP:50,DOGE:500,SUI:10,AVAX:1,LINK:1,PAXG:0.01,PEPE:1000000,WIF:10,ARB:10,OP:5,TIA:1,BONK:100000,INJ:0.5,SEI:20,ONDO:5,JUP:5,PUMP:100,PENGU:100,XAU:0.001,XAG:0.01};
 
 // Trade buffers
 let _liveTrades=[];        // Filtered trades for display (max 40)
@@ -1213,22 +1213,25 @@ function _renderCoinFlow(){
   const now=Date.now(),cutoff=now-(_flowWindowMin*60000);
   const recent=_allTradesBuffer.filter(t=>t.time>=cutoff);
   const byC={};
-  WS_COINS.forEach(c=>byC[c]={buy:0,sell:0,count:0});
   for(const t of recent){
     if(!byC[t.coin])byC[t.coin]={buy:0,sell:0,count:0};
     if(t.side==='B')byC[t.coin].buy+=t.usd;
     else byC[t.coin].sell+=t.usd;
     byC[t.coin].count++;
   }
-  el.innerHTML=WS_COINS.map(c=>{
-    const d=byC[c]||{buy:0,sell:0,count:0};
-    const total=d.buy+d.sell;
-    const buyPct=total>0?(d.buy/total*100):50;
-    const net=d.buy-d.sell;
+  // Sort by total volume, take top 6
+  const sorted=Object.entries(byC).map(([c,d])=>({c,...d,total:d.buy+d.sell})).filter(x=>x.total>100).sort((a,b)=>b.total-a.total).slice(0,6);
+  if(!sorted.length){
+    el.innerHTML=WS_COINS.slice(0,5).map(c=>`<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-dim);margin:4px 0">—</div></div>`).join('');
+    return;
+  }
+  el.innerHTML=sorted.map(({c,buy,sell,count,total})=>{
+    const buyPct=total>0?(buy/total*100):50;
+    const net=buy-sell;
     const netColor=net>0?'var(--green)':net<0?'var(--red)':'var(--text-dim)';
     const barGreen=`width:${buyPct}%;background:var(--green);height:100%;border-radius:2px 0 0 2px`;
     const barRed=`width:${100-buyPct}%;background:var(--red);height:100%;border-radius:0 2px 2px 0`;
-    return `<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${netColor};margin:4px 0">${net>=0?'+':''}$${F.c(Math.abs(net))}</div><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0"><div style="${barGreen}"></div><div style="${barRed}"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px"><span style="color:var(--green)">${buyPct.toFixed(0)}% B</span><span style="color:var(--text-muted)">${d.count}</span><span style="color:var(--red)">${(100-buyPct).toFixed(0)}% S</span></div></div>`;
+    return `<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${netColor};margin:4px 0">${net>=0?'+':''}$${F.c(Math.abs(net))}</div><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0"><div style="${barGreen}"></div><div style="${barRed}"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px"><span style="color:var(--green)">${buyPct.toFixed(0)}% B</span><span style="color:var(--text-muted)">${count}</span><span style="color:var(--red)">${(100-buyPct).toFixed(0)}% S</span></div></div>`;
   }).join('');
 }
 
