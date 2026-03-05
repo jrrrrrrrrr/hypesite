@@ -15,7 +15,7 @@ if(typeof LightweightCharts==='undefined'){
 <style>
 :root{--bg:#08090c;--bg2:#0d0f14;--surface:#12151c;--surface2:#181c25;--surface3:#1e222d;--border:#222738;--border-bright:#2e3448;--accent:#00d4ff;--accent-glow:rgba(0,212,255,0.15);--fire:#ff6b2b;--fire-glow:rgba(255,107,43,0.15);--green:#00e676;--green-dim:rgba(0,230,118,0.12);--red:#ff3d5a;--red-dim:rgba(255,61,90,0.12);--text:#c0c8d8;--text-dim:#5a6580;--text-bright:#eef2ff;--text-muted:#3a4258;--purple:#a78bfa;--yellow:#fbbf24;--pink:#ff6b9d;--mono:'JetBrains Mono',monospace;--sans:'Outfit',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow-x:hidden;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;opacity:0.02;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px}
 
@@ -25,10 +25,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .logo-cat{filter:drop-shadow(0 0 8px rgba(167,139,250,0.4));flex-shrink:0}
 .logo .hype{color:var(--text-bright)}.logo .intel{color:var(--accent);font-weight:400;letter-spacing:0.1em;font-size:12px}
 .nav-tabs{display:flex;gap:2px}
-.nav-tab{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.06em;padding:6px 14px;border-radius:6px;background:0;border:0;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
+.nav-tab{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.06em;padding:6px 14px;border-radius:6px;background:0;border:0;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
 .nav-tab:hover{color:var(--text);background:var(--surface)}.nav-tab.active{color:var(--accent);background:var(--accent-glow)}
 .nav-right{display:flex;align-items:center;gap:12px}
-.ws-status{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text-dim)}
+.ws-status{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim)}
 .ws-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);transition:all 0.3s}
 .ws-dot.connected{background:var(--green);box-shadow:0 0 8px var(--green)}.ws-dot.error{background:var(--red);box-shadow:0 0 8px var(--red)}
 .price-live{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text-bright)}
@@ -59,11 +59,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.3s}
 .metric-card:hover{border-color:var(--border-bright)}
 .mc-glow{position:absolute;top:-30px;right:-30px;width:70px;height:70px;border-radius:50%;filter:blur(35px);opacity:0.12;pointer-events:none}
-.mc-label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px}
+.mc-label{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px}
 .mc-value{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text-bright);letter-spacing:-0.02em;line-height:1.2}
-.mc-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:3px}
+.mc-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:3px}
 .mc-value.fire{color:var(--fire)}.mc-value.green{color:var(--green)}.mc-value.cyan{color:var(--accent)}
-.mc-breakdown{font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px;line-height:1.8;border-top:1px solid var(--border);padding-top:6px}
+.mc-breakdown{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:6px;line-height:1.8;border-top:1px solid var(--border);padding-top:6px}
 .mc-breakdown .brk{display:flex;justify-content:space-between}.mc-breakdown .bv{color:var(--text)}
 
 .two-col{display:grid;grid-template-columns:280px 1fr;gap:20px;margin-bottom:28px;align-items:start}
@@ -72,7 +72,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .ring-canvas canvas{width:100%;height:100%}
 .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring-center .total{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--text-bright)}
-.ring-center .label{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.1em}
+.ring-center .label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.1em}
 .legend-row{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:3px 0}
 .legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.legend-label{color:var(--text-dim);flex:1;margin-left:8px}.legend-val{color:var(--text-bright);font-weight:600}
 
@@ -84,7 +84,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .af-live{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px}
 .af-live-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
 .af-stat{text-align:center}
-.af-stat .lbl{font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase}
+.af-stat .lbl{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase}
 .af-stat .val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text-bright)}
 .af-stat .val.fire{color:var(--fire)}.af-stat .val.green{color:var(--green)}.af-stat .val.cyan{color:var(--accent)}
 
@@ -107,18 +107,18 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .rf-level{display:grid;grid-template-columns:60px 1fr 70px 60px;gap:4px;padding:4px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;align-items:center}
 .rf-ratio{font-weight:700}.rf-bar{height:6px;border-radius:3px;position:relative}
 .rf-bar-price{position:absolute;left:0;top:0;height:100%;border-radius:3px;background:rgba(255,255,255,0.3)}
-.rf-price{text-align:right;color:var(--text-bright)}.rf-ctx{text-align:right;color:var(--text-dim);font-size:9px}
+.rf-price{text-align:right;color:var(--text-bright)}.rf-ctx{text-align:right;color:var(--text-dim);font-size:10px}
 
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
 .chart-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
 .chart-hdr .left{display:flex;align-items:center;gap:10px}
 .chart-title{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text-bright)}
-.chart-meta{font-family:var(--mono);font-size:10px;color:var(--text-dim)}
+.chart-meta{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
 .tf-btns{display:flex;gap:2px}
 .tf-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all 0.2s}
 .tf-btn:hover{border-color:var(--text-dim)}.tf-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
 .chart-wrap{height:360px;position:relative}
-.chart-ohlc{display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:8px;flex-wrap:wrap}
+.chart-ohlc{display:flex;gap:14px;font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:8px;flex-wrap:wrap}
 .chart-ohlc .v{color:var(--text-bright)}
 
 .trade-row{display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:5px 0;border-bottom:1px solid rgba(34,39,56,0.4);font-family:var(--mono);font-size:11px;align-items:center;animation:fadeIn 0.25s ease}
@@ -144,7 +144,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 /* ── Intel News Site ──────────────────────── */
 .news-ticker{overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0;height:32px;position:relative;margin-bottom:16px}
-.news-ticker::before{content:'BREAKING';position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;padding:0 12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--bg);background:linear-gradient(135deg,var(--purple),var(--pink));z-index:2}
+.news-ticker::before{content:'BREAKING';position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;padding:0 12px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--bg);background:linear-gradient(135deg,var(--purple),var(--pink));z-index:2}
 .ticker-track{display:flex;align-items:center;height:100%;animation:tickerScroll 45s linear infinite;white-space:nowrap;padding-left:90px}
 .ticker-track:hover{animation-play-state:paused}
 .ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 28px;font-family:var(--mono);font-size:11px;color:var(--text);flex-shrink:0}
@@ -178,11 +178,11 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .hs-row .tk-chg{text-align:right;font-weight:600;min-width:60px}
 .hs-mkt-row{display:grid;grid-template-columns:72px 1fr 1fr 1fr 1fr 80px;gap:2px;padding:6px 16px;font-family:var(--mono);font-size:10px;border-top:1px solid var(--border);align-items:center;transition:background 0.15s}
 .hs-mkt-row:hover{background:rgba(0,212,255,0.04)}
-.hs-mkt-hdr{border-top:0;color:var(--text-muted);font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:0.04em}
+.hs-mkt-hdr{border-top:0;color:var(--text-muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.04em}
 .hs-mkt-hdr:hover{background:none}
 .mkt-name{font-weight:700;color:var(--text-bright)}
 .mkt-cell{text-align:right;color:var(--text)}
-@media(max-width:700px){.hs-mkt-row{grid-template-columns:60px 1fr 1fr 1fr;font-size:9px}.hs-mkt-row .mkt-cell:nth-child(5),.hs-mkt-row .mkt-cell:nth-child(6),.hs-mkt-hdr .mkt-cell:nth-child(5),.hs-mkt-hdr .mkt-cell:nth-child(6){display:none}}
+@media(max-width:700px){.hs-mkt-row{grid-template-columns:60px 1fr 1fr 1fr;font-size:10px}.hs-mkt-row .mkt-cell:nth-child(5),.hs-mkt-row .mkt-cell:nth-child(6),.hs-mkt-hdr .mkt-cell:nth-child(5),.hs-mkt-hdr .mkt-cell:nth-child(6){display:none}}
 .mom-row{display:grid;grid-template-columns:72px 1fr 90px;gap:8px;padding:5px 16px;align-items:center;font-family:var(--mono);font-size:10px;border-top:1px solid rgba(255,255,255,0.03)}
 .mom-name{font-weight:700;color:var(--text-bright)}
 .mom-bar-wrap{height:18px;display:flex;align-items:center;position:relative;gap:0}
@@ -193,7 +193,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .mom-net{text-align:right;font-weight:600;font-size:10px;white-space:nowrap}
 .hs-big{padding:16px;text-align:center;border-top:1px solid var(--border)}
 .hs-big .big-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text-bright)}
-.hs-big .big-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px}
+.hs-big .big-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:2px}
 .hs-twap-row{display:grid;grid-template-columns:50px 1fr auto auto auto;gap:8px;padding:6px 16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;align-items:center}
 .hs-twap-row .tw-side{font-weight:700;font-size:11px}
 .hs-twap-row .tw-token{color:var(--text-bright);font-weight:600}
@@ -202,7 +202,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .hs-pressure{display:grid;grid-template-columns:1fr 1fr;gap:0}
 .hs-pressure-cell{padding:14px 16px;border-top:1px solid var(--border);text-align:center}
 .hs-pressure-cell:first-child{border-right:1px solid var(--border)}
-.hs-pressure-cell .pr-lbl{font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
+.hs-pressure-cell .pr-lbl{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
 .hs-pressure-cell .pr-val{font-family:var(--mono);font-size:16px;font-weight:700}
 .hs-stable-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;align-items:center}
 @media(max-width:900px){.hs-grid{grid-template-columns:1fr}}
@@ -219,11 +219,11 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .nft-stat:last-child{border-right:0}
 .nft-stat .ns-lbl{font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
 .nft-stat .ns-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text-bright)}
-.nft-stat .ns-sub{font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:2px}
+.nft-stat .ns-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:2px}
 .nft-chart-wrap{height:220px;padding:0 2px 2px}
-.nft-link{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text-dim);text-decoration:none;transition:all 0.2s;letter-spacing:0.06em}
+.nft-link{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text-dim);text-decoration:none;transition:all 0.2s;letter-spacing:0.06em}
 .nft-link:hover{color:var(--pink);background:rgba(255,107,157,0.04)}
-.hero-cat{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--fire);margin-bottom:8px}
+.hero-cat{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.12em;color:var(--fire);margin-bottom:8px}
 .hero-main h2{font-family:var(--sans);font-size:24px;font-weight:800;color:var(--text-bright);margin:0 0 14px 0;line-height:1.3}
 .hero-main .hero-lede{font-family:var(--sans);font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px}
 .hero-main .hero-impact{font-family:var(--mono);font-size:11px;color:var(--accent);line-height:1.6;padding:12px 14px;background:rgba(0,212,255,0.04);border-radius:8px;border:1px solid rgba(0,212,255,0.1)}
@@ -232,17 +232,17 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .sidebar-card:hover{border-color:var(--accent)}
 .sidebar-card .sc-cat{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em;margin-bottom:4px}
 .sidebar-card h4{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--text-bright);margin:0 0 4px 0;line-height:1.3}
-.sidebar-card .sc-signal{font-family:var(--mono);font-size:9px;font-weight:600}
+.sidebar-card .sc-signal{font-family:var(--mono);font-size:10px;font-weight:600}
 
 .news-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
 .news-card{background:var(--surface);border-radius:8px;padding:16px;border:1px solid var(--border);border-left:3px solid var(--border)}
 .news-card .nc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .news-card .nc-cat{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:0.1em}
-.news-card .nc-date{font-family:var(--mono);font-size:9px;color:var(--text-muted)}
+.news-card .nc-date{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
 .news-card h4{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--text-bright);margin:0 0 6px 0;line-height:1.3}
 .news-card .nc-eli5{font-family:var(--sans);font-size:11px;color:var(--text-dim);line-height:1.5;margin-bottom:8px}
 .news-card .nc-impact{font-family:var(--mono);font-size:10px;color:var(--accent);line-height:1.5;padding:8px;background:rgba(0,212,255,0.03);border-radius:6px;border:1px solid rgba(0,212,255,0.06)}
-.news-card .nc-signal{font-family:var(--mono);font-size:9px;font-weight:700;display:flex;align-items:center;gap:4px}
+.news-card .nc-signal{font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px}
 .news-card .nc-dots{font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-left:auto}
 
 .news-section-hdr{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
@@ -263,7 +263,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .eco-card-meta h2{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text-bright);margin:0 0 4px}
 .eco-card-meta .eco-tagline{font-family:var(--sans);font-size:12px;color:var(--text-dim);margin:0}
 .eco-card-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.eco-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em}
+.eco-tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em}
 .eco-card-body{padding:20px 24px}
 .eco-card-body h3{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:0 0 10px;display:flex;align-items:center;gap:8px}
 .eco-card-body h3::before{content:'';width:3px;height:12px;background:linear-gradient(180deg,var(--purple),var(--accent));border-radius:2px}
@@ -339,56 +339,64 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
   </div>
 
-  <div class="metrics-grid">
+  <!-- Top metrics — merged with AF data for maximum info density -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr)">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
       <div class="mc-label">🔥 Total Burned</div>
       <div class="mc-value fire" id="mBurned">—</div>
       <div class="mc-sub" id="mBurnedSub">—</div>
       <div class="mc-breakdown" id="mBurnedBreakdown"></div>
     </div>
-    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div><div class="mc-label">🥩 Total Staked</div><div class="mc-value green" id="mStaked">—</div><div class="mc-sub" id="mStakedSub">—</div></div>
-    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div><div class="mc-label">📊 Circulating</div><div class="mc-value cyan" id="mCirc">—</div><div class="mc-sub" id="mCircSub">—</div></div>
-    <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div><div class="mc-label">💰 24h Spot Volume</div><div class="mc-value" id="mVol">—</div><div class="mc-sub">&nbsp;</div></div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div>
+      <div class="mc-label">🥩 Total Staked</div>
+      <div class="mc-value green" id="mStaked">—</div>
+      <div class="mc-sub" id="mStakedSub">—</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">📊 Circulating</div>
+      <div class="mc-value cyan" id="mCirc">—</div>
+      <div class="mc-sub" id="mCircSub">—</div>
+    </div>
   </div>
 
-  <!-- AF Live Monitor — moved above supply -->
+  <!-- Session stats + AF + Volume -->
+  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Session Burns</div>
+      <div class="mc-value fire" id="afSessionFees" style="font-size:18px">—</div>
+      <div class="mc-sub" id="afSessionTime">since page load</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">🏦 AF Limit Bid</div>
+      <div class="mc-value" id="afLiveBid" style="font-size:18px;color:var(--fire)">—</div>
+      <div class="mc-sub"><span id="afLiveSpread" style="color:var(--green)">—</span> spread</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div>
+      <div class="mc-label">🏦 AF USDC</div>
+      <div class="mc-value" id="afLiveUsdc" style="font-size:18px">—</div>
+      <div class="mc-sub">Buyback balance</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--yellow)"></div>
+      <div class="mc-label">💰 24h Volume</div>
+      <div class="mc-value" id="mVol" style="font-size:18px">—</div>
+      <div class="mc-sub">Spot trading</div>
+    </div>
+  </div>
+
+  <!-- AF Live Monitor chart -->
   <div class="af-live" style="margin-top:0;margin-bottom:16px">
     <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
     <div class="af-live-stats">
       <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
-      <div class="af-stat"><div class="lbl">Limit Bid</div><div class="val fire" id="afLiveBid">—</div></div>
-      <div class="af-stat"><div class="lbl">USDC Bal</div><div class="val" id="afLiveUsdc">—</div></div>
-      <div class="af-stat"><div class="lbl">Spread</div><div class="val green" id="afLiveSpread">—</div></div>
+      <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val fire" id="afHype">—</div></div>
+      <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="afFeeBurns">—</div></div>
+      <div class="af-stat"><div class="lbl">Bid Info</div><div class="val" id="afBidInfo">—</div></div>
     </div>
     <div class="chart-wrap" id="afWrap" style="height:260px"></div>
   </div>
 
-  <!-- Supply + AF + Rating -->
-  <div class="overview-grid">
-    <div class="metric-card supply-card" style="padding:16px">
-      <div class="mc-label" style="margin-bottom:12px">Supply Breakdown</div>
-      <div style="display:flex;align-items:center;gap:24px;justify-content:center">
-        <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="160" height="160" style="width:160px;height:160px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;min-width:280px">
-          <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="metric-card" style="padding:16px">
-      <div class="mc-label" style="margin-bottom:10px">🏦 Assistance Fund</div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <div class="ov-row"><span class="ov-k">HYPE Holdings</span><span class="ov-v fire" id="afHype">—</span></div>
-        <div class="ov-row"><span class="ov-k">USDC Balance</span><span class="ov-v cyan" id="afUsdc">—</span></div>
-        <div class="ov-row"><span class="ov-k">Limit Bid</span><span class="ov-v" id="afBidInfo">—</span></div>
-        <div class="ov-row"><span class="ov-k">Bid Spread</span><span class="ov-v green" id="afSpread">—</span></div>
-        <div class="ov-row"><span class="ov-k">Fee Burns</span><span class="ov-v" id="afFeeBurns">—</span></div>
-        <div class="ov-row"><span class="ov-k">Session Fees</span><span class="ov-v green" id="afSessionFees">—</span></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:2px" id="afSessionTime">since page load</div>
-      </div>
-    </div>
+  <!-- Price Rating -->
+  <div class="overview-grid" style="grid-template-columns:1fr">
     <div class="metric-card" style="padding:16px">
       <div class="mc-label" style="margin-bottom:10px">📊 Price Rating</div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
@@ -587,6 +595,20 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ BURNS TAB ═══════════════════════════════════════════════ -->
 <div class="page" id="page-burns">
+  <!-- Supply Breakdown ring chart -->
+  <div class="metric-card" style="padding:20px;margin-bottom:16px">
+    <div class="mc-label" style="margin-bottom:14px;font-size:13px">Supply Breakdown</div>
+    <div style="display:flex;align-items:center;gap:28px;justify-content:center;flex-wrap:wrap">
+      <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="200" height="200" style="width:200px;height:200px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;min-width:300px">
+        <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
+      </div>
+    </div>
+  </div>
+
   <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned2">—</div><div class="mc-sub" id="mBurnedSub2">—</div></div>
     <div class="metric-card"><div class="mc-label">AF HYPE (burned by vote)</div><div class="mc-value fire" id="burnAfHype">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
@@ -636,15 +658,15 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div class="af-live">
     <div class="chart-hdr"><div class="left"><span class="chart-title">📊 Supply Dynamics — Burns vs Emissions</span><span class="chart-meta" id="supDynMeta">Computing…</span></div></div>
     <div class="af-live-stats" style="margin-bottom:8px">
-      <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div><div class="lbl" id="emDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
-      <div class="af-stat"><div class="lbl">Daily Burns (7d avg)</div><div class="val fire" id="emBurnDaily">—</div><div class="lbl" id="emBurnDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
-      <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div><div class="lbl" id="emNetDailyUsd" style="font-size:9px;margin-top:2px">—</div></div>
-      <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div><div class="lbl" id="emAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
-      <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div><div class="lbl" id="emBurnAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
-      <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div><div class="lbl" id="emNetAnnualUsd" style="font-size:9px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div><div class="lbl" id="emDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Daily Burns (7d avg)</div><div class="val fire" id="emBurnDaily">—</div><div class="lbl" id="emBurnDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div><div class="lbl" id="emNetDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div><div class="lbl" id="emAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div><div class="lbl" id="emBurnAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div><div class="lbl" id="emNetAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
     </div>
     <div class="chart-wrap" id="emChartWrap" style="height:300px"></div>
-    <div style="padding:10px 16px;font-family:var(--mono);font-size:9px;color:var(--text-muted);line-height:1.6">
+    <div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:1.6">
       Emissions = staking rewards from the future emissions reserve (distributed daily). Formula: APR = 474/√(totalStaked), per HL docs (2.37% at 400M staked).<br>
       Burns = AF buyback burns + on-chain fee burns. $9.2M/week burned as of Mar 2 (CoinDesk). 37.5M HYPE AF burned via governance vote Dec 2025.<br>
       Net flow = emissions − burns. Green/negative = deflationary. USD values at current HYPE price.
@@ -706,7 +728,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">🔎 Filtered Trade Feed</span><span class="chart-meta" id="tradeFeedMeta">Connecting…</span></div>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">$500+ trades · 🐟 $10K+ · 🐋 $100K+ · 💰💰💰 $500K+ · 25 perp markets · Updates every 500ms</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:8px">$500+ trades · 🐟 $10K+ · 🐋 $100K+ · 💰💰💰 $500K+ · 25 perp markets · Updates every 500ms</div>
     <div style="max-height:400px;overflow-y:auto"><div id="liveTrades" style="min-height:100px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
   </div>
 
@@ -716,18 +738,18 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <!-- Top Markets -->
     <div class="hs-panel" style="grid-column:1/-1">
       <div class="hs-hdr"><span class="hs-live"></span>TOP MARKETS BY VOLUME <span style="font-size:8px;color:var(--text-muted);font-weight:400;margin-left:8px">auto-refreshes every 30s</span></div>
-      <div id="hsTrending"><div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Loading…</div></div>
+      <div id="hsTrending"><div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
     </div>
     <!-- 5-Minute Momentum Bars -->
     <div class="hs-panel" style="grid-column:1/-1">
       <div class="hs-hdr"><span class="hs-live"></span>5-MINUTE MOMENTUM <span style="font-size:8px;color:var(--text-muted);font-weight:400;margin-left:8px">live from WebSocket trades</span></div>
-      <div id="momentumBars" style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Collecting trade data…</div>
+      <div id="momentumBars" style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Collecting trade data…</div>
     </div>
     <!-- Active TWAPs -->
     <div class="hs-panel" style="grid-column:1/-1">
       <div class="hs-hdr"><span class="hs-live"></span>ACTIVE TWAPS — TOP BY VALUE</div>
       <div class="hs-twap-row" style="border-top:0;color:var(--text-dim);font-weight:600"><span>Side</span><span class="tw-token">Token</span><span class="tw-val">Value</span><span class="tw-val">Amount</span><span class="tw-time">Time Left</span></div>
-      <div id="hsTwapTable"><div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Loading…</div></div>
+      <div id="hsTwapTable"><div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
     </div>
   </div>
 </div>
@@ -760,19 +782,19 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div style="padding:0 24px;overflow:hidden">
       <div style="background:linear-gradient(135deg,#0c0c18 0%,#111127 50%,#0a1628 100%);border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin:16px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;font-family:var(--mono)">
         <div style="text-align:center">
-          <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Perps</div>
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Perps</div>
           <div style="font-size:18px;font-weight:700;color:#f0f0ff">198+</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Markets</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Markets</div>
         </div>
         <div style="text-align:center;border-left:1px solid #1e1e3a;border-right:1px solid #1e1e3a">
-          <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Volume</div>
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Volume</div>
           <div style="font-size:18px;font-weight:700;color:#06b6d4">$40B+</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cumulative</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Cumulative</div>
         </div>
         <div style="text-align:center">
-          <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Revenue</div>
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Revenue</div>
           <div style="font-size:18px;font-weight:700;color:#22c55e">$14M</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Earned</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Earned</div>
         </div>
       </div>
     </div>
@@ -837,17 +859,17 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <!-- App preview — equity perps showcase -->
     <div style="padding:0 24px;overflow:hidden">
       <div style="background:linear-gradient(135deg,#0f0a1a 0%,#1a0a2e 50%,#0a1628 100%);border:1px solid #2d1b4e;border-radius:12px;padding:16px 20px;margin:16px 0;font-family:var(--mono)">
-        <div style="font-size:9px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;font-weight:600">Equity Perps · Powered by Tether</div>
+        <div style="font-size:10px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;font-weight:600">Equity Perps · Powered by Tether</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center">
-          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">USA500</div><div style="font-size:9px;color:#22c55e;margin-top:2px">S&P 500</div></div>
-          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">TSLA</div><div style="font-size:9px;color:#06b6d4;margin-top:2px">Tesla</div></div>
-          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">NVDA</div><div style="font-size:9px;color:#a78bfa;margin-top:2px">Nvidia</div></div>
-          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAUT</div><div style="font-size:9px;color:#f59e0b;margin-top:2px">Gold</div></div>
-          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAGT</div><div style="font-size:9px;color:#94a3b8;margin-top:2px">Silver</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">USA500</div><div style="font-size:10px;color:#22c55e;margin-top:2px">S&P 500</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">TSLA</div><div style="font-size:10px;color:#06b6d4;margin-top:2px">Tesla</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">NVDA</div><div style="font-size:10px;color:#a78bfa;margin-top:2px">Nvidia</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAUT</div><div style="font-size:10px;color:#f59e0b;margin-top:2px">Gold</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAGT</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">Silver</div></div>
         </div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid #2d1b4e;display:flex;justify-content:space-between;align-items:center">
-          <div><span style="font-size:9px;color:#6b7280">Season 1 Rewards</span><span style="font-size:12px;font-weight:700;color:#f59e0b;margin-left:8px">$200K/week</span></div>
-          <div><span style="font-size:9px;color:#6b7280">Collateral</span><span style="font-size:11px;font-weight:600;color:#22c55e;margin-left:8px">USDT0</span></div>
+          <div><span style="font-size:10px;color:#6b7280">Season 1 Rewards</span><span style="font-size:12px;font-weight:700;color:#f59e0b;margin-left:8px">$200K/week</span></div>
+          <div><span style="font-size:10px;color:#6b7280">Collateral</span><span style="font-size:11px;font-weight:600;color:#22c55e;margin-left:8px">USDT0</span></div>
         </div>
       </div>
     </div>
@@ -889,7 +911,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <a class="eco-cta" href="https://dreamcash.xyz" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="dreamcash" onclick="navigator.clipboard&&navigator.clipboard.writeText('516KJA')">
         Try Dreamcash <span class="cta-arrow">→</span>
       </a>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:8px">Use referral code <span style="color:var(--accent);font-weight:600;cursor:pointer" onclick="navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span> during signup for bonus points · <span style="opacity:0.6">click code to copy</span></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:8px">Use referral code <span style="color:var(--accent);font-weight:600;cursor:pointer" onclick="navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span> during signup for bonus points · <span style="opacity:0.6">click code to copy</span></div>
     </div>
   </div>
 
@@ -938,7 +960,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 20px;margin-bottom:10px">
     <a href="https://app.hyperliquid.xyz/join/HYPESITE" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="hyperliquid" data-umami-event-location="footer" style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none;padding:4px 12px;border:1px solid rgba(0,212,255,0.3);border-radius:6px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(0,212,255,0.08)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.3)';this.style.background='none'">Trade on Hyperliquid ↗</a>
   </div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);line-height:2;margin-bottom:8px">
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:2;margin-bottom:8px">
     <span style="color:var(--text-dim)">Donate SOL:</span>
     <span id="footSol" style="color:var(--accent);cursor:pointer;opacity:0.7;transition:opacity 0.15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" onclick="navigator.clipboard.writeText('6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1');typeof umami!=='undefined'&&umami.track('wallet-copy',{chain:'solana',location:'footer'});var e=this;e.dataset.orig=e.textContent;e.textContent='Copied ✓';setTimeout(()=>e.textContent=e.dataset.orig,2000)">6aa8hQK5TjVNrfP6LrmcvUgDF6Ljd56b5CC3qazWEYn1</span><br>
     <span style="color:var(--text-dim)">Donate EVM:</span>
@@ -991,6 +1013,7 @@ function showPage(id,btn){
   // Double-rAF + timeout ensures layout is fully computed before chart init
   setTimeout(()=>{requestAnimationFrame(()=>{requestAnimationFrame(()=>{
     if(id==='burns'){
+      drawRing(); // Supply ring chart is on Burns tab
       if(!_burnChart&&typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart()}
       if(!_burnRateChart&&typeof LightweightCharts!=='undefined'){_initBurnRateChart()}
       if(!_emChart&&typeof LightweightCharts!=='undefined'){_initEmChart()}
@@ -1038,6 +1061,7 @@ let _allTradesBuffer=[];   // ALL trades kept for up to 4hr
 let _flowWindowMin=5;      // Current window in minutes (5/15/60/240)
 let _volBuckets=[];        // 1-min volume buckets for chart {time,buyVol,sellVol}
 let _renderTimer=null;
+let _lastTradeTime={}; // Algo filter: tracks last displayed trade time per coin+side
 let _volFlowChart=null,_volBuySeries=null,_volSellSeries=null;
 
 function setFlowWindow(mins,btn){
@@ -1088,8 +1112,14 @@ function _processTrades(trades){
     _addToVolBucket(rec);
 
     // Only display trades with $500+ notional value
+    // Also filter out likely algo noise: skip if same coin+side within 200ms of last displayed trade
     if(usd>=500){
-      _pendingTrades.push(rec);
+      const key=coin+side;
+      const lastTime=_lastTradeTime[key]||0;
+      if(now-lastTime>200){ // 200ms debounce per coin+side
+        _pendingTrades.push(rec);
+        _lastTradeTime[key]=now;
+      }
     }
   }
 
@@ -1137,7 +1167,7 @@ function _renderTrades(){
   const el=$('liveTrades');if(!el)return;
   if(!_liveTrades.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Waiting for trades…</div>';return}
   // Header
-  const hdr='<div style="display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:4px 0;font-family:var(--mono);font-size:9px;color:var(--text-muted);border-bottom:1px solid var(--border);letter-spacing:0.05em;text-transform:uppercase"><span>Coin</span><span>Side</span><span>Price</span><span style="text-align:right">Size</span><span style="text-align:right">Notional</span><span style="text-align:right">Time</span></div>';
+  const hdr='<div style="display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border);letter-spacing:0.05em;text-transform:uppercase"><span>Coin</span><span>Side</span><span>Price</span><span style="text-align:right">Size</span><span style="text-align:right">Notional</span><span style="text-align:right">Time</span></div>';
   el.innerHTML=hdr+_liveTrades.map(t=>{
     const isBuy=t.side==='B';
     const sideClass=isBuy?'trade-buy':'trade-sell';
@@ -1224,7 +1254,7 @@ function _renderCoinFlow(){
     const netColor=net>0?'var(--green)':net<0?'var(--red)':'var(--text-dim)';
     const barGreen=`width:${buyPct}%;background:var(--green);height:100%;border-radius:2px 0 0 2px`;
     const barRed=`width:${100-buyPct}%;background:var(--red);height:100%;border-radius:0 2px 2px 0`;
-    return `<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${netColor};margin:4px 0">${net>=0?'+':''}$${F.c(Math.abs(net))}</div><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0"><div style="${barGreen}"></div><div style="${barRed}"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px"><span style="color:var(--green)">${buyPct.toFixed(0)}% B</span><span style="color:var(--text-muted)">${count}</span><span style="color:var(--red)">${(100-buyPct).toFixed(0)}% S</span></div></div>`;
+    return `<div class="metric-card" style="padding:12px"><div class="mc-label">${c}</div><div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${netColor};margin:4px 0">${net>=0?'+':''}$${F.c(Math.abs(net))}</div><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0"><div style="${barGreen}"></div><div style="${barRed}"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px"><span style="color:var(--green)">${buyPct.toFixed(0)}% B</span><span style="color:var(--text-muted)">${count}</span><span style="color:var(--red)">${(100-buyPct).toFixed(0)}% S</span></div></div>`;
   }).join('');
 }
 
@@ -1531,7 +1561,7 @@ function renderAll(){
 // ═══════════════════════════════════════════════════════════════
 function drawRing(){
   const cv=$('ringCanvas');if(!cv)return;const ctx=cv.getContext('2d');
-  const sz=160;
+  const sz=200;
   const dpr=window.devicePixelRatio||1;cv.width=sz*dpr;cv.height=sz*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,sz,sz);
   const burned=D.totalBurned||0;
   const circ=D.circSupply||0;
@@ -1553,19 +1583,19 @@ function drawRing(){
   ];
   _ringSegs=segs;
   const total=segs.reduce((s,x)=>s+x.v,0)||1;
-  const cx=sz/2,cy=sz/2,r=60;
+  const cx=sz/2,cy=sz/2,r=75;
   let a=-Math.PI/2;
   for(const s of segs){
     const sw=(s.v/total)*Math.PI*2;if(sw<0.002)continue;
     s._startAngle=a;s._endAngle=a+sw;
-    ctx.beginPath();ctx.arc(cx,cy,r,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=18;ctx.lineCap='butt';ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,r,a,a+sw);ctx.strokeStyle=s.c;ctx.lineWidth=24;ctx.lineCap='butt';ctx.stroke();
     a+=sw;
   }
 }
 let _ringSegs=[];
 function _initRingHover(){
   const cv=$('ringCanvas');if(!cv)return;
-  const sz=160;
+  const sz=200;
   const tip=document.createElement('div');
   tip.id='ringTip';tip.style.cssText='position:absolute;display:none;background:rgba(18,21,28,0.95);border:1px solid var(--border-bright);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--text-bright);pointer-events:none;z-index:50;white-space:pre-line;max-width:220px';
   cv.parentElement.style.position='relative';cv.parentElement.appendChild(tip);
@@ -1614,7 +1644,7 @@ function renderValidators(){
       else if(comm>1) commStr=comm.toFixed(1)+'%';
       else commStr=(comm*100).toFixed(1)+'%';
     }
-    const fndTag=isFnd?'<span style="color:var(--text-dim);font-size:9px;margin-left:4px">🏛</span>':'';
+    const fndTag=isFnd?'<span style="color:var(--text-dim);font-size:10px;margin-left:4px">🏛</span>':'';
     const rowStyle=isFnd?'opacity:0.6':'';
     return`<div class="val-row" style="${rowStyle}"><span class="val-rank">${i+1}</span><span class="val-name">${nm}${fndTag}</span><span class="val-stake">${F.hype(st)}</span><span class="val-comm">${commStr}</span></div>`
   }).join('');
@@ -2676,14 +2706,14 @@ function _renderMomentumBars(){
   arr.sort((a,b)=>b.total-a.total);
 
   if(!arr.length){
-    el.innerHTML='<div style="padding:8px 0;font-family:var(--mono);font-size:10px;color:var(--text-dim)">Collecting trade data… bars appear after ~30s of WebSocket activity</div>';
+    el.innerHTML='<div style="padding:8px 0;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Collecting trade data… bars appear after ~30s of WebSocket activity</div>';
     return;
   }
 
   // Find max total for scaling bars
   const maxTotal=Math.max(...arr.map(c=>c.total));
 
-  let html='<div class="mom-row" style="border-top:0;color:var(--text-muted);font-size:9px;font-weight:600"><span>Market</span><span style="text-align:center">← SELL | BUY →</span><span style="text-align:right">Net 5m</span></div>';
+  let html='<div class="mom-row" style="border-top:0;color:var(--text-muted);font-size:10px;font-weight:600"><span>Market</span><span style="text-align:center">← SELL | BUY →</span><span style="text-align:right">Net 5m</span></div>';
 
   html+=arr.slice(0,14).map(c=>{
     const buyPct=maxTotal>0?(c.buy/maxTotal)*50:0;
@@ -2818,7 +2848,7 @@ function _renderIntelTab(){
       <div class="hero-cat">${hero.category} · ${hero.date} · ${'●'.repeat(hero.importance)+'○'.repeat(5-hero.importance)}</div>
       <h2>${hero.title}</h2>
       <div class="hero-lede">${hero.eli5}</div>
-      <div class="hero-impact"><span style="color:var(--text-muted);font-size:9px;letter-spacing:0.08em;display:block;margin-bottom:4px">PERP TRADER IMPACT</span>${hero.perp_impact}</div>
+      <div class="hero-impact"><span style="color:var(--text-muted);font-size:10px;letter-spacing:0.08em;display:block;margin-bottom:4px">PERP TRADER IMPACT</span>${hero.perp_impact}</div>
       <div style="margin-top:14px;font-family:var(--mono);font-size:11px;font-weight:700;color:${sigColors[hero.signal]||'var(--text-dim)'}">${sigEmoji[hero.signal]||''} ${hero.signal}</div>`;
   }
 
@@ -2863,7 +2893,7 @@ function _renderIntelTab(){
   const blogEl=$('intelBlog');
   if(blogEl)blogEl.innerHTML=INTEL_BLOG.map((entry,i)=>`
     <article class="blog-entry">
-      ${i===0?'<div style="position:absolute;top:0;right:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:var(--bg);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
+      ${i===0?'<div style="position:absolute;top:0;right:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:var(--bg);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
       <div class="blog-date">${entry.date}</div>
       <h3>${entry.title}</h3>
       <div class="intel-blog-body">${entry.body}</div>
@@ -3067,7 +3097,7 @@ async function fHsTrending(){
     });
     tokens.sort((a,b)=>b.vol-a.vol);
     const el=$('hsTrending');if(!el)return;
-    if(!tokens.length){el.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">No data</div>';return}
+    if(!tokens.length){el.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">No data</div>';return}
     // Header row
     let html='<div class="hs-mkt-row hs-mkt-hdr"><span class="mkt-name">Market</span><span class="mkt-cell">Price</span><span class="mkt-cell">24h %</span><span class="mkt-cell">24h Vol</span><span class="mkt-cell">Open Interest</span><span class="mkt-cell">Funding</span></div>';
     html+=tokens.slice(0,16).map(t=>{
@@ -3146,7 +3176,7 @@ async function fHsTwaps(){
     // Sort by value and render top 15
     allTwaps.sort((a,b)=>b.val-a.val);
     const tEl=$('hsTwapTable');if(!tEl)return;
-    if(!allTwaps.length){tEl.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">No active TWAPs found</div>';return}
+    if(!allTwaps.length){tEl.innerHTML='<div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">No active TWAPs found</div>';return}
     tEl.innerHTML=allTwaps.slice(0,15).map(t=>{
       const sideColor=t.side==='BUY'?'var(--green)':'var(--red)';
       const timeStr=t.minsLeft>60?Math.floor(t.minsLeft/60)+'h '+Math.floor(t.minsLeft%60)+'m':Math.floor(t.minsLeft)+'m';
