@@ -54,6 +54,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .hero-sub .change{font-weight:600}.hero-sub .change.up{color:var(--green)}.hero-sub .change.down{color:var(--red)}
 
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.coin-flow-grid{grid-template-columns:repeat(7,1fr)!important}
+@media(max-width:900px){.coin-flow-grid{grid-template-columns:repeat(3,1fr)!important}.coin-flow-grid>.metric-card:nth-child(n+7){display:none}}
 .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.3s}
 .metric-card:hover{border-color:var(--border-bright)}
 .mc-glow{position:absolute;top:-30px;right:-30px;width:70px;height:70px;border-radius:50%;filter:blur(35px);opacity:0.12;pointer-events:none}
@@ -691,7 +693,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- Per-coin flow breakdown — dynamic top coins by volume -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:12px" id="coinFlowCards"></div>
+  <div class="metrics-grid coin-flow-grid" style="margin-bottom:12px" id="coinFlowCards"></div>
 
   <!-- Volume chart -->
   <div class="af-live" style="margin-top:0;margin-bottom:12px">
