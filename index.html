@@ -706,7 +706,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="chart-hdr">
       <div class="left"><span class="chart-title">🔎 Filtered Trade Feed</span><span class="chart-meta" id="tradeFeedMeta">Connecting…</span></div>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">Tracking 25 perp markets · Dynamic size filters · Updates every 500ms</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:8px">$500+ trades · 🐟 $10K+ · 🐋 $100K+ · 💰💰💰 $500K+ · 25 perp markets · Updates every 500ms</div>
     <div style="max-height:400px;overflow-y:auto"><div id="liveTrades" style="min-height:100px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Connecting…</div></div></div>
   </div>
 
@@ -1101,9 +1101,8 @@ function _processTrades(trades){
     // Add to volume buckets
     _addToVolBucket(rec);
 
-    // Only display trades meeting minimum size
-    const min=MIN_SZ[coin];
-    if(min&&sz>=min){
+    // Only display trades with $500+ notional value
+    if(usd>=500){
       _pendingTrades.push(rec);
     }
   }
@@ -1159,10 +1158,11 @@ function _renderTrades(){
     const sideText=isBuy?'▲ BUY':'▼ SELL';
     const pxStr=t.px<1?'$'+F.f4(t.px):'$'+F.f2(t.px);
     const usdStr='$'+F.c(t.usd);
-    // Highlight large trades
-    const isLarge=t.usd>=50000;
+    // Size emojis: 🐟 $10K+ · 🐋 $100K+ · 💰💰💰 $500K+
+    const emoji=t.usd>=500000?' 💰💰💰':t.usd>=100000?' 🐋':t.usd>=10000?' 🐟':'';
+    const isLarge=t.usd>=10000;
     const rowStyle=isLarge?'background:rgba('+(isBuy?'0,230,118':'255,61,90')+',0.06)':'';
-    return `<div class="trade-row" style="${rowStyle}"><span class="trade-coin">${t.coin}${isLarge?' 🐋':''}</span><span class="${sideClass} trade-side">${sideText}</span><span style="color:var(--text-dim)">${pxStr}</span><span class="trade-size">${F.c(t.sz)}</span><span class="trade-usd ${sideClass}">${usdStr}</span><span class="trade-time">${F.t(t.time)}</span></div>`;
+    return `<div class="trade-row" style="${rowStyle}"><span class="trade-coin">${t.coin}${emoji}</span><span class="${sideClass} trade-side">${sideText}</span><span style="color:var(--text-dim)">${pxStr}</span><span class="trade-size">${F.c(t.sz)}</span><span class="trade-usd ${sideClass}">${usdStr}</span><span class="trade-time">${F.t(t.time)}</span></div>`;
   }).join('');
 
   const wMs=_flowWindowMin*60000;const wCut=Date.now()-wMs;
