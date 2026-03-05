@@ -54,6 +54,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .hero-sub .change{font-weight:600}.hero-sub .change.up{color:var(--green)}.hero-sub .change.down{color:var(--red)}
 
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-5{grid-template-columns:repeat(5,1fr)}
 .coin-flow-grid{grid-template-columns:repeat(7,1fr)!important}
 @media(max-width:900px){.coin-flow-grid{grid-template-columns:repeat(3,1fr)!important}.coin-flow-grid>.metric-card:nth-child(n+7){display:none}}
 .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.3s}
@@ -287,9 +289,9 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .intel-blog-body{font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.85}
 .intel-blog-body p{margin:0 0 14px 0}.intel-blog-body p:last-child{margin-bottom:0}
 .intel-blog-body strong{color:var(--text-bright);font-weight:600}
-@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}.news-hero{grid-template-columns:1fr}.news-grid{grid-template-columns:1fr}.nft-stats{grid-template-columns:repeat(3,1fr)}.nft-top{grid-template-columns:1fr}.nft-cat-badge{display:none}}
+@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1fr 1fr}.grid-5{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.indicator-grid{grid-template-columns:1fr!important}.overview-grid{grid-template-columns:1fr}.overview-grid .supply-card{grid-column:auto}.news-hero{grid-template-columns:1fr}.news-grid{grid-template-columns:1fr}.nft-stats{grid-template-columns:repeat(3,1fr)}.nft-top{grid-template-columns:1fr}.nft-cat-badge{display:none}}
 @media(max-width:800px){.rating-grid{grid-template-columns:1fr}}
-@media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}
+@media(max-width:640px){nav{padding:0 12px;height:48px}.nav-tabs{display:none}.page{padding:14px}.hero-price{font-size:30px}.metrics-grid{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1fr}.grid-5{grid-template-columns:1fr 1fr}.chart-wrap{height:260px}
 .mob-menu-btn{display:flex!important;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-dim);cursor:pointer;font-size:16px}
 .mob-dropdown{display:none!important}
 .mob-dropdown.open{display:flex!important}
@@ -340,7 +342,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- Top metrics — merged with AF data for maximum info density -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr)">
+  <div class="metrics-grid grid-3">
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
       <div class="mc-label">🔥 Total Burned</div>
       <div class="mc-value fire" id="mBurned">—</div>
@@ -360,7 +362,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- Session stats + AF + Volume -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-top:0">
+  <div class="metrics-grid grid-5" style="margin-top:0">
     <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div>
       <div class="mc-label">💵 Session Fees</div>
       <div class="mc-value green" id="afSessionFees" style="font-size:18px">$0.00</div>
