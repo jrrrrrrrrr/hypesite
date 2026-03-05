@@ -2951,26 +2951,79 @@ function _initNftChart(){
 }
 
 async function _fetchNftLiveData(){
+  // CoinGecko free Demo API — /nfts/{id} endpoint
+  // Returns: floor_price, market_cap, volume_24h, number_of_unique_addresses, total_supply
   try{
-    const r=await fetch('https://api.opensea.io/api/v2/collections/hypurr-hyperevm/stats',{
-      headers:{'Accept':'application/json'}
-    });
-    if(!r.ok)return;
+    const r=await fetch('https://api.coingecko.com/api/v3/nfts/hypurr-hyperevm');
+    if(!r.ok){console.warn('[NFT] CoinGecko returned',r.status);return}
     const d=await r.json();
-    if(d.total){
-      const floor=d.total.floor_price||d.total.floor_price_symbol;
-      if(floor){
-        const fe=$('nftFloor');if(fe)fe.textContent=parseFloat(floor).toFixed(0);
-      }
-      if(d.total.volume){
-        const ve=$('nftVol');if(ve)ve.textContent=parseFloat(d.total.volume).toLocaleString(undefined,{maximumFractionDigits:0});
-      }
-      if(d.total.num_owners){
-        const oe=$('nftOwners');if(oe)oe.textContent=parseInt(d.total.num_owners).toLocaleString();
-      }
+    console.log('[NFT] CoinGecko data:',JSON.stringify(d).slice(0,500));
+
+    // Floor price (in native currency = HYPE)
+    if(d.floor_price?.native_currency){
+      const floor=parseFloat(d.floor_price.native_currency);
+      const fe=$('nftFloor');if(fe)fe.textContent=floor.toFixed(0);
+      // USD floor
+      const usdFloor=d.floor_price?.usd;
+      const usdEl=$('nftFloorUsd');
+      if(usdEl&&usdFloor)usdEl.textContent='≈ $'+parseFloat(usdFloor).toLocaleString(undefined,{maximumFractionDigits:0});
     }
-  }catch(e){/* Fallback to baked data — already displayed */}
+
+    // 24h volume
+    if(d.volume_24h?.native_currency){
+      const vol=parseFloat(d.volume_24h.native_currency);
+      const ve=$('nftVol');if(ve)ve.textContent=vol.toLocaleString(undefined,{maximumFractionDigits:0});
+    }
+
+    // Owners
+    if(d.number_of_unique_addresses){
+      const owners=parseInt(d.number_of_unique_addresses);
+      const total=parseInt(d.total_supply||4600);
+      const pct=total>0?((owners/total)*100).toFixed(1):'—';
+      const oe=$('nftOwners');if(oe)oe.textContent=owners.toLocaleString();
+      // Update the sub label with unique %
+      const oeSub=oe?.parentElement?.querySelector('.ns-sub');
+      if(oeSub)oeSub.textContent=pct+'% unique';
+    }
+
+    // Floor price 24h change
+    if(d.floor_price_in_usd_24h_percentage_change!==undefined){
+      const chg=parseFloat(d.floor_price_in_usd_24h_percentage_change);
+      const spreadEl=$('nftSpread');
+      if(spreadEl){
+        spreadEl.textContent=(chg>=0?'+':'')+chg.toFixed(1)+'%';
+        spreadEl.style.color=chg>=0?'var(--green)':'var(--red)';
+      }
+      const spreadSub=spreadEl?.parentElement?.querySelector('.ns-sub');
+      if(spreadSub)spreadSub.textContent='24h change';
+    }
+
+    // Market cap
+    if(d.market_cap?.usd){
+      const mcap=parseFloat(d.market_cap.usd);
+      const le=$('nftListed');
+      if(le)le.textContent='$'+F.c(mcap);
+      const leSub=le?.parentElement?.querySelector('.ns-sub');
+      if(leSub)leSub.textContent='market cap';
+    }
+
+    // Top bid / best offer
+    if(d.floor_price_7d_percentage_change!==undefined){
+      const chg7d=parseFloat(d.floor_price_7d_percentage_change);
+      const be=$('nftBid');
+      if(be){
+        be.textContent=(chg7d>=0?'+':'')+chg7d.toFixed(1)+'%';
+        be.style.color=chg7d>=0?'var(--green)':'var(--red)';
+      }
+      const beSub=be?.parentElement?.querySelector('.ns-sub');
+      if(beSub)beSub.textContent='7d change';
+    }
+
+  }catch(e){console.warn('[NFT] CoinGecko fetch failed:',e.message)}
 }
+
+// Auto-refresh NFT data every 5 minutes
+setInterval(_fetchNftLiveData,300000);
 
 // Update NFT floor USD value when HYPE price updates
 function _updateNftUsd(hypePrice){
