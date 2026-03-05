@@ -360,11 +360,16 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- Session stats + AF + Volume -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
-    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
-      <div class="mc-label">🔥 Session Burns</div>
-      <div class="mc-value fire" id="afSessionFees" style="font-size:18px">—</div>
+  <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr);margin-top:0">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div>
+      <div class="mc-label">💵 Session Fees</div>
+      <div class="mc-value green" id="afSessionFees" style="font-size:18px">$0.00</div>
       <div class="mc-sub" id="afSessionTime">since page load</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Session Burned</div>
+      <div class="mc-value fire" id="afSessionBurns" style="font-size:18px">0 HYPE</div>
+      <div class="mc-sub">on-chain burns this session</div>
     </div>
     <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
       <div class="mc-label">🏦 AF Limit Bid</div>
@@ -1687,6 +1692,7 @@ function setPriceType(t){_pType=t;$('btnCandle').classList.toggle('active',t==='
 // ── AF LIVE MONITOR CHART ─────────────────────────────────
 let _afChart=null,_afPriceSeries=null,_afBidSeries=null,_afUsdcSeries=null;
 let _afLiveTimer=null,_afSessionStart=Date.now(),_afLastUsdc=null,_afFeesCollected=0,_afPoints=[];
+let _sessionBurnBaseline=null; // feesBurned at session start, set on first tick
 
 function _initAfChart(){
   const wrap=$('afWrap');if(!wrap)return;
@@ -1766,19 +1772,23 @@ async function _afLiveTick(){
     if(usdc!=null)set('afLiveUsdc',F.full(usdc)+' USDC');
     if(px&&bid){const spread=((px-bid)/px*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}}
 
-    // 6. Session fees tracking — only count USDC increases (fees flowing in)
+    // 6. Session tracking — fees (USD) + burns (HYPE)
     if(usdc!=null){
       if(_afLastUsdc!=null){
         const delta=usdc-_afLastUsdc;
-        if(delta>0) _afFeesCollected+=delta; // fees arrived
-        // When delta<0, AF spent USDC buying HYPE — don't subtract
+        if(delta>0) _afFeesCollected+=delta;
       }
       _afLastUsdc=usdc;
-      const elapsed=Date.now()-_afSessionStart;
-      const m=Math.floor(elapsed/60000),s=Math.floor((elapsed%60000)/1000);
-      set('afSessionTime',m+'m '+s+'s on page');
-      set('afSessionFees','$'+F.f2(_afFeesCollected));
     }
+    // Track HYPE burned since session start
+    if(D.feesBurned>0&&_sessionBurnBaseline===null)_sessionBurnBaseline=D.feesBurned;
+    const sessionHypeBurned=_sessionBurnBaseline!==null?Math.max(0,D.feesBurned-_sessionBurnBaseline):0;
+
+    const elapsed=Date.now()-_afSessionStart;
+    const m=Math.floor(elapsed/60000),s=Math.floor((elapsed%60000)/1000);
+    set('afSessionTime',m+'m '+s+'s on page');
+    set('afSessionFees','$'+F.f2(_afFeesCollected));
+    set('afSessionBurns',F.c(sessionHypeBurned)+' HYPE');
 
     // 7. Recompute total burned + update display live
     D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
