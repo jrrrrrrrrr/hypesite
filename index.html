@@ -388,6 +388,24 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
   </div>
 
+  <!-- HYPE 5-min Momentum Bar -->
+  <div class="metric-card" style="padding:14px 20px;margin-top:0;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="mc-label" style="margin:0">HYPE 5-MIN MOMENTUM</div>
+      <div style="font-family:var(--mono);font-size:12px;font-weight:700" id="hypeMomLabel">—</div>
+    </div>
+    <div style="position:relative;height:24px;background:var(--bg2);border-radius:4px;overflow:hidden">
+      <div style="position:absolute;left:50%;width:2px;height:100%;background:var(--border-bright);z-index:2"></div>
+      <div id="hypeMomBuyBar" style="position:absolute;right:50%;height:100%;background:linear-gradient(270deg,rgba(0,230,118,0.9),rgba(0,212,255,0.7),rgba(167,139,250,0.3));border-radius:4px 0 0 4px;transition:width 0.8s ease;width:0"></div>
+      <div id="hypeMomSellBar" style="position:absolute;left:50%;height:100%;background:linear-gradient(90deg,rgba(255,61,90,0.9),rgba(255,107,43,0.7),rgba(251,191,36,0.3));border-radius:0 4px 4px 0;transition:width 0.8s ease;width:0"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:10px">
+      <span style="color:var(--green)" id="hypeMomBuyAmt">—</span>
+      <span style="color:var(--text-muted)" id="hypeMomTradeCount">—</span>
+      <span style="color:var(--red)" id="hypeMomSellAmt">—</span>
+    </div>
+  </div>
+
   <!-- AF Live Monitor chart -->
   <div class="af-live" style="margin-top:0;margin-bottom:16px">
     <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
@@ -1692,7 +1710,8 @@ function setPriceType(t){_pType=t;$('btnCandle').classList.toggle('active',t==='
 // ── AF LIVE MONITOR CHART ─────────────────────────────────
 let _afChart=null,_afPriceSeries=null,_afBidSeries=null,_afUsdcSeries=null;
 let _afLiveTimer=null,_afSessionStart=Date.now(),_afLastUsdc=null,_afFeesCollected=0,_afPoints=[];
-let _sessionBurnBaseline=null; // feesBurned at session start, set on first tick
+let _sessionBurnBaseline=null;
+let _afUsdcSpent=0,_afHypePurchased=0,_afLastHype=null;
 
 function _initAfChart(){
   const wrap=$('afWrap');if(!wrap)return;
@@ -1772,23 +1791,39 @@ async function _afLiveTick(){
     if(usdc!=null)set('afLiveUsdc',F.full(usdc)+' USDC');
     if(px&&bid){const spread=((px-bid)/px*100).toFixed(3);const el=$('afLiveSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}}
 
-    // 6. Session tracking — fees (USD) + burns (HYPE)
+    // 6. Session tracking — fees (USD) + burns + AF purchases (HYPE)
     if(usdc!=null){
       if(_afLastUsdc!=null){
         const delta=usdc-_afLastUsdc;
-        if(delta>0) _afFeesCollected+=delta;
+        if(delta>0) _afFeesCollected+=delta; // fees arrived
+        if(delta<0) _afUsdcSpent+=Math.abs(delta); // AF spent USDC buying HYPE
       }
       _afLastUsdc=usdc;
     }
-    // Track HYPE burned since session start
+    // Track AF HYPE balance changes (increases = purchases)
+    if(D.afHype>0){
+      if(_afLastHype!==null){
+        const hDelta=D.afHype-_afLastHype;
+        if(hDelta>0)_afHypePurchased+=hDelta;
+      }
+      _afLastHype=D.afHype;
+    }
+    // Track on-chain fee burns since session start
     if(D.feesBurned>0&&_sessionBurnBaseline===null)_sessionBurnBaseline=D.feesBurned;
-    const sessionHypeBurned=_sessionBurnBaseline!==null?Math.max(0,D.feesBurned-_sessionBurnBaseline):0;
+    const onChainBurned=_sessionBurnBaseline!==null?Math.max(0,D.feesBurned-_sessionBurnBaseline):0;
+    // Total session impact = on-chain burns + HYPE purchased by AF (will be burned)
+    const sessionTotalImpact=onChainBurned+_afHypePurchased;
 
     const elapsed=Date.now()-_afSessionStart;
     const m=Math.floor(elapsed/60000),s=Math.floor((elapsed%60000)/1000);
     set('afSessionTime',m+'m '+s+'s on page');
     set('afSessionFees','$'+F.f2(_afFeesCollected));
-    set('afSessionBurns',F.c(sessionHypeBurned)+' HYPE');
+    const burnStr=F.c(sessionTotalImpact)+' HYPE';
+    const burnUsd=D.price?(sessionTotalImpact*D.price):0;
+    set('afSessionBurns',burnStr+(burnUsd>0?' · $'+F.c(burnUsd):''));
+
+    // Update HYPE momentum bar on overview
+    _updateHypeMomentumBar();
 
     // 7. Recompute total burned + update display live
     D.totalBurned=(D.afHype||0)+(D.feesBurned||0);
@@ -2748,6 +2783,40 @@ function _renderMomentumBars(){
 
 // Update momentum bars every 3 seconds
 setInterval(_renderMomentumBars,3000);
+
+// ── HYPE Momentum Bar (Overview page) ──
+function _updateHypeMomentumBar(){
+  const now=Date.now();
+  const cutoff=now-300000; // 5 min
+  let buy=0,sell=0,count=0;
+  _allTradesBuffer.forEach(t=>{
+    if(t.time<cutoff||t.coin!=='HYPE')return;
+    if(t.side==='B')buy+=t.usd;else sell+=t.usd;
+    count++;
+  });
+  const total=buy+sell;
+  const net=buy-sell;
+  const buyPct=total>0?(buy/total)*50:0;
+  const sellPct=total>0?(sell/total)*50:0;
+
+  const buyBar=$('hypeMomBuyBar');if(buyBar)buyBar.style.width=buyPct+'%';
+  const sellBar=$('hypeMomSellBar');if(sellBar)sellBar.style.width=sellPct+'%';
+
+  const label=$('hypeMomLabel');
+  if(label){
+    if(total<100){label.textContent='Waiting for data…';label.style.color='var(--text-dim)'}
+    else if(net>total*0.3){label.textContent='🟢 STRONG BUY';label.style.color='var(--green)'}
+    else if(net>total*0.1){label.textContent='📈 Buying';label.style.color='var(--green)'}
+    else if(net<-total*0.3){label.textContent='🔴 STRONG SELL';label.style.color='var(--red)'}
+    else if(net<-total*0.1){label.textContent='📉 Selling';label.style.color='var(--red)'}
+    else{label.textContent='⟺ Neutral';label.style.color='var(--text-dim)'}
+  }
+  set('hypeMomBuyAmt','Buy $'+F.c(buy));
+  set('hypeMomSellAmt','Sell $'+F.c(sell));
+  set('hypeMomTradeCount',count+' trades · 5m');
+}
+// Update HYPE momentum every 3s alongside the main momentum bars
+setInterval(_updateHypeMomentumBar,3000);
 // ═══════════════════════════════════════════════════════════════
 //  INTEL TAB — Curated Hyperliquid briefing for perp traders
 // ═══════════════════════════════════════════════════════════════
