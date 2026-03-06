@@ -197,6 +197,15 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .hs-big .big-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text-bright)}
 .hs-big .big-sub{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:2px}
 .hs-twap-row{display:grid;grid-template-columns:50px 1fr auto auto auto;gap:8px;padding:6px 16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;align-items:center}
+@media(max-width:640px){
+.trade-row{grid-template-columns:60px 46px 1fr 1fr 50px!important;font-size:10px!important}
+.trade-row .trade-size{display:none}
+.hs-twap-row{grid-template-columns:40px 1fr auto auto!important;font-size:10px}
+.hs-twap-row .tw-time{display:none}
+.af-live-stats{flex-wrap:wrap}
+.af-live-stats .af-stat{min-width:45%}
+.nft-stats{grid-template-columns:repeat(2,1fr)!important}
+}
 .hs-twap-row .tw-side{font-weight:700;font-size:11px}
 .hs-twap-row .tw-token{color:var(--text-bright);font-weight:600}
 .hs-twap-row .tw-val{color:var(--text);text-align:right}
@@ -285,7 +294,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .eco-support{text-align:center;padding:24px 20px;margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
 .eco-support p{font-family:var(--sans);font-size:12px;color:var(--text-dim);line-height:1.7;margin:0}
 .eco-support strong{color:var(--text-bright)}
-@media(max-width:640px){.eco-features{grid-template-columns:1fr}.eco-card-top{flex-direction:column;align-items:flex-start;gap:10px}}
+@media(max-width:640px){.eco-features{grid-template-columns:1fr}.eco-card-top{flex-direction:column;align-items:flex-start;gap:10px}.supply-legend{grid-template-columns:1fr!important}}
 .intel-blog-body{font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.85}
 .intel-blog-body p{margin:0 0 14px 0}.intel-blog-body p:last-child{margin-bottom:0}
 .intel-blog-body strong{color:var(--text-bright);font-weight:600}
@@ -439,7 +448,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- HYPE Perp Intelligence -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+  <div class="metrics-grid" style="margin-bottom:16px">
     <div class="metric-card"><div class="mc-label">HYPE Funding (Ann.)</div><div class="mc-value" id="psFunding" style="font-size:15px">—</div><div class="mc-sub">1h rate × 8760</div></div>
     <div class="metric-card"><div class="mc-label">HYPE Open Interest</div><div class="mc-value cyan" id="psHypeOI" style="font-size:15px">—</div><div class="mc-sub">perp notional</div></div>
     <div class="metric-card"><div class="mc-label">HYPE Premium</div><div class="mc-value" id="psPremium" style="font-size:15px">—</div><div class="mc-sub">mark vs oracle</div></div>
@@ -447,13 +456,13 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 
   <!-- Platform Stats -->
-  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
+  <div class="metrics-grid" style="margin-top:0">
     <div class="metric-card"><div class="mc-label">Total Open Interest</div><div class="mc-value" id="psOI" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">24h Perp Volume</div><div class="mc-value" id="psVol" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">Spot Tokens</div><div class="mc-value" id="psSpot" style="font-size:15px">—</div></div>
   </div>
-  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-top:0">
+  <div class="metrics-grid" style="margin-top:0">
     <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
     <div class="metric-card"><div class="mc-label">Unstake Queue</div><div class="mc-value" id="psQueue" style="font-size:15px">—</div><div class="mc-sub" id="psQueueSub"></div></div>
@@ -625,7 +634,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="mc-label" style="margin-bottom:14px;font-size:13px">Supply Breakdown</div>
     <div style="display:flex;align-items:center;gap:28px;justify-content:center;flex-wrap:wrap">
       <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="200" height="200" style="width:200px;height:200px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;min-width:300px">
+      <div class="supply-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;min-width:0">
         <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
         <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
@@ -634,7 +643,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
   </div>
 
-  <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
+  <div class="metrics-grid" >
     <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned2">—</div><div class="mc-sub" id="mBurnedSub2">—</div></div>
     <div class="metric-card"><div class="mc-label">AF HYPE (burned by vote)</div><div class="mc-value fire" id="burnAfHype">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
     <div class="metric-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="burnFees">—</div><div class="mc-sub">HyperCore + HyperEVM</div></div>
@@ -885,7 +894,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div style="padding:0 24px;overflow:hidden">
       <div style="background:linear-gradient(135deg,#0f0a1a 0%,#1a0a2e 50%,#0a1628 100%);border:1px solid #2d1b4e;border-radius:12px;padding:16px 20px;margin:16px 0;font-family:var(--mono)">
         <div style="font-size:10px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;font-weight:600">Equity Perps · Powered by Tether</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;text-align:center">
           <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">USA500</div><div style="font-size:10px;color:#22c55e;margin-top:2px">S&P 500</div></div>
           <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">TSLA</div><div style="font-size:10px;color:#06b6d4;margin-top:2px">Tesla</div></div>
           <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">NVDA</div><div style="font-size:10px;color:#a78bfa;margin-top:2px">Nvidia</div></div>
@@ -1192,7 +1201,7 @@ function _renderTrades(){
   const el=$('liveTrades');if(!el)return;
   if(!_liveTrades.length){el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Waiting for trades…</div>';return}
   // Header
-  const hdr='<div style="display:grid;grid-template-columns:70px 52px 100px 80px 80px 56px;gap:6px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border);letter-spacing:0.05em;text-transform:uppercase"><span>Coin</span><span>Side</span><span>Price</span><span style="text-align:right">Size</span><span style="text-align:right">Notional</span><span style="text-align:right">Time</span></div>';
+  const hdr='<div class="trade-row" style="border-bottom:1px solid var(--border);color:var(--text-muted);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;animation:none"><span>Coin</span><span>Side</span><span>Price</span><span class="trade-size" style="text-align:right">Size</span><span style="text-align:right">Notional</span><span style="text-align:right">Time</span></div>';
   el.innerHTML=hdr+_liveTrades.map(t=>{
     const isBuy=t.side==='B';
     const sideClass=isBuy?'trade-buy':'trade-sell';
