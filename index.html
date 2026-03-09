@@ -2673,6 +2673,8 @@ async function _afLiveTick(){
     }
 
     set('afChartMeta','Live · '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
+    // Redraw liq heatmap if Charts tab is visible
+    if(document.querySelector('#page-charts.active'))_drawLiqHeatmap();
     _redrawAfSeries();
   }catch(e){console.warn('af tick',e)}
 }
