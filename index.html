@@ -435,6 +435,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
     <!-- Live Sentiment Pulse -->
     <div id="heroSentiment" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.5;max-width:640px;margin-left:auto;margin-right:auto;text-align:center;padding:6px 12px">Analyzing…</div>
+    <button id="shareStatsBtn" onclick="_shareStats()" style="margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--accent);background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:6px;padding:6px 16px;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;opacity:0.7" onmouseover="this.style.opacity='1';this.style.borderColor='var(--accent)'" onmouseout="this.style.opacity='0.7';this.style.borderColor='rgba(0,212,255,0.15)'">📸 Share Stats</button>
   </div>
 
   <!-- Top metrics — merged with AF data for maximum info density -->
@@ -681,10 +682,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </a>
   </div>
 
-  <!-- Share Stats Button -->
-  <div style="text-align:center;margin:20px 0">
-    <button id="shareStatsBtn" onclick="_shareStats()" style="font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 24px;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(0,212,255,0.12)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.2)';this.style.background='rgba(0,212,255,0.06)'">📸 Share HYPE Stats</button>
-  </div>
   <!-- Hidden share card for screenshot -->
   <div id="shareCard" style="position:fixed;left:-9999px;top:0;width:600px;padding:28px;background:#08090c;border:2px solid #222738;border-radius:12px;z-index:-1">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
