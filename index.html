@@ -433,7 +433,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
     <!-- Live Sentiment Pulse -->
     <div id="heroSentiment" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto;text-align:center;padding:8px 16px;background:rgba(0,212,255,0.03);border-radius:8px;border:1px solid rgba(0,212,255,0.06)">Analyzing…</div>
-    <div style="margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:0.15em;color:var(--text-muted)"><span style="color:var(--accent);font-weight:600">hype-site.com</span> — free Hyperliquid analytics</div>
   </div>
 
   <!-- Top metrics — merged with AF data for maximum info density -->
@@ -675,29 +674,34 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </a>
   </div>
 
-  <!-- Hypurr NFT Collection Widget -->
-  <div class="nft-section">
-    <div class="nft-header">
-      <svg viewBox="0 0 32 32" width="18" height="18"><defs><linearGradient id="catG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG2)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r="0.7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r="0.7" fill="#eef2ff"/></svg>
-      <h3>Hypurr NFT Collection</h3>
-      <span class="nft-badge">LIVE</span>
+  <!-- Share Stats Button -->
+  <div style="text-align:center;margin:20px 0">
+    <button id="shareStatsBtn" onclick="_shareStats()" style="font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 24px;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(0,212,255,0.12)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.2)';this.style.background='rgba(0,212,255,0.06)'">📸 Share HYPE Stats</button>
+  </div>
+  <!-- Hidden share card for screenshot -->
+  <div id="shareCard" style="position:fixed;left:-9999px;top:0;width:600px;padding:28px;background:#08090c;border:2px solid #222738;border-radius:12px;z-index:-1">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <svg viewBox="0 0 32 32" width="28" height="28"><defs><linearGradient id="scG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="40%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#scG)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r=".7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r=".7" fill="#eef2ff"/></svg>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#eef2ff">HYPE</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#00d4ff">INTELLIGENCE</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a6580;margin-left:auto">hype-site.com</span>
     </div>
-    <div class="nft-panel">
-      <div class="nft-top">
-        <div class="nft-cat-badge">
-          <svg viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="catBig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M12 20L16 6c0-1 1.2-1.4 1.8-.6l6 6.6h16.4l6-6.6c.6-.8 1.8-.4 1.8.6l4 14c4 5 4 11 0 16-3 4-8 7-14 8v3c0 1.6-1.4 3-3 3H26c-1.6 0-3-1.4-3-3v-3c-6-1-11-4-14-8-4-5-4-11 0-16z" fill="url(#catBig)" opacity="0.85"/><circle cx="24" cy="28" r="5" fill="#08090c"/><circle cx="40" cy="28" r="5" fill="#08090c"/><circle cx="25.5" cy="26.5" r="1.8" fill="#eef2ff"/><circle cx="41.5" cy="26.5" r="1.8" fill="#eef2ff"/><ellipse cx="32" cy="36" rx="2.4" ry="1.6" fill="#ff6b9d"/><path d="M28 39q4 3 8 0" stroke="#08090c" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 34l-5 2M26 36l-5 0M38 34l5 2M38 36l5 0" stroke="#08090c" stroke-width="0.6" opacity="0.3"/></svg>
-        </div>
-        <div class="nft-stats">
-          <div class="nft-stat"><div class="ns-lbl">Floor</div><div class="ns-val" id="nftFloor">459</div><div class="ns-sub" id="nftFloorUsd">HYPE</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Top Bid</div><div class="ns-val" id="nftBid" style="color:var(--green)">440</div><div class="ns-sub">WHYPE</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Spread</div><div class="ns-val" id="nftSpread" style="color:var(--yellow)">4.1%</div><div class="ns-sub">bid / ask</div></div>
-          <div class="nft-stat"><div class="ns-lbl">24h Vol</div><div class="ns-val" id="nftVol">4,056</div><div class="ns-sub">HYPE</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Owners</div><div class="ns-val" id="nftOwners">3,608</div><div class="ns-sub">78.4% unique</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Listed</div><div class="ns-val" id="nftListed">4.4%</div><div class="ns-sub">of 4,600</div></div>
-        </div>
-      </div>
-      <div class="nft-chart-wrap" id="nftChartWrap"></div>
-      <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
+    <div id="sharePrice" style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:#eef2ff;margin-bottom:4px"></div>
+    <div id="shareChg" style="font-family:'JetBrains Mono',monospace;font-size:14px;margin-bottom:16px"></div>
+    <div id="shareSentiment" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c0c8d8;margin-bottom:16px;padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">BURNED</div><div id="shareBurned" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#ff6b2b"></div></div>
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">STAKED</div><div id="shareStaked" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00e676"></div></div>
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">AF BID</div><div id="shareAfBid" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#ff6b2b"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">MCAP</div><div id="shareMcap" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00d4ff"></div></div>
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">24H VOL</div><div id="shareVol" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#eef2ff"></div></div>
+      <div style="padding:10px;background:#12151c;border-radius:8px;border:1px solid #222738"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-bottom:4px">STAKING APR</div><div id="shareApr" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00e676"></div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#3a4258" id="shareTime"></span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#00d4ff">hype-site.com · Live Hyperliquid Analytics</span>
     </div>
   </div>
 </div>
@@ -782,6 +786,32 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom2">—</span><span class="ri-signal" id="riMomSig2">—</span></div>
         <div class="ri-row"><span class="ri-name">Volume Trend</span><span class="ri-val" id="riVolT">—</span><span class="ri-signal" id="riVolTSig">—</span></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Hypurr NFT Collection -->
+  <div class="nft-section" style="margin-top:20px">
+    <div class="nft-header">
+      <svg viewBox="0 0 32 32" width="18" height="18"><defs><linearGradient id="catG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG2)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r="0.7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r="0.7" fill="#eef2ff"/></svg>
+      <h3>Hypurr NFT Collection</h3>
+      <span class="nft-badge">LIVE</span>
+    </div>
+    <div class="nft-panel">
+      <div class="nft-top">
+        <div class="nft-cat-badge">
+          <svg viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="catBig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M12 20L16 6c0-1 1.2-1.4 1.8-.6l6 6.6h16.4l6-6.6c.6-.8 1.8-.4 1.8.6l4 14c4 5 4 11 0 16-3 4-8 7-14 8v3c0 1.6-1.4 3-3 3H26c-1.6 0-3-1.4-3-3v-3c-6-1-11-4-14-8-4-5-4-11 0-16z" fill="url(#catBig)" opacity="0.85"/><circle cx="24" cy="28" r="5" fill="#08090c"/><circle cx="40" cy="28" r="5" fill="#08090c"/><circle cx="25.5" cy="26.5" r="1.8" fill="#eef2ff"/><circle cx="41.5" cy="26.5" r="1.8" fill="#eef2ff"/><ellipse cx="32" cy="36" rx="2.4" ry="1.6" fill="#ff6b9d"/><path d="M28 39q4 3 8 0" stroke="#08090c" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 34l-5 2M26 36l-5 0M38 34l5 2M38 36l5 0" stroke="#08090c" stroke-width="0.6" opacity="0.3"/></svg>
+        </div>
+        <div class="nft-stats">
+          <div class="nft-stat"><div class="ns-lbl">Floor</div><div class="ns-val" id="nftFloor">—</div><div class="ns-sub" id="nftFloorUsd">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">24h Change</div><div class="ns-val" id="nftBid" style="color:var(--green)">—</div><div class="ns-sub">24h</div></div>
+          <div class="nft-stat"><div class="ns-lbl">7d Change</div><div class="ns-val" id="nftSpread" style="color:var(--yellow)">—</div><div class="ns-sub">7 days</div></div>
+          <div class="nft-stat"><div class="ns-lbl">24h Vol</div><div class="ns-val" id="nftVol">—</div><div class="ns-sub">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Owners</div><div class="ns-val" id="nftOwners">—</div><div class="ns-sub">unique</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Market Cap</div><div class="ns-val" id="nftListed">—</div><div class="ns-sub">native</div></div>
+        </div>
+      </div>
+      <div class="nft-chart-wrap" id="nftChartWrap"></div>
+      <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
     </div>
   </div>
 </div>
@@ -946,6 +976,16 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="hs-hdr"><span class="hs-live"></span>ACTIVE TWAPS — TOP BY VALUE</div>
       <div class="hs-twap-row" style="border-top:0;color:var(--text-dim);font-weight:600"><span>Side</span><span class="tw-token">Token</span><span class="tw-val">Value</span><span class="tw-val">Amount</span><span class="tw-time">Time Left</span></div>
       <div id="hsTwapTable"><div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
+    </div>
+    <!-- HIP-3 Permissionless Perp Volumes -->
+    <div class="hs-panel" style="grid-column:1/-1">
+      <div class="hs-hdr"><span class="hs-live"></span>🚀 HIP-3 PERMISSIONLESS PERP VOLUMES</div>
+      <div class="af-live-stats" style="margin:8px 16px">
+        <div class="af-stat"><div class="lbl">Total Volume</div><div class="val cyan" id="hipTotalVol">—</div></div>
+        <div class="af-stat"><div class="lbl">DEXs</div><div class="val" id="hipDexCount">—</div></div>
+        <div class="af-stat"><div class="lbl">Open Interest</div><div class="val" id="hipTotalOI">—</div></div>
+      </div>
+      <div id="hipVolumeList" style="padding:4px 16px 12px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading HIP-3 DEXs…</div></div>
     </div>
   </div>
 </div>
@@ -1622,6 +1662,55 @@ async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(A
     D.topVol=[...D.markets].sort((a,b)=>b.vol-a.vol).slice(0,5);
   }}catch(e){}}
 
+// ── HIP-3 Permissionless Perp DEXs ──
+async function fHipDexs(){
+  try{
+    const dexs=await hl({type:'perpDexs'});
+    if(!Array.isArray(dexs))return;
+    D.hipDexs=dexs.filter(Boolean); // filter nulls (index 0 is null = main dex)
+    console.log('[fHipDexs] ✅ '+D.hipDexs.length+' HIP-3 DEXs found');
+
+    // For each HIP-3 dex, get its market data
+    const hipMarkets=[];
+    for(const dex of D.hipDexs){
+      try{
+        const md=await hl({type:'metaAndAssetCtxs',perpDex:dex.name});
+        if(Array.isArray(md)&&md.length>=2){
+          const[meta,ctxs]=md;
+          let dexVol=0,dexOI=0,mktCount=0;
+          (meta.universe||[]).forEach((u,i)=>{
+            const c=ctxs[i];if(!c)return;
+            const mid=parseFloat(c.midPx||c.markPx||0);
+            const oi=parseFloat(c.openInterest||0)*mid;
+            const vol=parseFloat(c.dayNtlVlm||0);
+            dexVol+=vol;dexOI+=oi;mktCount++;
+          });
+          hipMarkets.push({name:dex.name,fullName:dex.fullName||dex.name,deployer:dex.deployer,vol:dexVol,oi:dexOI,markets:mktCount});
+        }
+      }catch(e){}
+    }
+    D.hipMarkets=hipMarkets.sort((a,b)=>b.vol-a.vol);
+    _renderHipVolumes();
+  }catch(e){console.warn('fHipDexs',e)}
+}
+
+function _renderHipVolumes(){
+  if(!D.hipMarkets||!D.hipMarkets.length)return;
+  const el=$('hipVolumeList');if(!el)return;
+  let totalVol=0,totalOI=0,totalMkts=0;
+  D.hipMarkets.forEach(h=>{totalVol+=h.vol;totalOI+=h.oi;totalMkts+=h.markets});
+
+  set('hipTotalVol','$'+F.c(totalVol));
+  set('hipDexCount',D.hipMarkets.length+' DEXs · '+totalMkts+' markets');
+  set('hipTotalOI','$'+F.c(totalOI)+' OI');
+
+  const rows=D.hipMarkets.slice(0,12).map(h=>{
+    const volPct=totalVol>0?((h.vol/totalVol)*100).toFixed(1):'0';
+    return '<div class="ov-row" style="padding:4px 0"><span class="ov-k" style="font-size:11px" title="'+h.fullName+'">'+h.name+'</span><span class="ov-v" style="font-size:11px"><span style="color:var(--accent)">$'+F.c(h.vol)+'</span> <span style="color:var(--text-muted);font-size:9px">'+volPct+'%</span> <span style="color:var(--text-dim);font-size:9px">· '+h.markets+' mkts</span></span></div>';
+  }).join('');
+  el.innerHTML=rows;
+}
+
 async function fSpotCount(){try{const d=await hl({type:'spotMeta'});if(d?.tokens)D.spotMarkets=d.tokens.length;else if(d?.universe)D.spotMarkets=d.universe.length}catch(e){}}
 
 async function fFeesBurned(){
@@ -1813,6 +1902,64 @@ function _updateSentimentPulse(){
   if(bullish>bearish)el.style.borderColor='rgba(0,230,118,0.15)';
   else if(bearish>bullish)el.style.borderColor='rgba(255,61,90,0.15)';
   else el.style.borderColor='rgba(0,212,255,0.06)';
+}
+
+// ── Share Stats Screenshot ──
+async function _shareStats(){
+  const btn=$('shareStatsBtn');
+  if(btn)btn.textContent='📸 Generating…';
+
+  // Populate the share card with current data
+  const card=$('shareCard');if(!card)return;
+  card.style.left='0';card.style.top='0';card.style.position='fixed';card.style.zIndex='99999';
+
+  set('sharePrice','$'+F.f2(D.price||0));
+  const chgEl=$('shareChg');
+  if(chgEl&&D.priceChg!=null){
+    chgEl.textContent=(D.priceChg>=0?'+':'')+D.priceChg.toFixed(2)+'% 24h · MCap '+F.usd((D.price||0)*(D.circSupply||0));
+    chgEl.style.color=D.priceChg>=0?'#00e676':'#ff3d5a';
+  }
+  const sentEl=$('heroSentiment');
+  set('shareSentiment',sentEl?sentEl.textContent:'Loading…');
+  set('shareBurned',F.hype(D.totalBurned||0));
+  set('shareStaked',F.hype(D.staked||0));
+  set('shareAfBid',D.afBid?'$'+F.f2(D.afBid):'—');
+  set('shareMcap',F.usd((D.price||0)*(D.circSupply||0)));
+  set('shareVol',D.vol24?F.usd(D.vol24):'—');
+  set('shareApr',D.apr?(D.apr.toFixed(2)+'%'):'—');
+  set('shareTime',new Date().toLocaleString());
+
+  // Use html2canvas if available, otherwise use clipboard API with text
+  try{
+    // Dynamic import of html2canvas
+    if(typeof html2canvas==='undefined'){
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      document.head.appendChild(s);
+      await new Promise(r=>s.onload=r);
+    }
+    const canvas=await html2canvas(card,{backgroundColor:'#08090c',scale:2,useCORS:true});
+    card.style.left='-9999px';card.style.zIndex='-1';
+
+    canvas.toBlob(async blob=>{
+      try{
+        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+        if(btn){btn.textContent='✅ Copied to clipboard!';setTimeout(()=>btn.textContent='📸 Share HYPE Stats',3000)}
+      }catch(e){
+        // Fallback: download
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');a.href=url;a.download='hype-stats-'+Date.now()+'.png';a.click();
+        URL.revokeObjectURL(url);
+        if(btn){btn.textContent='✅ Downloaded!';setTimeout(()=>btn.textContent='📸 Share HYPE Stats',3000)}
+      }
+    },'image/png');
+  }catch(e){
+    card.style.left='-9999px';card.style.zIndex='-1';
+    // Text fallback
+    const text=`HYPE $${F.f2(D.price||0)} (${D.priceChg>=0?'+':''}${(D.priceChg||0).toFixed(1)}%)\nBurned: ${F.hype(D.totalBurned||0)} | Staked: ${F.hype(D.staked||0)}\nAF Bid: $${F.f2(D.afBid||0)} | MCap: ${F.usd((D.price||0)*(D.circSupply||0))}\nhype-site.com`;
+    await navigator.clipboard.writeText(text);
+    if(btn){btn.textContent='✅ Text copied!';setTimeout(()=>btn.textContent='📸 Share HYPE Stats',3000)}
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3389,7 +3536,7 @@ function _updateNftUsd(hypePrice){
 // ═══════════════════════════════════════════════════════════════
 async function fHsDashboard(){
   // All fetches in parallel — each handles its own errors
-  await Promise.allSettled([fHsTrending(),fHsTwaps(),fHsFees(),fHsExtra(),fHlpVault(),fLiquidatable()]);
+  await Promise.allSettled([fHsTrending(),fHsTwaps(),fHsFees(),fHsExtra(),fHlpVault(),fLiquidatable(),fHipDexs()]);
 }
 
 // ── Trending Tokens (from Hyperliquid spot meta — $1M+ volume only) ──
