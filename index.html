@@ -432,7 +432,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="hero-price"><span class="dollar">$</span><span id="heroPrice">—</span></div>
     <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
     <!-- Live Sentiment Pulse -->
-    <div id="heroSentiment" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto;text-align:center;padding:8px 16px;background:rgba(0,212,255,0.03);border-radius:8px;border:1px solid rgba(0,212,255,0.06)">Analyzing…</div>
+    <div id="heroSentiment" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.5;max-width:640px;margin-left:auto;margin-right:auto;text-align:center;padding:6px 12px">Analyzing…</div>
   </div>
 
   <!-- Top metrics — merged with AF data for maximum info density -->
@@ -1873,12 +1873,12 @@ function _updateSentimentPulse(){
   const parts=[];
   // 1. Price action
   if(D.priceChg!=null){
-    if(D.priceChg>5)parts.push('🟢 HYPE +'+D.priceChg.toFixed(1)+'% today');
-    else if(D.priceChg>0)parts.push('📈 HYPE +'+D.priceChg.toFixed(1)+'% today');
-    else if(D.priceChg>-3)parts.push('↔ HYPE '+D.priceChg.toFixed(1)+'% today');
-    else parts.push('📉 HYPE '+D.priceChg.toFixed(1)+'% today');
+    if(D.priceChg>5)parts.push('🟢 +'+D.priceChg.toFixed(1)+'% today');
+    else if(D.priceChg>0)parts.push('📈 +'+D.priceChg.toFixed(1)+'% today');
+    else if(D.priceChg>-3)parts.push('↔ '+D.priceChg.toFixed(1)+'% today');
+    else parts.push('📉 '+D.priceChg.toFixed(1)+'% today');
   }
-  // 2. Burn rate vs emissions — with specific numbers
+  // 2. Burn rate vs emissions — net number
   if(D.feesBurned>0&&D.price&&D.staked){
     const weeklyBurnUsd=9220000;
     const dailyBurnUsd=weeklyBurnUsd/7;
@@ -1886,51 +1886,42 @@ function _updateSentimentPulse(){
     const dailyEmissionUsd=dailyEmissionHype*D.price;
     const net=dailyBurnUsd-dailyEmissionUsd;
     if(net>0)parts.push('🔥 Net deflationary -$'+F.c(net)+'/day');
-    else parts.push('⚖️ Emissions exceed burns by $'+F.c(Math.abs(net))+'/day');
+    else parts.push('⚖️ Emissions +$'+F.c(Math.abs(net))+'/day over burns');
   }
-  // 3. AF activity
-  if(D.afBid&&D.price){
-    const spread=((D.price-D.afBid)/D.price*100);
-    if(spread<0.1)parts.push('🏦 AF bid tight ('+spread.toFixed(3)+'%)');
-    else if(spread<0.5)parts.push('🏦 AF support at $'+F.f2(D.afBid));
-    else parts.push('🏦 AF bid $'+F.f2(D.afBid)+' ('+spread.toFixed(1)+'% below)');
-  }
-  // 4. Momentum from WS trades — with time range
-  const now=Date.now(),cut5=now-300000;
+  // 3. 4-hour trade flow momentum
+  const now=Date.now(),cut4h=now-14400000;
   let buyV=0,sellV=0,tCount=0;
   if(typeof _allTradesBuffer!=='undefined'){
-    _allTradesBuffer.forEach(t=>{if(t.time<cut5||t.coin!=='HYPE')return;if(t.side==='B')buyV+=t.usd;else sellV+=t.usd;tCount++});
+    _allTradesBuffer.forEach(t=>{if(t.time<cut4h||t.coin!=='HYPE')return;if(t.side==='B')buyV+=t.usd;else sellV+=t.usd;tCount++});
   }
   const total=buyV+sellV;
   if(total>1000){
     const ratio=buyV/total;
     const pct=(ratio*100).toFixed(0);
-    if(ratio>0.65)parts.push('💪 '+pct+'% buy flow (5m, '+tCount+' trades)');
-    else if(ratio>0.55)parts.push('👍 '+pct+'% buys (5m)');
-    else if(ratio<0.35)parts.push('🔻 '+(100-parseInt(pct))+'% sell flow (5m, '+tCount+' trades)');
-    else if(ratio<0.45)parts.push('📊 '+(100-parseInt(pct))+'% sells (5m)');
-    else parts.push('⚖️ Balanced '+pct+'%/'+((100-parseInt(pct)))+'% (5m)');
+    if(ratio>0.6)parts.push('💪 '+pct+'% buys (4h)');
+    else if(ratio>0.52)parts.push('👍 '+pct+'% buys (4h)');
+    else if(ratio<0.4)parts.push('🔻 '+(100-parseInt(pct))+'% sells (4h)');
+    else if(ratio<0.48)parts.push('📊 '+(100-parseInt(pct))+'% sells (4h)');
+    else parts.push('⚖️ Balanced (4h)');
   }
-  // 5. Session fees vs estimated average
+  // 4. Fee pacing
   if(_afFeesCollected>0){
     const elapsed=(Date.now()-_afSessionStart)/1000;
     if(elapsed>60){
-      const feeRate=_afFeesCollected/(elapsed/3600); // $/hour
+      const feeRate=_afFeesCollected/(elapsed/3600);
       const dailyRate=feeRate*24;
-      // Weekly avg is ~$9.22M/week = ~$1.32M/day
       const avgDaily=1317000;
       const pctOfAvg=((dailyRate/avgDaily)*100).toFixed(0);
-      parts.push('💵 Fees today pacing '+pctOfAvg+'% of avg ($'+F.c(dailyRate)+'/day rate)');
+      parts.push('💵 Fees '+pctOfAvg+'% of avg');
     }
   }
   if(parts.length)el.textContent=parts.join(' · ');
   else el.textContent='Loading live data…';
-  // Color based on overall sentiment
   const bullish=parts.filter(p=>p.includes('🟢')||p.includes('📈')||p.includes('🔥')||p.includes('💪')||p.includes('👍')).length;
-  const bearish=parts.filter(p=>p.includes('📉')||p.includes('🔻')||p.includes('⚖️ Emissions')).length;
-  if(bullish>bearish)el.style.borderColor='rgba(0,230,118,0.15)';
-  else if(bearish>bullish)el.style.borderColor='rgba(255,61,90,0.15)';
-  else el.style.borderColor='rgba(0,212,255,0.06)';
+  const bearish=parts.filter(p=>p.includes('📉')||p.includes('🔻')||p.includes('Emissions')).length;
+  if(bullish>bearish)el.style.color='var(--green)';
+  else if(bearish>bullish)el.style.color='var(--red)';
+  else el.style.color='var(--text-dim)';
 }
 
 // ── Share Stats Screenshot ──
