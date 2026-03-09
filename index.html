@@ -690,41 +690,45 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00d4ff">INTELLIGENCE</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-left:auto">hype-site.com</span>
     </div>
-    <!-- Price + Change + Rating -->
+    <!-- Price + Rating badge -->
     <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px">
       <div id="sharePrice" style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#eef2ff"></div>
       <div id="shareChg" style="font-family:'JetBrains Mono',monospace;font-size:14px"></div>
       <div id="shareRating" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin-left:auto;padding:4px 10px;border-radius:4px"></div>
     </div>
-    <!-- Headline — the most interesting thing happening right now -->
+    <!-- Headline -->
     <div id="shareHeadline" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fbbf24;margin-bottom:12px;padding:10px 12px;background:rgba(251,191,36,0.06);border-radius:6px;border-left:3px solid #fbbf24"></div>
-    <!-- 3-col momentum strip -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+    <!-- 4-col key metrics -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">5M FLOW</div>
-        <div id="shareFlow" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700"></div>
+        <div id="shareFlow" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
+      </div>
+      <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">SQUEEZE</div>
+        <div id="shareSqz" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
       </div>
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">FUNDING</div>
-        <div id="shareFunding" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700"></div>
+        <div id="shareFunding" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
       </div>
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">SUPPLY</div>
-        <div id="shareSupply" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700"></div>
+        <div id="shareSupply" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
       </div>
     </div>
-    <!-- Key numbers row -->
+    <!-- OI + Perp Vol -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">🎯 OPEN INTEREST</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">🎯 HYPE OPEN INTEREST</div>
         <div id="shareOI" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#a78bfa"></div>
       </div>
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">⚠️ LIQ CLUSTERS</div>
-        <div id="shareLiqs" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fbbf24"></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">📊 PLATFORM VOLUME</div>
+        <div id="shareVol" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#eef2ff"></div>
       </div>
     </div>
-    <!-- Top coins strip -->
+    <!-- Hot coins strip -->
     <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;margin-bottom:10px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:4px">🔥 HOTTEST MARKETS RIGHT NOW</div>
       <div id="shareHotCoins" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#eef2ff"></div>
@@ -2217,10 +2221,14 @@ async function _shareStats(){
   // Check for unusual volume
   if(D.vol24&&D.vol24>100000000)headlines.push({score:3,text:'📊 $'+F.c(D.vol24)+' spot volume — '+((D.vol24/83000000)*100).toFixed(0)+'% of recent average'});
 
-  // Check price move
-  if(D.priceChg!=null){
-    if(Math.abs(D.priceChg)>10)headlines.push({score:5,text:(D.priceChg>0?'🚀':'💥')+' HYPE '+(D.priceChg>0?'surging':'dumping')+' '+(D.priceChg>0?'+':'')+D.priceChg.toFixed(1)+'% today'});
-    else if(Math.abs(D.priceChg)>5)headlines.push({score:3,text:(D.priceChg>0?'📈':'📉')+' HYPE moving '+(D.priceChg>0?'+':'')+D.priceChg.toFixed(1)+'% — '+( D.priceChg>0?'bulls in control':'bears pressing')});
+  // Check squeeze momentum
+  const sqzState=$('sqzState'),sqzDir=$('sqzDir'),sqzStr=$('sqzStr');
+  if(sqzState&&sqzState.textContent.includes('FIRING')){
+    const dir=sqzDir?sqzDir.textContent:'';
+    const str=sqzStr?sqzStr.textContent:'';
+    headlines.push({score:5,text:'⚡ Squeeze FIRING '+dir+' — Strength '+str+'. Momentum building, expect expansion.'});
+  } else if(sqzState&&sqzState.textContent.includes('ON')){
+    headlines.push({score:4,text:'🔋 Squeeze building — compression before a big move. Direction: '+(sqzDir?sqzDir.textContent:'TBD')});
   }
 
   // Check 5m flow for extreme imbalance
@@ -2230,27 +2238,21 @@ async function _shareStats(){
   const tot5=bV5+sV5;
   if(tot5>50000){
     const ratio5=bV5/tot5;
-    if(ratio5>0.7)headlines.push({score:4,text:'💪 Heavy buying: '+((ratio5*100).toFixed(0))+'% buy flow in last 5 min ($'+F.c(bV5)+' buys)'});
-    if(ratio5<0.3)headlines.push({score:4,text:'🔻 Heavy selling: '+((100-ratio5*100).toFixed(0))+'% sell flow in last 5 min ($'+F.c(sV5)+' sells)'});
+    if(ratio5>0.7)headlines.push({score:4,text:'💪 Heavy buying: '+((ratio5*100).toFixed(0))+'% buy flow in 5 min ($'+F.c(bV5)+' buys vs $'+F.c(sV5)+' sells)'});
+    if(ratio5<0.3)headlines.push({score:4,text:'🔻 Heavy selling: '+((100-ratio5*100).toFixed(0))+'% sell flow in 5 min ($'+F.c(sV5)+' sells vs $'+F.c(bV5)+' buys)'});
   }
 
   // Check funding for extreme
   if(D.hypeFunding!=null){
     const fAbs=Math.abs(D.hypeFunding);
-    if(fAbs>0.0005)headlines.push({score:4,text:'⚡ Extreme funding: '+(D.hypeFunding*100).toFixed(4)+'% — '+(D.hypeFunding>0?'longs paying heavily, squeeze risk':'shorts paying heavily, pump risk')});
+    if(fAbs>0.0005)headlines.push({score:4,text:'⚡ Extreme funding '+(D.hypeFunding*100).toFixed(4)+'% — '+(D.hypeFunding>0?'longs paying, squeeze risk':'shorts paying, pump risk')});
   }
 
   // Deflationary status
   if(D.feesBurned>0&&D.price&&D.staked){
     const dailyBurn=9220000/7,dailyEmUsd=(474*86400/Math.sqrt(D.staked||191e6))*D.price;
     const net=dailyBurn-dailyEmUsd;
-    if(net>0)headlines.push({score:2,text:'🔥 Net deflationary: -$'+F.c(net)+'/day being removed from supply'});
-  }
-
-  // Top traded coins from momentum
-  const topCoins=[];
-  if(D.topVol&&D.topVol.length){
-    D.topVol.slice(0,3).forEach(m=>topCoins.push(m.name));
+    if(net>0)headlines.push({score:2,text:'🔥 Net deflationary: -$'+F.c(net)+'/day removed from supply'});
   }
 
   // HIP-3 hot market
@@ -2293,17 +2295,25 @@ async function _shareStats(){
     if(sEl){sEl.textContent=net>0?'-$'+F.c(net)+'/d':'+$'+F.c(Math.abs(net))+'/d';sEl.style.color=net>0?'#00e676':'#ff3d5a'}
   }
 
-  // OI
+  // OI — just HYPE OI, clean
   const oiEl=$('shareOI');
-  if(oiEl){
-    oiEl.textContent=(D.hypeOI?'$'+F.c(D.hypeOI):'—')+' · '+(D.totalPerpVol?'$'+F.c(D.totalPerpVol)+' perp vol':'');
+  if(oiEl){oiEl.textContent=D.hypeOI?'$'+F.c(D.hypeOI):'—'}
+
+  // Platform volume — perp + spot
+  const volEl=$('shareVol');
+  if(volEl){
+    const perpV=D.totalPerpVol||0;const spotV=D.vol24||0;
+    volEl.textContent='$'+F.c(perpV)+' perp'+(spotV?' · $'+F.c(spotV)+' spot':'');
   }
 
-  // Liq clusters
-  const liqEl=$('shareLiqs');
-  if(liqEl){
-    const liqSum=$('liqHeatSummary');
-    liqEl.textContent=liqSum&&liqSum.textContent!=='—'?liqSum.textContent:'Visit Charts tab for liq map';
+  // Squeeze Momentum
+  const sqzEl=$('shareSqz');
+  if(sqzEl){
+    const state=sqzState?sqzState.textContent:'—';
+    const dir=sqzDir?sqzDir.textContent:'—';
+    if(state.includes('FIRING')){sqzEl.textContent='⚡ '+dir;sqzEl.style.color=dir.includes('BULL')?'#00e676':'#ff3d5a'}
+    else if(state.includes('ON')){sqzEl.textContent='🔋 Building';sqzEl.style.color='#fbbf24'}
+    else{sqzEl.textContent='— Off';sqzEl.style.color='#5a6580'}
   }
 
   // Hot coins — combine main DEX + HIP-3
