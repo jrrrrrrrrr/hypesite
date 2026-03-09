@@ -402,6 +402,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <button class="nav-tab" onclick="showPage('burns',this)">Burns</button>
       <button class="nav-tab" onclick="showPage('staking',this)">Staking</button>
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
+      <button class="nav-tab" onclick="showPage('hip3',this)">HIP-3</button>
       <button class="nav-tab" onclick="showPage('ecosystem',this)">Ecosystem</button>
       <button class="nav-tab" onclick="showPage('intel',this)">Intel</button>
     </div>
@@ -419,6 +420,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <button onclick="showPage('burns',this);document.getElementById('mobDropdown').classList.remove('open')">Burns</button>
   <button onclick="showPage('staking',this);document.getElementById('mobDropdown').classList.remove('open')">Staking</button>
   <button onclick="showPage('trades',this);document.getElementById('mobDropdown').classList.remove('open')">Live Trades</button>
+  <button onclick="showPage('hip3',this);document.getElementById('mobDropdown').classList.remove('open')">HIP-3</button>
   <button onclick="showPage('ecosystem',this);document.getElementById('mobDropdown').classList.remove('open')">Ecosystem</button>
   <button onclick="showPage('intel',this);document.getElementById('mobDropdown').classList.remove('open')">Intel</button>
 </div>
@@ -982,15 +984,69 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="hs-twap-row" style="border-top:0;color:var(--text-dim);font-weight:600"><span>Side</span><span class="tw-token">Token</span><span class="tw-val">Value</span><span class="tw-val">Amount</span><span class="tw-time">Time Left</span></div>
       <div id="hsTwapTable"><div style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
     </div>
-    <!-- HIP-3 Permissionless Perp Volumes -->
-    <div class="hs-panel" style="grid-column:1/-1">
-      <div class="hs-hdr"><span class="hs-live"></span>🚀 HIP-3 PERMISSIONLESS PERP VOLUMES</div>
-      <div class="af-live-stats" style="margin:8px 16px">
-        <div class="af-stat"><div class="lbl">Total Volume</div><div class="val cyan" id="hipTotalVol">—</div></div>
-        <div class="af-stat"><div class="lbl">DEXs</div><div class="val" id="hipDexCount">—</div></div>
-        <div class="af-stat"><div class="lbl">Open Interest</div><div class="val" id="hipTotalOI">—</div></div>
-      </div>
-      <div id="hipVolumeList" style="padding:4px 16px 12px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading HIP-3 DEXs…</div></div>
+  </div>
+</div>
+
+<!-- ══ HIP-3 TAB ═══════════════════════════════════════════════ -->
+<div class="page" id="page-hip3">
+  <h2 class="sr-only">HIP-3 Permissionless Perpetual Markets — Hyperliquid Builder DEXs</h2>
+
+  <!-- Summary Cards -->
+  <div class="metrics-grid grid-3">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">🚀 Total HIP-3 Volume</div>
+      <div class="mc-value cyan" id="hipTotalVol" style="font-size:20px">—</div>
+      <div class="mc-sub" id="hipDexCount">Loading…</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div>
+      <div class="mc-label">📊 Open Interest</div>
+      <div class="mc-value" id="hipTotalOI" style="font-size:20px;color:var(--purple)">—</div>
+      <div class="mc-sub">Across all HIP-3 DEXs</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 HYPE Staked by Deployers</div>
+      <div class="mc-value fire" id="hipStaked" style="font-size:20px">—</div>
+      <div class="mc-sub">500K HYPE per DEX</div>
+    </div>
+  </div>
+
+  <!-- Activity Heat Meter -->
+  <div class="metric-card" style="padding:16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="mc-label" style="margin:0">HIP-3 ACTIVITY HEAT</div>
+      <div style="font-family:var(--mono);font-size:12px;font-weight:700" id="hipHeatLabel">—</div>
+    </div>
+    <div style="position:relative;height:20px;border-radius:10px;overflow:hidden;background:linear-gradient(90deg,#12151c,#12151c)">
+      <div style="position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg,rgba(0,212,255,0.1),rgba(0,230,118,0.3),rgba(251,191,36,0.5),rgba(255,107,43,0.7),rgba(255,61,90,0.9));opacity:0.3"></div>
+      <div id="hipHeatFill" style="position:absolute;left:0;top:0;height:100%;border-radius:10px;background:linear-gradient(90deg,rgba(0,212,255,0.8),rgba(0,230,118,0.8),rgba(251,191,36,0.8),rgba(255,107,43,0.8),rgba(255,61,90,0.8));transition:width 1s ease;width:0%"></div>
+      <div id="hipHeatMarker" style="position:absolute;top:-2px;width:3px;height:24px;background:var(--text-bright);border-radius:2px;transition:left 1s ease;left:0%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--text-muted)">
+      <span>Low</span><span>Average</span><span>High</span><span>🔥 Extreme</span>
+    </div>
+  </div>
+
+  <!-- DEX Breakdown -->
+  <div class="section-title">Builder DEX Breakdown</div>
+  <div id="hipDexCards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:20px;text-align:center">Loading HIP-3 DEX data…</div>
+  </div>
+
+  <!-- Top Markets Table -->
+  <div class="section-title">Top HIP-3 Markets by Volume</div>
+  <div class="metric-card" style="padding:0;overflow:hidden;margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 90px 90px 80px 70px;gap:4px;padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.05em">
+      <span>Market</span><span style="text-align:right">Volume</span><span style="text-align:right">OI</span><span style="text-align:right">Funding</span><span style="text-align:right">Price</span>
+    </div>
+    <div id="hipMarketsTable"><div style="padding:16px;font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center">Loading…</div></div>
+  </div>
+
+  <!-- Funding Heatmap -->
+  <div class="section-title">Funding Rate Heatmap</div>
+  <div class="metric-card" style="padding:16px;margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:10px">Green = longs pay shorts · Red = shorts pay longs · Size = relative volume</div>
+    <div id="hipFundingHeatmap" style="display:flex;flex-wrap:wrap;gap:6px">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div>
     </div>
   </div>
 </div>
@@ -1691,8 +1747,9 @@ async function fHipDexs(){
             const mid=parseFloat(c.midPx||c.markPx||0);
             const oi=parseFloat(c.openInterest||0)*mid;
             const vol=parseFloat(c.dayNtlVlm||0);
+            const funding=parseFloat(c.funding||0);
             dexVol+=vol;dexOI+=oi;mktCount++;
-            if(vol>0)topAssets.push({name:u.name||u.coin||('Asset'+i),vol,oi});
+            if(vol>0||oi>0)topAssets.push({name:u.name||u.coin||('Asset'+i),vol,oi,funding,mid});
           });
           topAssets.sort((a,b)=>b.vol-a.vol);
           hipMarkets.push({name:dex.name,fullName:dex.fullName||dex.name,deployer:dex.deployer,vol:dexVol,oi:dexOI,markets:mktCount,topAssets:topAssets.slice(0,5)});
@@ -1706,23 +1763,102 @@ async function fHipDexs(){
 
 function _renderHipVolumes(){
   if(!D.hipMarkets||!D.hipMarkets.length)return;
-  const el=$('hipVolumeList');if(!el)return;
   let totalVol=0,totalOI=0,totalMkts=0;
   D.hipMarkets.forEach(h=>{totalVol+=h.vol;totalOI+=h.oi;totalMkts+=h.markets});
 
   set('hipTotalVol','$'+F.c(totalVol));
   set('hipDexCount',D.hipMarkets.length+' DEXs · '+totalMkts+' markets');
-  set('hipTotalOI','$'+F.c(totalOI)+' OI');
+  set('hipTotalOI','$'+F.c(totalOI));
+  set('hipStaked',F.c(D.hipMarkets.length*500000)+' HYPE');
 
-  const rows=D.hipMarkets.map(h=>{
-    const volPct=totalVol>0?((h.vol/totalVol)*100).toFixed(1):'0';
-    const topStr=h.topAssets&&h.topAssets.length?h.topAssets.map(a=>a.name).join(', '):'';
-    return '<div style="padding:8px 0;border-bottom:1px solid var(--border)">'+
-      '<div class="ov-row" style="padding:0"><span class="ov-k" style="font-size:12px;font-weight:600;color:var(--text-bright)" title="'+h.fullName+'">'+h.name+'</span><span class="ov-v" style="font-size:12px"><span style="color:var(--accent)">$'+F.c(h.vol)+'</span> <span style="color:var(--text-muted);font-size:10px">'+volPct+'%</span> <span style="color:var(--text-dim);font-size:10px">· '+h.markets+' mkts · $'+F.c(h.oi)+' OI</span></span></div>'+
-      (topStr?'<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:3px;padding-left:2px">Top: '+topStr+'</div>':'')+
+  // Heat meter — based on volume relative to weekly avg (~$4B/week = ~$570M/day)
+  const avgDailyVol=570000000;
+  const heatPct=Math.min(100,Math.max(0,(totalVol/avgDailyVol)*50));
+  const heatFill=$('hipHeatFill');if(heatFill)heatFill.style.width=heatPct+'%';
+  const heatMarker=$('hipHeatMarker');if(heatMarker)heatMarker.style.left=Math.min(98,heatPct)+'%';
+  const heatLabel=$('hipHeatLabel');
+  if(heatLabel){
+    if(heatPct>80){heatLabel.textContent='🔥 EXTREME';heatLabel.style.color='var(--fire)'}
+    else if(heatPct>60){heatLabel.textContent='🟠 HIGH';heatLabel.style.color='var(--yellow)'}
+    else if(heatPct>35){heatLabel.textContent='🟢 NORMAL';heatLabel.style.color='var(--green)'}
+    else{heatLabel.textContent='🔵 LOW';heatLabel.style.color='var(--accent)'}
+  }
+
+  // DEX Cards
+  const cardsEl=$('hipDexCards');
+  if(cardsEl){
+    cardsEl.innerHTML=D.hipMarkets.map(h=>{
+      const volPct=totalVol>0?((h.vol/totalVol)*100).toFixed(1):'0';
+      const topStr=h.topAssets?h.topAssets.slice(0,8).map(a=>{
+        const fColor=a.funding>0?'var(--green)':a.funding<0?'var(--red)':'var(--text-dim)';
+        const fStr=a.funding!=null?((a.funding*100).toFixed(4)+'%'):'';
+        return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--bg);border-radius:4px;font-size:10px"><span style="color:var(--text-bright)">'+a.name+'</span><span style="color:var(--accent)">$'+F.c(a.vol)+'</span>'+(fStr?'<span style="color:'+fColor+'">'+fStr+'</span>':'')+'</span>';
+      }).join(''):'';
+      // Volume bar
+      const barPct=Math.min(100,parseFloat(volPct));
+      return '<div class="metric-card" style="padding:16px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+          '<div><span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)">'+h.name+'</span>'+
+          (h.fullName&&h.fullName!==h.name?' <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">'+h.fullName+'</span>':'')+
+          '</div>'+
+          '<div style="text-align:right;font-family:var(--mono)"><span style="font-size:16px;font-weight:700;color:var(--accent)">$'+F.c(h.vol)+'</span>'+
+          '<span style="font-size:10px;color:var(--text-muted);margin-left:6px">'+volPct+'%</span></div>'+
+        '</div>'+
+        '<div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:10px">'+
+          '<div style="height:100%;width:'+barPct+'%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:3px;transition:width 0.8s"></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:16px;margin-bottom:8px;font-family:var(--mono);font-size:11px">'+
+          '<span><span style="color:var(--text-dim)">Markets:</span> <span style="color:var(--text-bright)">'+h.markets+'</span></span>'+
+          '<span><span style="color:var(--text-dim)">OI:</span> <span style="color:var(--purple)">$'+F.c(h.oi)+'</span></span>'+
+        '</div>'+
+        (topStr?'<div style="display:flex;flex-wrap:wrap;gap:4px">'+topStr+'</div>':'')+
       '</div>';
-  }).join('');
-  el.innerHTML=rows||'<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">No HIP-3 DEXs with volume found</div>';
+    }).join('');
+  }
+
+  // Top Markets Table — collect all markets across all DEXs
+  const allMkts=[];
+  D.hipMarkets.forEach(h=>{
+    if(h.topAssets)h.topAssets.forEach(a=>{
+      allMkts.push({...a,dex:h.name});
+    });
+  });
+  allMkts.sort((a,b)=>b.vol-a.vol);
+  const tblEl=$('hipMarketsTable');
+  if(tblEl){
+    tblEl.innerHTML=allMkts.slice(0,30).map(m=>{
+      const fColor=m.funding>0?'var(--green)':m.funding<0?'var(--red)':'var(--text-dim)';
+      const fStr=m.funding!=null?((m.funding*100).toFixed(4)+'%'):'—';
+      return '<div style="display:grid;grid-template-columns:1fr 90px 90px 80px 70px;gap:4px;padding:8px 16px;font-family:var(--mono);font-size:11px;border-bottom:1px solid rgba(34,39,56,0.3);align-items:center">'+
+        '<span><span style="color:var(--text-bright)">'+m.name+'</span> <span style="color:var(--text-muted);font-size:9px">'+m.dex+'</span></span>'+
+        '<span style="text-align:right;color:var(--accent)">$'+F.c(m.vol)+'</span>'+
+        '<span style="text-align:right;color:var(--purple)">$'+F.c(m.oi)+'</span>'+
+        '<span style="text-align:right;color:'+fColor+'">'+fStr+'</span>'+
+        '<span style="text-align:right;color:var(--text)">$'+(m.mid?F.f2(m.mid):'—')+'</span>'+
+      '</div>';
+    }).join('')||'<div style="padding:16px;font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center">No market data</div>';
+  }
+
+  // Funding Heatmap — visual blocks colored by funding rate
+  const hmEl=$('hipFundingHeatmap');
+  if(hmEl){
+    const mWithFunding=allMkts.filter(m=>m.funding!=null&&m.vol>10000);
+    mWithFunding.sort((a,b)=>b.vol-a.vol);
+    hmEl.innerHTML=mWithFunding.slice(0,40).map(m=>{
+      const f=m.funding||0;
+      const absF=Math.abs(f);
+      const intensity=Math.min(1,absF/0.0005);
+      const bg=f>=0?
+        'rgba(0,230,118,'+(0.15+intensity*0.6)+')':
+        'rgba(255,61,90,'+(0.15+intensity*0.6)+')';
+      const border=f>=0?'rgba(0,230,118,0.3)':'rgba(255,61,90,0.3)';
+      const size=Math.max(60,Math.min(120,40+Math.log10(m.vol+1)*10));
+      return '<div style="width:'+size+'px;padding:6px 8px;background:'+bg+';border:1px solid '+border+';border-radius:6px;text-align:center;cursor:default" title="'+m.dex+':'+m.name+' · Funding: '+(f*100).toFixed(4)+'% · Vol: $'+F.c(m.vol)+'">'+
+        '<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-bright);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.name+'</div>'+
+        '<div style="font-family:var(--mono);font-size:9px;color:var(--text)">'+(f*100).toFixed(4)+'%</div>'+
+      '</div>';
+    }).join('')||'<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">No funding data</div>';
+  }
 }
 
 async function fSpotCount(){try{const d=await hl({type:'spotMeta'});if(d?.tokens)D.spotMarkets=d.tokens.length;else if(d?.universe)D.spotMarkets=d.universe.length}catch(e){}}
@@ -1882,18 +2018,18 @@ function _updateSentimentPulse(){
     else parts.push('⚖️ Net inflationary +$'+F.c(Math.abs(net))+'/day');
   }
   // 2. Fee pacing vs daily average
-  if(_afFeesCollected>0){
-    const elapsed=(Date.now()-_afSessionStart)/1000;
-    if(elapsed>60){
-      const feeRate=_afFeesCollected/(elapsed/3600);
-      const dailyRate=feeRate*24;
-      const avgDaily=1317000;
-      const pctOfAvg=((dailyRate/avgDaily)*100).toFixed(0);
-      parts.push('💵 Fees pacing '+pctOfAvg+'% of daily avg ($'+F.c(dailyRate)+'/day)');
-    }
+  const elapsed=(Date.now()-_afSessionStart)/1000;
+  if(_afFeesCollected>0&&elapsed>60){
+    const feeRate=_afFeesCollected/(elapsed/3600);
+    const dailyRate=feeRate*24;
+    const avgDaily=1317000;
+    const pctOfAvg=((dailyRate/avgDaily)*100).toFixed(0);
+    parts.push('💵 Fees pacing '+pctOfAvg+'% of daily avg ($'+F.c(dailyRate)+'/day)');
+  } else if(elapsed>30&&_afFeesCollected===0){
+    parts.push('💵 Collecting fee data…');
   }
   if(parts.length)el.textContent=parts.join(' · ');
-  else el.textContent='Loading live data…';
+  else el.textContent='Analyzing…';
   const hasBullBurn=parts.some(p=>p.includes('deflationary'));
   if(hasBullBurn)el.style.color='var(--green)';
   else if(parts.some(p=>p.includes('inflationary')))el.style.color='var(--red)';
