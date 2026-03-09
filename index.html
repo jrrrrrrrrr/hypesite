@@ -658,7 +658,12 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="ov-row"><span class="ov-k">Chairman</span><span class="ov-v" style="color:var(--text-bright)">Bob Diamond (fmr. Barclays CEO)</span></div>
       <div class="ov-row"><span class="ov-k">CEO</span><span class="ov-v" style="color:var(--text-bright)">David Schamis</span></div>
       <div class="ov-row"><span class="ov-k">Backers</span><span class="ov-v" style="color:var(--text)">D1 Capital · Galaxy · Pantera · Republic · 683 Capital</span></div>
-      <div class="ov-row"><span class="ov-k">Analyst Rating</span><span class="ov-v" style="color:var(--green)">Strong Buy · PT $7.23 (+48%)</span></div>
+      <div class="ov-row"><span class="ov-k">Analyst Rating</span><span class="ov-v" style="color:var(--green)">2 Buy · 1 Hold · 1 Sell</span></div>
+      <div class="ov-row"><span class="ov-k">Price Targets</span><span class="ov-v" style="color:var(--accent)">Avg $7.23 · High $8.45 · Low $6.00</span></div>
+      <div class="ov-row"><span class="ov-k">Chardan Capital</span><span class="ov-v" style="color:var(--green)">Buy · PT $8.45</span></div>
+      <div class="ov-row"><span class="ov-k">Cantor Fitzgerald</span><span class="ov-v" style="color:var(--green)">Overweight · PT $6.00</span></div>
+      <div class="ov-row"><span class="ov-k">Wall Street Zen</span><span class="ov-v" style="color:var(--text)">Hold</span></div>
+      <div class="ov-row"><span class="ov-k">Weiss Ratings</span><span class="ov-v" style="color:var(--red)">Sell</span></div>
       <div class="ov-row"><span class="ov-k">Market Cap</span><span class="ov-v" style="color:var(--text-bright)">~$651M</span></div>
       <div class="ov-row"><span class="ov-k">Shares Repurchased</span><span class="ov-v" style="color:var(--accent)">3.0M ($10.5M deployed)</span></div>
     </div>
@@ -1667,27 +1672,32 @@ async function fHipDexs(){
   try{
     const dexs=await hl({type:'perpDexs'});
     if(!Array.isArray(dexs))return;
-    D.hipDexs=dexs.filter(Boolean); // filter nulls (index 0 is null = main dex)
+    D.hipDexs=dexs.filter(Boolean);
     console.log('[fHipDexs] ✅ '+D.hipDexs.length+' HIP-3 DEXs found');
 
-    // For each HIP-3 dex, get its market data
+    // For each HIP-3 dex, get its market data using the correct 'dex' parameter
     const hipMarkets=[];
     for(const dex of D.hipDexs){
       try{
-        const md=await hl({type:'metaAndAssetCtxs',perpDex:dex.name});
+        const md=await hl({type:'metaAndAssetCtxs',dex:dex.name});
         if(Array.isArray(md)&&md.length>=2){
-          const[meta,ctxs]=md;
+          const meta=md[0],ctxs=md[1];
+          const universe=meta.universe||meta;
+          const ctxArr=Array.isArray(ctxs)?ctxs:[];
           let dexVol=0,dexOI=0,mktCount=0;
-          (meta.universe||[]).forEach((u,i)=>{
-            const c=ctxs[i];if(!c)return;
+          const topAssets=[];
+          (Array.isArray(universe)?universe:[]).forEach((u,i)=>{
+            const c=ctxArr[i];if(!c)return;
             const mid=parseFloat(c.midPx||c.markPx||0);
             const oi=parseFloat(c.openInterest||0)*mid;
             const vol=parseFloat(c.dayNtlVlm||0);
             dexVol+=vol;dexOI+=oi;mktCount++;
+            if(vol>0)topAssets.push({name:u.name||u.coin||('Asset'+i),vol,oi});
           });
-          hipMarkets.push({name:dex.name,fullName:dex.fullName||dex.name,deployer:dex.deployer,vol:dexVol,oi:dexOI,markets:mktCount});
+          topAssets.sort((a,b)=>b.vol-a.vol);
+          hipMarkets.push({name:dex.name,fullName:dex.fullName||dex.name,deployer:dex.deployer,vol:dexVol,oi:dexOI,markets:mktCount,topAssets:topAssets.slice(0,5)});
         }
-      }catch(e){}
+      }catch(e){console.warn('HIP dex fetch error for '+dex.name,e)}
     }
     D.hipMarkets=hipMarkets.sort((a,b)=>b.vol-a.vol);
     _renderHipVolumes();
@@ -1704,11 +1714,15 @@ function _renderHipVolumes(){
   set('hipDexCount',D.hipMarkets.length+' DEXs · '+totalMkts+' markets');
   set('hipTotalOI','$'+F.c(totalOI)+' OI');
 
-  const rows=D.hipMarkets.slice(0,12).map(h=>{
+  const rows=D.hipMarkets.map(h=>{
     const volPct=totalVol>0?((h.vol/totalVol)*100).toFixed(1):'0';
-    return '<div class="ov-row" style="padding:4px 0"><span class="ov-k" style="font-size:11px" title="'+h.fullName+'">'+h.name+'</span><span class="ov-v" style="font-size:11px"><span style="color:var(--accent)">$'+F.c(h.vol)+'</span> <span style="color:var(--text-muted);font-size:9px">'+volPct+'%</span> <span style="color:var(--text-dim);font-size:9px">· '+h.markets+' mkts</span></span></div>';
+    const topStr=h.topAssets&&h.topAssets.length?h.topAssets.map(a=>a.name).join(', '):'';
+    return '<div style="padding:8px 0;border-bottom:1px solid var(--border)">'+
+      '<div class="ov-row" style="padding:0"><span class="ov-k" style="font-size:12px;font-weight:600;color:var(--text-bright)" title="'+h.fullName+'">'+h.name+'</span><span class="ov-v" style="font-size:12px"><span style="color:var(--accent)">$'+F.c(h.vol)+'</span> <span style="color:var(--text-muted);font-size:10px">'+volPct+'%</span> <span style="color:var(--text-dim);font-size:10px">· '+h.markets+' mkts · $'+F.c(h.oi)+' OI</span></span></div>'+
+      (topStr?'<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:3px;padding-left:2px">Top: '+topStr+'</div>':'')+
+      '</div>';
   }).join('');
-  el.innerHTML=rows;
+  el.innerHTML=rows||'<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">No HIP-3 DEXs with volume found</div>';
 }
 
 async function fSpotCount(){try{const d=await hl({type:'spotMeta'});if(d?.tokens)D.spotMarkets=d.tokens.length;else if(d?.universe)D.spotMarkets=d.universe.length}catch(e){}}
@@ -1864,41 +1878,56 @@ function _updateSentimentPulse(){
     else if(D.priceChg>-3)parts.push('↔ HYPE '+D.priceChg.toFixed(1)+'% today');
     else parts.push('📉 HYPE '+D.priceChg.toFixed(1)+'% today');
   }
-  // 2. Burn rate vs emissions
-  if(D.feesBurned>0&&D.price){
-    // Daily fee burns ≈ weekly burns / 7
-    const weeklyBurnUsd=9220000; // ~$9.22M/week from recent data
-    const dailyBurn=weeklyBurnUsd/7;
-    const dailyEmission=D.price*(474*86400/Math.sqrt(D.staked||191000000)); // rough daily emission
-    if(dailyBurn>dailyEmission)parts.push('🔥 Net deflationary today');
-    else parts.push('⚖️ Burns partially offsetting emissions');
+  // 2. Burn rate vs emissions — with specific numbers
+  if(D.feesBurned>0&&D.price&&D.staked){
+    const weeklyBurnUsd=9220000;
+    const dailyBurnUsd=weeklyBurnUsd/7;
+    const dailyEmissionHype=474*86400/Math.sqrt(D.staked||191000000);
+    const dailyEmissionUsd=dailyEmissionHype*D.price;
+    const net=dailyBurnUsd-dailyEmissionUsd;
+    if(net>0)parts.push('🔥 Net deflationary -$'+F.c(net)+'/day');
+    else parts.push('⚖️ Emissions exceed burns by $'+F.c(Math.abs(net))+'/day');
   }
   // 3. AF activity
   if(D.afBid&&D.price){
     const spread=((D.price-D.afBid)/D.price*100);
-    if(spread<0.1)parts.push('🏦 AF bid tight ('+spread.toFixed(2)+'%)');
+    if(spread<0.1)parts.push('🏦 AF bid tight ('+spread.toFixed(3)+'%)');
     else if(spread<0.5)parts.push('🏦 AF support at $'+F.f2(D.afBid));
+    else parts.push('🏦 AF bid $'+F.f2(D.afBid)+' ('+spread.toFixed(1)+'% below)');
   }
-  // 4. Momentum from WS trades
-  const now=Date.now(),cut=now-300000;
-  let buyV=0,sellV=0;
+  // 4. Momentum from WS trades — with time range
+  const now=Date.now(),cut5=now-300000;
+  let buyV=0,sellV=0,tCount=0;
   if(typeof _allTradesBuffer!=='undefined'){
-    _allTradesBuffer.forEach(t=>{if(t.time<cut||t.coin!=='HYPE')return;if(t.side==='B')buyV+=t.usd;else sellV+=t.usd});
+    _allTradesBuffer.forEach(t=>{if(t.time<cut5||t.coin!=='HYPE')return;if(t.side==='B')buyV+=t.usd;else sellV+=t.usd;tCount++});
   }
   const total=buyV+sellV;
   if(total>1000){
     const ratio=buyV/total;
-    if(ratio>0.65)parts.push('💪 Strong buy pressure');
-    else if(ratio>0.55)parts.push('👍 Buyers leading');
-    else if(ratio<0.35)parts.push('🔻 Heavy selling');
-    else if(ratio<0.45)parts.push('📊 Sellers leading');
-    else parts.push('⚖️ Balanced flow');
+    const pct=(ratio*100).toFixed(0);
+    if(ratio>0.65)parts.push('💪 '+pct+'% buy flow (5m, '+tCount+' trades)');
+    else if(ratio>0.55)parts.push('👍 '+pct+'% buys (5m)');
+    else if(ratio<0.35)parts.push('🔻 '+(100-parseInt(pct))+'% sell flow (5m, '+tCount+' trades)');
+    else if(ratio<0.45)parts.push('📊 '+(100-parseInt(pct))+'% sells (5m)');
+    else parts.push('⚖️ Balanced '+pct+'%/'+((100-parseInt(pct)))+'% (5m)');
+  }
+  // 5. Session fees vs estimated average
+  if(_afFeesCollected>0){
+    const elapsed=(Date.now()-_afSessionStart)/1000;
+    if(elapsed>60){
+      const feeRate=_afFeesCollected/(elapsed/3600); // $/hour
+      const dailyRate=feeRate*24;
+      // Weekly avg is ~$9.22M/week = ~$1.32M/day
+      const avgDaily=1317000;
+      const pctOfAvg=((dailyRate/avgDaily)*100).toFixed(0);
+      parts.push('💵 Fees today pacing '+pctOfAvg+'% of avg ($'+F.c(dailyRate)+'/day rate)');
+    }
   }
   if(parts.length)el.textContent=parts.join(' · ');
   else el.textContent='Loading live data…';
   // Color based on overall sentiment
   const bullish=parts.filter(p=>p.includes('🟢')||p.includes('📈')||p.includes('🔥')||p.includes('💪')||p.includes('👍')).length;
-  const bearish=parts.filter(p=>p.includes('📉')||p.includes('🔻')).length;
+  const bearish=parts.filter(p=>p.includes('📉')||p.includes('🔻')||p.includes('⚖️ Emissions')).length;
   if(bullish>bearish)el.style.borderColor='rgba(0,230,118,0.15)';
   else if(bearish>bullish)el.style.borderColor='rgba(255,61,90,0.15)';
   else el.style.borderColor='rgba(0,212,255,0.06)';
