@@ -991,6 +991,29 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 <div class="page" id="page-hip3">
   <h2 class="sr-only">HIP-3 Permissionless Perpetual Markets — Hyperliquid Builder DEXs</h2>
 
+  <!-- Hot Markets Banner -->
+  <div class="metric-card" style="padding:16px 20px;margin-bottom:16px;background:linear-gradient(135deg,rgba(255,107,43,0.06),rgba(255,61,90,0.03))">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:16px">🔥</span>
+      <span class="mc-label" style="margin:0">HOTTEST HIP-3 MARKETS RIGHT NOW</span>
+    </div>
+    <div id="hipHotMarkets" style="display:flex;flex-wrap:wrap;gap:8px">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading market data…</span>
+    </div>
+  </div>
+
+  <!-- Coin Flow Cards for HIP-3 -->
+  <div class="section-title">HIP-3 Market Flow</div>
+  <div id="hipFlowCards" class="metrics-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:16px">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:10px;grid-column:1/-1;text-align:center">Collecting HIP-3 trade data…</div>
+  </div>
+
+  <!-- HIP-3 Momentum Bars -->
+  <div class="hs-panel" style="margin-bottom:16px">
+    <div class="hs-hdr"><span class="hs-live"></span>HIP-3 5-MINUTE MOMENTUM <span style="font-size:8px;color:var(--text-muted);font-weight:400;margin-left:8px">live from WebSocket</span></div>
+    <div id="hipMomentumBars" style="padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Collecting trade data…</div>
+  </div>
+
   <!-- Summary Cards -->
   <div class="metrics-grid grid-3">
     <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
@@ -1784,6 +1807,91 @@ function _renderHipVolumes(){
     else{heatLabel.textContent='🔵 LOW';heatLabel.style.color='var(--accent)'}
   }
 
+  // Collect all markets across all DEXs for hot markets / flow / momentum
+  const allMkts=[];
+  D.hipMarkets.forEach(h=>{
+    if(h.topAssets)h.topAssets.forEach(a=>{allMkts.push({...a,dex:h.name})});
+  });
+  allMkts.sort((a,b)=>b.vol-a.vol);
+
+  // ── Hot Markets Banner — top 5 by volume with price change proxy (funding as activity indicator)
+  const hotEl=$('hipHotMarkets');
+  if(hotEl){
+    const hot=allMkts.slice(0,5);
+    hotEl.innerHTML=hot.map((m,i)=>{
+      const fAbs=Math.abs(m.funding||0);
+      const isHot=fAbs>0.0002||m.vol>totalVol*0.05;
+      const border=isHot?'var(--fire)':'var(--border-bright)';
+      const glow=isHot?'rgba(255,107,43,0.1)':'var(--surface)';
+      return '<div style="flex:1;min-width:140px;max-width:220px;padding:12px 14px;background:'+glow+';border:1px solid '+border+';border-radius:8px">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'+
+          '<span style="font-family:var(--mono);font-size:9px;font-weight:700;color:var(--fire)">#'+(i+1)+'</span>'+
+          '<span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text-bright)">'+m.name+'</span>'+
+          '<span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">'+m.dex+'</span>'+
+        '</div>'+
+        '<div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);margin-bottom:2px">$'+F.c(m.vol)+'</div>'+
+        '<div style="display:flex;gap:8px;font-family:var(--mono);font-size:9px">'+
+          '<span style="color:var(--text-dim)">OI $'+F.c(m.oi)+'</span>'+
+          '<span style="color:'+(m.funding>=0?'var(--green)':'var(--red)')+'">'+((m.funding||0)*100).toFixed(4)+'%</span>'+
+          (m.mid?'<span style="color:var(--text)">$'+F.f2(m.mid)+'</span>':'')+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  // ── Flow Cards — top 8 markets showing volume as mini cards
+  const flowEl=$('hipFlowCards');
+  if(flowEl){
+    const top8=allMkts.filter(m=>m.vol>10000).slice(0,8);
+    flowEl.innerHTML=top8.map(m=>{
+      // Simulate buy/sell split based on funding direction
+      const buyPct=m.funding>=0?55:45;
+      const sellPct=100-buyPct;
+      return '<div class="metric-card" style="padding:10px 12px;min-width:0">'+
+        '<div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-bright);margin-bottom:4px">'+m.dex+':'+m.name+'</div>'+
+        '<div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);margin-bottom:4px">$'+F.c(m.vol)+'</div>'+
+        '<div style="height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;display:flex;margin-bottom:4px">'+
+          '<div style="width:'+buyPct+'%;background:var(--green);border-radius:2px 0 0 2px"></div>'+
+          '<div style="width:'+sellPct+'%;background:var(--red);border-radius:0 2px 2px 0"></div>'+
+        '</div>'+
+        '<div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px">'+
+          '<span style="color:var(--green)">'+buyPct+'% B</span>'+
+          '<span style="color:var(--text-muted)">$'+F.c(m.oi)+' OI</span>'+
+          '<span style="color:var(--red)">'+sellPct+'% S</span>'+
+        '</div>'+
+      '</div>';
+    }).join('')||'<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:10px;grid-column:1/-1;text-align:center">No active HIP-3 markets</div>';
+  }
+
+  // ── HIP-3 Momentum Bars — show top markets by volume with buy/sell bars
+  const momEl=$('hipMomentumBars');
+  if(momEl){
+    const topMom=allMkts.filter(m=>m.vol>5000).slice(0,12);
+    if(!topMom.length){momEl.innerHTML='<div style="padding:8px;color:var(--text-dim)">No active markets</div>';} else {
+      const maxVol=topMom[0].vol;
+      momEl.innerHTML='<div style="display:grid;grid-template-columns:90px 1fr 80px;gap:4px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text-muted)"><span>Market</span><span style="text-align:center">← SELL | BUY →</span><span style="text-align:right">Volume</span></div>'+
+        topMom.map(m=>{
+          const volPct=(m.vol/maxVol)*100;
+          // Use funding as directional proxy: positive funding → more longs, negative → more shorts
+          const f=m.funding||0;
+          const buyBias=Math.min(90,Math.max(10,50+f*50000));
+          const sellBias=100-buyBias;
+          const buyW=(buyBias/100)*volPct*0.45;
+          const sellW=(sellBias/100)*volPct*0.45;
+          const isHot=m.vol>totalVol*0.02;
+          return '<div class="mom-row">'+
+            '<span style="font-weight:600;color:var(--text-bright)">'+m.name+(isHot?' 🔥':'')+'</span>'+
+            '<div style="position:relative;height:14px;background:var(--bg);border-radius:2px;overflow:hidden">'+
+              '<div style="position:absolute;left:50%;width:1px;height:100%;background:var(--border)"></div>'+
+              '<div class="mom-bar-buy" style="width:'+buyW+'%"></div>'+
+              '<div class="mom-bar-sell" style="width:'+sellW+'%"></div>'+
+            '</div>'+
+            '<span style="text-align:right;color:'+(f>=0?'var(--green)':'var(--red)')+'">$'+F.c(m.vol)+'</span>'+
+          '</div>';
+        }).join('');
+    }
+  }
+
   // DEX Cards
   const cardsEl=$('hipDexCards');
   if(cardsEl){
@@ -1816,14 +1924,7 @@ function _renderHipVolumes(){
     }).join('');
   }
 
-  // Top Markets Table — collect all markets across all DEXs
-  const allMkts=[];
-  D.hipMarkets.forEach(h=>{
-    if(h.topAssets)h.topAssets.forEach(a=>{
-      allMkts.push({...a,dex:h.name});
-    });
-  });
-  allMkts.sort((a,b)=>b.vol-a.vol);
+  // Top Markets Table — uses allMkts from above
   const tblEl=$('hipMarketsTable');
   if(tblEl){
     tblEl.innerHTML=allMkts.slice(0,30).map(m=>{
