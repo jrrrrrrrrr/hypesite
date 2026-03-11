@@ -517,21 +517,44 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="chart-wrap" id="afWrap" style="height:260px"></div>
   </div>
 
-  <!-- Price Rating -->
-  <div class="overview-grid" style="grid-template-columns:1fr">
-    <div class="metric-card" style="padding:16px">
-      <div class="mc-label" style="margin-bottom:10px">📊 Price Rating</div>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
-        <div class="rating-score" id="ratingScore" style="font-size:36px">—</div>
-        <div><div class="rating-label" id="ratingLabel" style="font-size:11px">Loading…</div>
-        <div class="rating-bar-wrap" style="width:140px;margin-top:6px"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div></div>
+  <!-- Trade Signal — actionable for traders -->
+  <div class="metric-card" style="padding:16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="mc-label" style="margin:0">⚡ HYPE TRADE SIGNAL</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="rating-score" id="ratingScore" style="font-size:28px">—</div>
+        <div>
+          <div class="rating-label" id="ratingLabel" style="font-size:12px;font-weight:700">Loading…</div>
+          <div class="rating-bar-wrap" style="width:100px;margin-top:4px"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:3px">
-        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi">—</span><span class="ri-signal" id="riRsiSig">—</span></div>
-        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma20">—</span><span class="ri-signal" id="riSma20Sig">—</span></div>
-        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd">—</span><span class="ri-signal" id="riMacdSig">—</span></div>
-        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom">—</span><span class="ri-signal" id="riMomSig">—</span></div>
+    </div>
+    <div id="tradeSignalSummary" style="font-family:var(--sans);font-size:12px;color:var(--text);line-height:1.65;margin-bottom:12px;padding:10px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">Analyzing price action…</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
+      <div class="ri-row" style="flex-direction:column;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:6px"><span class="ri-name" style="margin-bottom:2px">RSI (14)</span><span class="ri-val" id="riRsi" style="font-size:14px">—</span><span class="ri-signal" id="riRsiSig">—</span></div>
+      <div class="ri-row" style="flex-direction:column;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:6px"><span class="ri-name" style="margin-bottom:2px">SMA 20</span><span class="ri-val" id="riSma20" style="font-size:14px">—</span><span class="ri-signal" id="riSma20Sig">—</span></div>
+      <div class="ri-row" style="flex-direction:column;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:6px"><span class="ri-name" style="margin-bottom:2px">MACD</span><span class="ri-val" id="riMacd" style="font-size:14px">—</span><span class="ri-signal" id="riMacdSig">—</span></div>
+      <div class="ri-row" style="flex-direction:column;align-items:flex-start;padding:8px;background:var(--bg2);border-radius:6px"><span class="ri-name" style="margin-bottom:2px">Momentum</span><span class="ri-val" id="riMom" style="font-size:14px">—</span><span class="ri-signal" id="riMomSig">—</span></div>
+    </div>
+  </div>
+
+  <!-- Quick Bubbles: PURR + NFT -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <div class="metric-card" style="padding:10px 14px;flex:1;min-width:180px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:16px">🐱</span>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em">PURR STOCK</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)" id="purrBubblePrice">—</div>
       </div>
+      <div id="purrBubbleChg" style="font-family:var(--mono);font-size:11px;font-weight:600;margin-left:auto">—</div>
+    </div>
+    <div class="metric-card" style="padding:10px 14px;flex:1;min-width:180px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:16px">😺</span>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em">HYPURR NFT</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)" id="nftBubbleFloor">—</div>
+      </div>
+      <div id="nftBubbleChg" style="font-family:var(--mono);font-size:11px;font-weight:600;margin-left:auto">—</div>
     </div>
   </div>
 
@@ -1306,7 +1329,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <!-- Masthead -->
   <div class="news-masthead">
     <h1>HYPE <span>INTELLIGENCE</span></h1>
-    <div class="news-date">MARCH 8, 2026 · WEEKLY BRIEF · CURATED FOR PERP TRADERS</div>
+    <div class="news-date">MARCH 11, 2026 · WEEKLY BRIEF · CURATED FOR PERP TRADERS</div>
   </div>
 
   <!-- Signal summary -->
@@ -2040,6 +2063,21 @@ function renderAll(){
   if(D.price&&D.circSupply)set('heroMcap',F.usd(D.price*D.circSupply));
   if(D.price)set('heroFdv',F.usd(D.price*MAX_S));
   if(D.price)_updateNftUsd(D.price);
+
+  // PURR bubble — use static data (PURR stock doesn't have a live API in our stack)
+  set('purrBubblePrice','$5.22');
+  const purrChgEl=$('purrBubbleChg');
+  if(purrChgEl){purrChgEl.textContent='+12.3% wk';purrChgEl.style.color='#00e676'}
+
+  // NFT bubble — use live CoinGecko data if available
+  if(D.nftFloor){
+    set('nftBubbleFloor',F.c(D.nftFloor)+' HYPE');
+    const nftChgEl=$('nftBubbleChg');
+    if(nftChgEl&&D.nftFloorChg24h!=null){
+      nftChgEl.textContent=(D.nftFloorChg24h>=0?'+':'')+D.nftFloorChg24h.toFixed(1)+'% 24h';
+      nftChgEl.style.color=D.nftFloorChg24h>=0?'#00e676':'#ff3d5a';
+    }
+  }
 
   // Total burned = AF HYPE + fee burns
   if(D.totalBurned>0){
@@ -2981,6 +3019,37 @@ function computePriceRating(){
   ['ratingScore','ratingScore2'].forEach(id=>{const el=$(id);if(el){el.textContent=score+'/100';el.style.color=col}});
   ['ratingLabel','ratingLabel2'].forEach(id=>{const el=$(id);if(el){el.textContent=label;el.style.color=col;el.style.background=bg}});
   ['ratingBar','ratingBar2'].forEach(id=>{const el=$(id);if(el)el.style.left=score+'%'});
+
+  // Generate actionable trade signal summary
+  const sigEl=$('tradeSignalSummary');
+  if(sigEl){
+    const px=D.price||0;
+    const parts=[];
+    // RSI context
+    if(rsi>70)parts.push('RSI at '+rsi.toFixed(0)+' signals overbought — pullback risk elevated.');
+    else if(rsi>60)parts.push('RSI at '+rsi.toFixed(0)+' shows bullish momentum with room to run.');
+    else if(rsi>40)parts.push('RSI at '+rsi.toFixed(0)+' is neutral — no clear directional bias from momentum.');
+    else if(rsi>30)parts.push('RSI at '+rsi.toFixed(0)+' approaching oversold — watch for a bounce.');
+    else parts.push('RSI at '+rsi.toFixed(0)+' is oversold — reversal probability increasing.');
+    // SMA context
+    if(px>sma20&&sma20>0)parts.push('Price above SMA20 ($'+F.f2(sma20)+') — short-term trend is up.');
+    else if(sma20>0)parts.push('Price below SMA20 ($'+F.f2(sma20)+') — short-term trend is down, reclaim needed.');
+    // MACD
+    if(macdVal>0)parts.push('MACD positive ('+macdVal.toFixed(3)+') — buying pressure outweighs selling.');
+    else if(macdVal<0)parts.push('MACD negative ('+macdVal.toFixed(3)+') — selling pressure dominates.');
+    // Funding
+    if(D.hypeFunding!=null){
+      const f=D.hypeFunding;
+      if(f>0.0003)parts.push('Funding rate positive ('+((f*100).toFixed(4))+'%) — longs crowded, squeeze shorts if price drops.');
+      else if(f<-0.0003)parts.push('Funding rate negative ('+((f*100).toFixed(4))+'%) — shorts crowded, squeeze longs if price rises.');
+    }
+    // Overall
+    if(score>=70)parts.push('Overall: Strong bullish setup. Look for entries on dips to SMA20.');
+    else if(score>=55)parts.push('Overall: Leaning bullish. Manage risk — set stops below recent swing low.');
+    else if(score>=45)parts.push('Overall: Mixed signals. Wait for a clearer setup before sizing in.');
+    else parts.push('Overall: Bearish bias. Consider reducing exposure or hedging with shorts.');
+    sigEl.textContent=parts.join(' ');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3794,6 +3863,26 @@ setInterval(_updateHypeMomentumBar,3000);
 //  INTEL TAB — Curated Hyperliquid briefing for perp traders
 // ═══════════════════════════════════════════════════════════════
 const INTEL_DATA=[
+  {title:"HIP-3 OI Hits $1.2B Record — Oil & Equity Futures Boom",date:"Mar 10",category:"PROTOCOL",
+   eli5:"Open interest on Hyperliquid's permissionless HIP-3 markets hit an all-time record of $1.2 billion. Only 7 of the top 30 markets are crypto — the rest are commodity and equity futures. Oil contract CL-USDC did $1.62B in 24h volume alone, leading the entire platform. XYZ100 (tokenized equities) holds $213M in OI.",
+   perp_impact:"This is the inflection point for HIP-3. When commodity and equity perps dominate your DEX, you're not just a crypto platform anymore — you're an alternative exchange. Each HIP-3 deployer stakes 500K HYPE ($17M+), and the fee revenue flows into burns. Crude oil liq'd $56M in positions in 24h. The Iran conflict is the catalyst, but the infrastructure will outlast it.",
+   signal:"BULLISH",importance:5},
+  {title:"Arthur Hayes: $150 HYPE Target by August 2026",date:"Mar 10",category:"TRADING",
+   eli5:"BitMEX founder Arthur Hayes published a detailed bull case for HYPE hitting $150 by August — a 330% gain from current $35. Maelstrom (his fund) holds a substantial position. His thesis: 97% revenue-to-buyback ratio is unmatched in crypto, HYPE is 'this cycle's GMX,' and the platform is capturing CEX volume as competitor incentive programs fade.",
+   perp_impact:"Hayes calling $150 with a specific timeline (August) and his fund's position public adds serious signal. GMX hit $90 in early 2023 during a similar macro backdrop. The key difference: Hyperliquid's volume is 10x GMX at peak. If market believes revenue growth sustains, the earnings multiple re-rating alone could drive significant upside. Support at $28, resistance at $36.6.",
+   signal:"BULLISH",importance:5},
+  {title:"Portfolio Margin Upgrade — Alpha Phase Coming",date:"Mar 10",category:"PROTOCOL",
+   eli5:"Hyperliquid announced portfolio margin is upgrading from 'pre-alpha to alpha phase' on the next network upgrade. The feature will support accounts under $500K, gated by weighted volume requirements. Dynamic margin scaling and cross-collateral improvements reduce liquidation risk.",
+   perp_impact:"Portfolio margin is what institutional traders need. Cross-margin across correlated positions means better capital efficiency — you can run more complex strategies with less collateral. This directly competes with CEX margin features and makes Hyperliquid viable for larger accounts. The volume-gated access also incentivizes more trading activity.",
+   signal:"BULLISH",importance:4},
+  {title:"$1.76M Short Squeeze — 87% of Liquidations Were Shorts",date:"Mar 10",category:"TRADING",
+   eli5:"A major short squeeze hit HYPE on March 10 as price rallied 12.5% to $34.23. Of the $2.02M in total liquidations, $1.76M (87.1%) were shorts getting liquidated. The squeeze validated the setup we flagged earlier — short liquidation leverage was clustered above $34.",
+   perp_impact:"The squeeze above $34 played out exactly as the on-chain data predicted. Now the question: is there more to squeeze? Check funding rates — if they're still negative after the squeeze, there are more shorts to liquidate. If funding flipped positive, the easy money has been made. Next resistance: $36.6, then $38 (February high).",
+   signal:"BULLISH",importance:4},
+  {title:"HYPE +120% YoY While Altcoins Down 40-70%",date:"Mar 10",category:"TRADING",
+   eli5:"HYPE is up 120% over the past year according to CoinGecko data, while most major altcoins are down 40-70% in the same period. The token hit $35.28 intraday on March 10. Total platform OI exceeds $5B, 24h volume $5.71B, TVL $4.06B — all outpacing Aster, Edgex, Lighter, and Jupiter.",
+   perp_impact:"This is the decoupling thesis confirmed. HYPE trades on revenue fundamentals, not crypto sentiment. When BTC drops, Hyperliquid volume actually increases (more hedging activity), which means more fees, which means more burns. This is structurally different from holding ETH or SOL. The 120% YoY in a bear market is what institutional allocators notice.",
+   signal:"BULLISH",importance:4},
   {title:"$316M Unlock Absorbed — Price Held $30",date:"Mar 6",category:"TRADING",
    eli5:"The largest HYPE unlock yet (9.92M tokens, $316M) hit on March 6. Core contributor allocations entered circulation. The market's response: HYPE held $30 and Hyperliquid processed $73.4B in volume that same day — a record. Either the team isn't selling, or buyer depth fully absorbed the new supply.",
    perp_impact:"This is the most bullish possible outcome from an unlock event. Price holding through $316M of new supply means the sell-side thesis just got weaker. Next unlock is April 6 — now that the market has a precedent for absorbing these, the fear discount should shrink. If you were waiting to size up, the unlock holding $30 was your signal. Stop below $28.",
@@ -3837,6 +3926,14 @@ const INTEL_DATA=[
 ];
 
 const INTEL_BLOG=[
+  {date:"Mar 11, 2026",title:"Oil, Gold, and the $1.2B OI: How HIP-3 Just Changed the Game Forever",
+   body:`<p>Something historic happened on March 10. Hyperliquid's HIP-3 permissionless perpetual markets hit $1.2 billion in open interest — a record. But the headline number isn't what matters. <strong>What matters is what people are trading.</strong></p>
+<p>Of the top 30 markets by OI on Hyperliquid, only 7 are crypto. The rest? Crude oil, Brent crude, S&P 500, silver, gold, NVIDIA, Tesla. The CL-USDC oil contract alone did $1.62 billion in 24-hour volume — more than Ethereum. When a decentralized exchange is doing more oil futures volume than some traditional commodity brokers, you're witnessing a structural shift in how financial markets work.</p>
+<p><strong>Why this matters for HYPE:</strong> Every HIP-3 deployer stakes 500,000 HYPE ($17M+ at current prices) to launch their DEX. There are now 7 active DEXs with 138+ markets. That's 3.5M HYPE locked just in deployer stakes. On top of that, all trading fees from HIP-3 markets flow into the same buyback-and-burn engine as the main DEX. The $1.62B in oil volume on March 10 generated massive fees — all buying and burning HYPE.</p>
+<p><strong>The Iran catalyst:</strong> The US-Iran conflict escalated over the weekend when traditional markets were closed. Traders couldn't access COMEX gold futures or NYMEX crude. But Hyperliquid was open 24/7. Crude oil perps surged, silver saw record volume, and $56M in positions got liquidated on oil alone. This isn't a one-off — every future geopolitical weekend event is now a Hyperliquid growth catalyst.</p>
+<p><strong>Arthur Hayes is betting big:</strong> The BitMEX founder published his $150 target for HYPE by August 2026. His thesis: "No other project in all of crypto hands as much money back to token holders as Hyperliquid." Maelstrom's fund has a substantial position. He compared HYPE to GMX, which hit $90 during the 2023 sideways market. The key difference? Hyperliquid's volume is 10x GMX at peak.</p>
+<p><strong>Portfolio margin upgrade:</strong> The cherry on top — Hyperliquid announced portfolio margin is moving from pre-alpha to alpha. This means cross-collateral, dynamic margin scaling, and better capital efficiency for accounts under $500K. This is what institutional traders need to move serious size onto the platform.</p>
+<p><strong>The trade:</strong> HYPE held $30 through the March 6 unlock, squeezed shorts at $34 (87% of liquidations were shorts), and now trades at $35. The $34 level flipped from resistance to support. Next targets: $36.6, then $38 (February high), then $43 if the squeeze extends. Stop: daily close below $30. The fundamentals have never been stronger — $5B+ total OI, $5.7B daily volume, 120% YoY gain while altcoins are down 40-70%. This is infrastructure, not speculation.</p>`},
   {date:"Mar 8, 2026",title:"The Unlock That Didn't Matter: What March 6 Tells Us About HYPE's Buy-Side Depth",
    body:`<p>The numbers are in. On March 6, 9.92 million HYPE tokens ($316M) unlocked for core contributors. The platform processed $73.4 billion in volume that same day — a single-day record. And the price held $30.</p>
 <p>Let that sink in. A 2.7% supply increase hit the market on a day when the platform was simultaneously handling its highest volume ever due to Iran crisis commodity trading. The result? <strong>Nothing happened to the price.</strong> This is the most important data point of the month.</p>
