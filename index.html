@@ -1809,7 +1809,18 @@ async function fAfOrders(){
 }
 
 async function fDelegations(){try{const d=await hs('/delegations');if(Array.isArray(d)&&d.length){const tot=d.reduce((s,v)=>s+parseFloat(v.amount||v.stake||0),0);if(tot>0&&!D.staked)D.staked=tot}}catch(e){}}
-async function fQueue(){const d=await hs('/unstakingQueue');if(Array.isArray(d))D.queue=d}
+async function fQueue(){
+  // Try fullUnstakingQueue first (more complete), then unstakingQueue
+  try{const d=await hs('/fullUnstakingQueue');if(Array.isArray(d)&&d.length>0){D.queue=d;console.log('[fQueue] ✅ fullUnstakingQueue:',d.length);return}}catch(e){}
+  try{const d=await hs('/unstakingQueue');if(Array.isArray(d))D.queue=d}catch(e){}
+  // Also try HL API staking endpoint
+  if(!D.queue||D.queue.length===0){
+    try{
+      const d=await hl({type:'spotClearinghouseState',user:'0x0000000000000000000000000000000000000000'});
+      console.log('[fQueue] HL staking query returned');
+    }catch(e){}
+  }
+}
 async function fPerpStats(){try{const d=await hl({type:'metaAndAssetCtxs'});if(Array.isArray(d)&&d.length>=2){const[meta,ctxs]=d;let tOI=0,tVol=0;D.markets=(meta.universe||[]).map((u,i)=>{const c=ctxs[i];if(!c)return null;const mid=parseFloat(c.midPx||c.markPx||0);const oi=parseFloat(c.openInterest||0)*mid;const vol=parseFloat(c.dayNtlVlm||0);const funding=parseFloat(c.funding||0);const premium=parseFloat(c.premium||0);tOI+=oi;tVol+=vol;
       // HYPE-specific metrics
       if(u.name==='HYPE'){D.hypeFunding=funding;D.hypePremium=premium;D.hypeOI=oi;D.hypeVol=vol}
@@ -2150,8 +2161,13 @@ function renderAll(){
   const _qParse=e=>{let a=0;if(e.amount)a=parseFloat(e.amount);else if(e.nHype){const n=parseFloat(e.nHype);a=n>1e15?n/1e18:n}else if(e.hype)a=parseFloat(e.hype);else if(e.value)a=parseFloat(e.value);if(a>1e12)a=a/1e18;return a};
   const qFiltered=D.queue.filter(e=>_qParse(e)>=1000);
   const qtTotal=qFiltered.reduce((s,e)=>s+_qParse(e),0);
-  set('psQueue',F.c(qtTotal)+' HYPE');
-  set('psQueueSub',qFiltered.length+' pending (≥1K)');
+  if(qtTotal>0){
+    set('psQueue',F.c(qtTotal)+' HYPE');
+    set('psQueueSub',qFiltered.length+' pending (≥1K)');
+  } else {
+    set('psQueue','None');
+    set('psQueueSub','No large unstakes pending');
+  }
   // AF total value
   if(D.afHype&&D.price){const tv=D.afHype*D.price+D.afUsdc;set('psAfTotal',F.usd(tv))}
 
@@ -4143,9 +4159,11 @@ async function _fetchNftLiveData(){
     // Floor price (in native currency = HYPE)
     if(d.floor_price?.native_currency){
       const floor=parseFloat(d.floor_price.native_currency);
+      D.nftFloor=floor;
       const fe=$('nftFloor');if(fe)fe.textContent=floor.toFixed(0);
       // USD floor
       const usdFloor=d.floor_price?.usd;
+      D.nftFloorUsd=usdFloor?parseFloat(usdFloor):null;
       const usdEl=$('nftFloorUsd');
       if(usdEl&&usdFloor)usdEl.textContent='≈ $'+parseFloat(usdFloor).toLocaleString(undefined,{maximumFractionDigits:0});
     }
@@ -4153,6 +4171,7 @@ async function _fetchNftLiveData(){
     // 24h volume
     if(d.volume_24h?.native_currency){
       const vol=parseFloat(d.volume_24h.native_currency);
+      D.nftVol24h=vol;
       const ve=$('nftVol');if(ve)ve.textContent=vol.toLocaleString(undefined,{maximumFractionDigits:0});
     }
 
@@ -4162,7 +4181,6 @@ async function _fetchNftLiveData(){
       const total=parseInt(d.total_supply||4600);
       const pct=total>0?((owners/total)*100).toFixed(1):'—';
       const oe=$('nftOwners');if(oe)oe.textContent=owners.toLocaleString();
-      // Update the sub label with unique %
       const oeSub=oe?.parentElement?.querySelector('.ns-sub');
       if(oeSub)oeSub.textContent=pct+'% unique';
     }
@@ -4170,6 +4188,7 @@ async function _fetchNftLiveData(){
     // Floor price 24h change
     if(d.floor_price_in_usd_24h_percentage_change!==undefined){
       const chg=parseFloat(d.floor_price_in_usd_24h_percentage_change);
+      D.nftFloorChg24h=chg;
       const spreadEl=$('nftSpread');
       if(spreadEl){
         spreadEl.textContent=(chg>=0?'+':'')+chg.toFixed(1)+'%';
