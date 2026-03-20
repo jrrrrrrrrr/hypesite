@@ -532,7 +532,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
       <button class="nav-tab" onclick="showPage('hip3',this)">HIP-3</button>
       <button class="nav-tab" onclick="showPage('ecosystem',this)">Ecosystem</button>
-      <button class="nav-tab" onclick="showPage('intel',this)">Intel</button>
     </div>
   </div>
   <div class="nav-right">
@@ -549,7 +548,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   <button onclick="showPage('trades',this);document.getElementById('mobDropdown').classList.remove('open')">Live Trades</button>
   <button onclick="showPage('hip3',this);document.getElementById('mobDropdown').classList.remove('open')">HIP-3</button>
   <button onclick="showPage('ecosystem',this);document.getElementById('mobDropdown').classList.remove('open')">Ecosystem</button>
-  <button onclick="showPage('intel',this);document.getElementById('mobDropdown').classList.remove('open')">Intel</button>
 </div>
 
 <!-- ══ OVERVIEW ════════════════════════════════════════════════ -->
@@ -634,51 +632,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div class="af-stat"><div class="lbl">Live Rate</div><div class="val cyan" id="burnLiveRate">—</div></div>
       </div>
       <div class="chart-wrap" id="burnWrap" style="height:220px"></div>
-    </div>
-
-    <!-- Burn Rate History -->
-    <div class="af-live" style="margin-top:12px">
-      <div class="chart-hdr">
-        <div class="left"><span class="chart-title">📊 Burn Rate History</span><span class="chart-meta" id="burnRateMeta">Estimating…</span></div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="tf-btns">
-            <button class="tf-btn" id="br30d" onclick="setBurnRange('30d',this)">30d</button>
-            <button class="tf-btn active" id="br90d" onclick="setBurnRange('90d',this)">90d</button>
-            <button class="tf-btn" id="brAll" onclick="setBurnRange('all',this)">All</button>
-          </div>
-          <div class="tf-btns">
-            <button class="tf-btn" id="brHour" onclick="setBurnTf('hour',this)">Hourly</button>
-            <button class="tf-btn active" id="brDay" onclick="setBurnTf('day',this)">Daily</button>
-            <button class="tf-btn" id="brWeek" onclick="setBurnTf('week',this)">Weekly</button>
-          </div>
-        </div>
-      </div>
-      <div class="af-live-stats" style="margin-bottom:8px">
-        <div class="af-stat"><div class="lbl">Burn Score</div><div class="val fire" id="burnScoreVal" style="font-size:22px">—</div></div>
-        <div class="af-stat"><div class="lbl">Last Period</div><div class="val" id="burnToday">—</div></div>
-        <div class="af-stat"><div class="lbl">Avg Daily</div><div class="val" id="burnAvgDay">—</div></div>
-        <div class="af-stat"><div class="lbl">Annual Velocity</div><div class="val green" id="burnVelocity">—</div></div>
-      </div>
-      <div class="chart-wrap" id="burnRateWrap" style="height:280px"></div>
-    </div>
-
-    <!-- Burns vs Emissions — the key deflationary narrative -->
-    <div class="af-live" style="margin-top:12px">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">⚖️ Burns vs Emissions — Is HYPE Deflationary?</span><span class="chart-meta" id="supDynMeta">Computing…</span></div></div>
-      <div class="af-live-stats" style="margin-bottom:8px">
-        <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div><div class="lbl" id="emDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
-        <div class="af-stat"><div class="lbl">Daily Burns (7d avg)</div><div class="val fire" id="emBurnDaily">—</div><div class="lbl" id="emBurnDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
-        <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div><div class="lbl" id="emNetDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
-        <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div><div class="lbl" id="emAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
-        <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div><div class="lbl" id="emBurnAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
-        <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div><div class="lbl" id="emNetAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
-      </div>
-      <div class="chart-wrap" id="emChartWrap" style="height:280px"></div>
-      <div style="padding:10px 16px;font-family:var(--sans);font-size:11px;color:var(--text-muted);line-height:1.7">
-        <strong style="color:var(--text-dim)">How it works:</strong> Stakers earn new HYPE from a reserve (emissions). Meanwhile, trading fees buy & burn HYPE. If burns &gt; emissions, total supply shrinks — that's deflationary.
-        <span id="emBurnNote" style="display:block;margin-top:4px;font-family:var(--mono);font-size:10px"></span>
-        <span id="emNetNote" style="display:block;margin-top:2px;font-family:var(--mono);font-size:10px"></span>
-      </div>
     </div>
   </div>
 
@@ -1386,7 +1339,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
           <div class="nft-stat"><div class="ns-lbl">Market Cap</div><div class="ns-val" id="nftListed">—</div><div class="ns-sub">native</div></div>
         </div>
       </div>
-      <div class="nft-chart-wrap" id="nftChartWrap"></div>
       <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
     </div>
   </div>
@@ -1468,35 +1420,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
   </div>
 </div>
 
-<!-- ══ INTEL ════════════════════════════════════════════════════ -->
-<div class="page" id="page-intel">
-  <h2 class="sr-only">Hyperliquid Intelligence &amp; HYPE Trading Analysis</h2>
-  <!-- Headline ticker -->
-  <div class="news-ticker"><div class="ticker-track" id="tickerTrack"></div></div>
-
-  <!-- Masthead -->
-  <div class="news-masthead">
-    <h1>HYPE <span>INTELLIGENCE</span></h1>
-    <div class="news-date">MARCH 13, 2026 · WEEKLY BRIEF · CURATED FOR PERP TRADERS</div>
-  </div>
-
-  <!-- Signal summary -->
-  <div id="intelSummary"></div>
-
-  <!-- Hero + sidebar -->
-  <div class="news-hero">
-    <div class="hero-main" id="heroStory"></div>
-    <div class="hero-sidebar" id="heroSidebar"></div>
-  </div>
-
-  <!-- More stories grid -->
-  <div class="news-section-hdr">Latest Updates</div>
-  <div class="news-grid" id="intelGrid"></div>
-
-  <!-- Daily brief / blog -->
-  <div class="news-section-hdr">Daily Intelligence Brief</div>
-  <div id="intelBlog"></div>
-</div>
 
 <footer>
   <!-- Referral & Discount Section — SEO keyword rich -->
@@ -1570,8 +1493,6 @@ function showPage(id,btn){
     if(id==='overview'){
       drawRing();
       if(!_burnChart&&typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart()}
-      if(!_burnRateChart&&typeof LightweightCharts!=='undefined'){_initBurnRateChart()}
-      if(!_emChart&&typeof LightweightCharts!=='undefined'){_initEmChart()}
     }
     if(id==='charts'){
       if(!_sqzChart&&typeof LightweightCharts!=='undefined'){_initSqzChart();if(_pData.length>30)computeSqzMom()}
@@ -1581,7 +1502,7 @@ function showPage(id,btn){
       if(!_volFlowChart&&typeof LightweightCharts!=='undefined'){_initVolFlowChart()}
     }
     if(id==='ecosystem'){
-      if(!_nftChart&&typeof LightweightCharts!=='undefined'){_initNftChart()}
+      _fetchNftLiveData();
     }
     _resizeAllCharts();
   })})},50);
@@ -1590,10 +1511,8 @@ function _resizeAllCharts(){
   const isVis=id=>{const el=$(id);return el&&el.closest('.page.active')};
   if(_afChart&&isVis('afWrap')){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h});_afChart.timeScale().fitContent()}
   if(_burnChart&&isVis('burnWrap')){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h});_burnChart.timeScale().fitContent()}
-  if(_burnRateChart&&isVis('burnRateWrap')){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h});_burnRateChart.timeScale().fitContent()}
   if(_sqzChart&&isVis('sqzWrap')){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h});_sqzChart.timeScale().fitContent()}
   if(_volFlowChart&&isVis('volFlowWrap')){const s=_wsz('volFlowWrap');_volFlowChart.applyOptions({width:s.w,height:s.h});_volFlowChart.timeScale().fitContent()}
-  if(_nftChart&&isVis('nftChartWrap')){const s=_wsz('nftChartWrap');_nftChart.applyOptions({width:s.w,height:s.h});_nftChart.timeScale().fitContent()}
   if(_emChart&&isVis('emChartWrap')){const s=_wsz('emChartWrap');_emChart.applyOptions({width:s.w,height:s.h});_emChart.timeScale().fitContent()}
 }
 
@@ -4103,297 +4022,13 @@ function _updateHypeMomentumBar(){
 }
 // Update HYPE momentum every 3s alongside the main momentum bars
 setInterval(_updateHypeMomentumBar,3000);
-// ═══════════════════════════════════════════════════════════════
-//  INTEL TAB — Curated Hyperliquid briefing for perp traders
-// ═══════════════════════════════════════════════════════════════
-const INTEL_DATA=[
-  {title:"HYPE Breaks $38 — Golden Cross Confirmed, +48% YTD",date:"Mar 12",category:"TRADING",
-   eli5:"HYPE surged to $38.08, its highest since February 3. The 50-day SMA crossed above the 100-day SMA (golden cross) — a classic bullish signal. The token is up 48% year-to-date and 170% since March 2025, while most altcoins are down 40-70%. Trading volume jumped 43% to $464M in 24 hours.",
-   perp_impact:"The golden cross + ascending triangle breakout is a strong technical setup. RSI at 67 means momentum is strong but not overbought yet. Key resistance at $40 — a sustained close above opens $48.91 (October high). Support at $35.47 (breakout zone) and $32 (200-day EMA). The weekly +20% gain may trigger profit-taking, so scale into longs rather than FOMOing at resistance.",
-   signal:"BULLISH",importance:5},
-  {title:"HIP-3 OI Hits $1.33B — Oil Volume >$1B Daily",date:"Mar 12",category:"PROTOCOL",
-   eli5:"HIP-3 open interest reached $1.33 billion — up from $500M just a month ago. Crude oil perpetuals alone generated $1.17B in 24-hour volume, making it the second most traded market on Hyperliquid after Bitcoin. 30% of all Hyperliquid volume at peak hours comes from tokenized traditional finance assets.",
-   perp_impact:"The HIP-3 growth is parabolic. $500M to $1.33B in OI in one month. Each deployer locks 500K HYPE ($18M+). The oil premium over spot prices during weekend trading creates arb opportunities. Watch for when traditional markets reopen — the HL oil price tends to converge, creating mean-reversion setups.",
-   signal:"BULLISH",importance:5},
-  {title:"PURR Stock Gaps Up to $6.07 — Analyst Upgrades",date:"Mar 12",category:"ECOSYSTEM",
-   eli5:"Hyperliquid Strategies (NASDAQ: PURR) stock gapped up to $6.07 from $5.84 close, a 4%+ move. Multiple analyst upgrades: Cantor Fitzgerald raised PT to $6 (Overweight), Chardan Capital PT $8.45 (Buy). The stock is tracking HYPE price closely as the company's NAV is ~80% HYPE tokens.",
-   perp_impact:"PURR trading above its NAV would signal institutional premium for HYPE exposure. If PURR trades at NAV discount, it's a leveraged way to play HYPE. Watch the NAV premium/discount as a sentiment indicator for institutional HYPE demand.",
-   signal:"BULLISH",importance:3},
-  {title:"HIP-4 Testnet Live — Binary Options for BTC & HYPE",date:"Mar 12",category:"PROTOCOL",
-   eli5:"Hyperliquid's testnet now shows HIP-4 prediction markets in the asset menu. Initial mainnet deployment will be limited to simple one-day binary markets for BTC and HYPE. These are fully collateralized instruments with fixed durations and non-linear payouts — no leverage or liquidation.",
-   perp_impact:"HIP-4 going live on testnet with actual UI means mainnet is weeks away, not months. One-day binary options on BTC and HYPE are the starting point. Once proven, permissionless deployment opens to any outcome market. This is the Polymarket killer thesis — and it's nearly shipping.",
-   signal:"BULLISH",importance:4},
-  {title:"Hyperliquid Leads All Non-Stablecoin Revenue — $54.4M/30d",date:"Mar 12",category:"ECOSYSTEM",
-   eli5:"Hyperliquid is now the #1 revenue-generating protocol in crypto (excluding stablecoins), collecting $54.39M over the last 30 days according to DefiLlama. This outpaces Pump.fun and the entire Tron ecosystem. Annualized run rate approaches $1.4B — all flowing into HYPE buyback-and-burn.",
-   perp_impact:"$54.4M/month × 97% = $52.8M/month in HYPE burns. That's $1.74M/day being permanently removed from supply. At current price ($37), that's ~47K HYPE burned per day. Compare to daily emissions of ~30K HYPE — the protocol is significantly net deflationary. Revenue growth directly translates to price support.",
-   signal:"BULLISH",importance:5},
-  {title:"HIP-3 OI Hits $1.2B Record — Oil & Equity Futures Boom",date:"Mar 10",category:"PROTOCOL",
-   eli5:"Open interest on Hyperliquid's permissionless HIP-3 markets hit an all-time record of $1.2 billion. Only 7 of the top 30 markets are crypto — the rest are commodity and equity futures. Oil contract CL-USDC did $1.62B in 24h volume alone, leading the entire platform. XYZ100 (tokenized equities) holds $213M in OI.",
-   perp_impact:"This is the inflection point for HIP-3. When commodity and equity perps dominate your DEX, you're not just a crypto platform anymore — you're an alternative exchange. Each HIP-3 deployer stakes 500K HYPE ($17M+), and the fee revenue flows into burns. Crude oil liq'd $56M in positions in 24h. The Iran conflict is the catalyst, but the infrastructure will outlast it.",
-   signal:"BULLISH",importance:5},
-  {title:"Arthur Hayes: $150 HYPE Target by August 2026",date:"Mar 10",category:"TRADING",
-   eli5:"BitMEX founder Arthur Hayes published a detailed bull case for HYPE hitting $150 by August — a 330% gain from current $35. Maelstrom (his fund) holds a substantial position. His thesis: 97% revenue-to-buyback ratio is unmatched in crypto, HYPE is 'this cycle's GMX,' and the platform is capturing CEX volume as competitor incentive programs fade.",
-   perp_impact:"Hayes calling $150 with a specific timeline (August) and his fund's position public adds serious signal. GMX hit $90 in early 2023 during a similar macro backdrop. The key difference: Hyperliquid's volume is 10x GMX at peak. If market believes revenue growth sustains, the earnings multiple re-rating alone could drive significant upside. Support at $28, resistance at $36.6.",
-   signal:"BULLISH",importance:5},
-  {title:"Portfolio Margin Upgrade — Alpha Phase Coming",date:"Mar 10",category:"PROTOCOL",
-   eli5:"Hyperliquid announced portfolio margin is upgrading from 'pre-alpha to alpha phase' on the next network upgrade. The feature will support accounts under $500K, gated by weighted volume requirements. Dynamic margin scaling and cross-collateral improvements reduce liquidation risk.",
-   perp_impact:"Portfolio margin is what institutional traders need. Cross-margin across correlated positions means better capital efficiency — you can run more complex strategies with less collateral. This directly competes with CEX margin features and makes Hyperliquid viable for larger accounts. The volume-gated access also incentivizes more trading activity.",
-   signal:"BULLISH",importance:4},
-  {title:"$1.76M Short Squeeze — 87% of Liquidations Were Shorts",date:"Mar 10",category:"TRADING",
-   eli5:"A major short squeeze hit HYPE on March 10 as price rallied 12.5% to $34.23. Of the $2.02M in total liquidations, $1.76M (87.1%) were shorts getting liquidated. The squeeze validated the setup we flagged earlier — short liquidation leverage was clustered above $34.",
-   perp_impact:"The squeeze above $34 played out exactly as the on-chain data predicted. Now the question: is there more to squeeze? Check funding rates — if they're still negative after the squeeze, there are more shorts to liquidate. If funding flipped positive, the easy money has been made. Next resistance: $36.6, then $38 (February high).",
-   signal:"BULLISH",importance:4},
-  {title:"HYPE +120% YoY While Altcoins Down 40-70%",date:"Mar 10",category:"TRADING",
-   eli5:"HYPE is up 120% over the past year according to CoinGecko data, while most major altcoins are down 40-70% in the same period. The token hit $35.28 intraday on March 10. Total platform OI exceeds $5B, 24h volume $5.71B, TVL $4.06B — all outpacing Aster, Edgex, Lighter, and Jupiter.",
-   perp_impact:"This is the decoupling thesis confirmed. HYPE trades on revenue fundamentals, not crypto sentiment. When BTC drops, Hyperliquid volume actually increases (more hedging activity), which means more fees, which means more burns. This is structurally different from holding ETH or SOL. The 120% YoY in a bear market is what institutional allocators notice.",
-   signal:"BULLISH",importance:4},
-  {title:"$316M Unlock Absorbed — Price Held $30",date:"Mar 6",category:"TRADING",
-   eli5:"The largest HYPE unlock yet (9.92M tokens, $316M) hit on March 6. Core contributor allocations entered circulation. The market's response: HYPE held $30 and Hyperliquid processed $73.4B in volume that same day — a record. Either the team isn't selling, or buyer depth fully absorbed the new supply.",
-   perp_impact:"This is the most bullish possible outcome from an unlock event. Price holding through $316M of new supply means the sell-side thesis just got weaker. Next unlock is April 6 — now that the market has a precedent for absorbing these, the fear discount should shrink. If you were waiting to size up, the unlock holding $30 was your signal. Stop below $28.",
-   signal:"BULLISH",importance:5},
-  {title:"HIP-4: Prediction Markets Coming to Hyperliquid",date:"Feb–Mar 2026",category:"PROTOCOL",
-   eli5:"Hyperliquid unveiled HIP-4 — 'outcome trading.' These are fully collateralized contracts that settle within a fixed range. Think prediction markets + bounded options, but running natively on HyperCore with unified margin. No leverage, no liquidations. Currently on testnet, mainnet expected after testing. HYPE surged 10-20% on the announcement.",
-   perp_impact:"HIP-4 is the biggest product expansion since HyperEVM. Prediction markets are a $44B+ TAM (Polymarket + Kalshi). Unlike those platforms, HIP-4 outcomes integrate with your perp positions — you could hedge a long ETH perp with an outcome contract that pays if ETH drops, all on one margin system. Each new outcome market requires 500K HYPE staked to deploy, creating another supply sink. Mainnet launch date is the next major catalyst.",
-   signal:"BULLISH",importance:5},
-  {title:"$73.4B Single-Day Volume Record",date:"Mar 6",category:"TRADING",
-   eli5:"Hyperliquid processed $73.4 billion in trading volume on March 6 alone — shattering previous records. The platform generated $2.88M in fees that day. This happened during the Iran crisis weekend + unlock day, proving that Hyperliquid thrives on volatility from any source. Cumulative volume has now exceeded $3.64 trillion.",
-   perp_impact:"$73.4B in one day means $2.88M in fees → 97% goes to buyback-and-burn. That's roughly $2.79M burned in a single day. Annualized at this pace, that's over $1B/year in burns. Obviously this was a peak day, but it shows the ceiling for the burn engine during high-volatility periods.",
-   signal:"BULLISH",importance:5},
-  {title:"3.4M Daily Transactions — All-Time High",date:"Mar 3",category:"PROTOCOL",
-   eli5:"HyperliquidX hit 3.4 million daily transactions on March 3, a new all-time high for the L1. This includes trades, transfers, staking operations, and HyperEVM contract calls. The chain handled this with sub-second finality and no degradation — proving the infrastructure scales.",
-   perp_impact:"Transaction count is a proxy for ecosystem health beyond just trading. More txs = more gas burned (HYPE), more HyperEVM activity, more fee revenue. The ATH coinciding with the geopolitical weekend surge shows organic growth, not wash trading. Watch this metric — sustained 3M+ daily txs would be very bullish for the gas demand thesis.",
-   signal:"BULLISH",importance:4},
-  {title:"Smart Money Long, Shorts Cluster Above $34",date:"Mar 7",category:"TRADING",
-   eli5:"On-chain analysis shows smart-money wallets are strongly net long HYPE, while retail holds net short positions. Short liquidation leverage is clustering above $34 — meaning a move above $34 could trigger cascading short liquidations (a squeeze). Technical indicators point to $39-43 as the next target if $34 breaks.",
-   perp_impact:"This is a classic squeeze setup. If HYPE reclaims $34, leveraged shorts above that level get liquidated, forcing market buys that push price higher, liquidating more shorts. The $34 level is your trigger — a clean break with volume above $34 could cascade to $39-43 quickly. Risk: if macro deteriorates, the long-side positioning could unwind instead.",
-   signal:"BULLISH",importance:4},
-  {title:"Continue Fund + Tornado Cash Dumping Finished",date:"Feb 2026",category:"TRADING",
-   eli5:"Major early investors including the Continue Fund and the 'Tornado Cash guy' have reportedly finished selling their HYPE allocations. This removes a significant source of persistent sell pressure that had been overhanging the market for months.",
-   perp_impact:"The clearing of known sellers is structurally bullish. Each month's unlock adds new supply, but the incremental selling from these specific large holders is done. Combined with the March 6 unlock holding $30, the sell-side picture is the cleanest it's been since launch. Remaining risk: monthly contributor unlocks (~$200M/month) continue through 2027.",
-   signal:"BULLISH",importance:4},
-  {title:"HyperEVM Mainnet Live — Gas Demand Growing",date:"Mar 1",category:"PROTOCOL",
-   eli5:"HyperEVM launched March 1 with ~10 min downtime. Developers can now deploy Solidity contracts on Hyperliquid's chain using HYPE for gas. New DEX pools (WHYPE-UBTC, USDH-WHYPE) launched with 100%+ APYs. The canonical WHYPE wrapper contract enables the DeFi building blocks.",
-   perp_impact:"Every HyperEVM smart contract call burns HYPE as gas — this is structural demand independent of trading. First-wave apps will be lending/borrowing and liquid staking. Both create HYPE sinks. TVL on HyperEVM is the metric to watch over the next 60 days. New contract deployments signal whether real builders are coming.",
-   signal:"BULLISH",importance:4},
-  {title:"$912M AF Burn — Governance Vote Passed",date:"Dec 2025",category:"GOVERNANCE",
-   eli5:"Validators voted 85% to permanently burn 37.5M HYPE in the Assistance Fund. Total supply dropped from 1B to ~962M. This was the single largest deflationary event in HYPE history. The tokens were already inaccessible but are now formally removed.",
-   perp_impact:"The AF overhang FUD is dead. Total supply permanently reduced by 3.75%. Combined with ongoing fee burns (~$9.22M/week), the protocol is structurally deflationary even with monthly unlocks. The burn-to-unlock ratio is the key metric — currently burning covers ~20% of unlock value, and growing.",
-   signal:"BULLISH",importance:4},
-  {title:"Next Unlock: April 6 (~$200M)",date:"Apr 6",category:"TRADING",
-   eli5:"The next contributor unlock is scheduled for April 6, 2026. Monthly unlocks of roughly $200M continue through 2027. Now that March's $316M unlock was absorbed cleanly, the market has a template for how these events play out — but April's macro conditions may differ.",
-   perp_impact:"Mark your calendar. April 6 is the next potential volatility event. If HYPE is trading above $34 by then, the squeeze setup + proven unlock absorption could make this a non-event. If HYPE is back near $28, the unlock becomes more dangerous. Tighten stops in the 3 days before each monthly unlock.",
-   signal:"WATCH",importance:3},
-  {title:"Hyperliquid Processes $4T Cumulative Volume",date:"Mar 2026",category:"ECOSYSTEM",
-   eli5:"Total cumulative trading volume on Hyperliquid has surpassed $3.64 trillion since launch. Monthly volumes exceeded $200B for both January and February while competitors declined. The platform now holds 10.2% of all DEX perp volume — the only DEX in the global top 10 perps exchanges.",
-   perp_impact:"Market share gains are the bull case in one number. From 2% to 10.2% in one year. If DEX perp share reaches 15-20% in 2026 (plausible given CEX security incidents like Bybit's $1.3B hack), HYPE's current valuation is significantly underpriced. Each percentage point of share gained translates directly to more fee revenue and more burns.",
-   signal:"BULLISH",importance:3}
-];
-
-const INTEL_BLOG=[
-  {date:"Mar 11, 2026",title:"Oil, Gold, and the $1.2B OI: How HIP-3 Just Changed the Game Forever",
-   body:`<p>Something historic happened on March 10. Hyperliquid's HIP-3 permissionless perpetual markets hit $1.2 billion in open interest — a record. But the headline number isn't what matters. <strong>What matters is what people are trading.</strong></p>
-<p>Of the top 30 markets by OI on Hyperliquid, only 7 are crypto. The rest? Crude oil, Brent crude, S&P 500, silver, gold, NVIDIA, Tesla. The CL-USDC oil contract alone did $1.62 billion in 24-hour volume — more than Ethereum. When a decentralized exchange is doing more oil futures volume than some traditional commodity brokers, you're witnessing a structural shift in how financial markets work.</p>
-<p><strong>Why this matters for HYPE:</strong> Every HIP-3 deployer stakes 500,000 HYPE ($17M+ at current prices) to launch their DEX. There are now 7 active DEXs with 138+ markets. That's 3.5M HYPE locked just in deployer stakes. On top of that, all trading fees from HIP-3 markets flow into the same buyback-and-burn engine as the main DEX. The $1.62B in oil volume on March 10 generated massive fees — all buying and burning HYPE.</p>
-<p><strong>The Iran catalyst:</strong> The US-Iran conflict escalated over the weekend when traditional markets were closed. Traders couldn't access COMEX gold futures or NYMEX crude. But Hyperliquid was open 24/7. Crude oil perps surged, silver saw record volume, and $56M in positions got liquidated on oil alone. This isn't a one-off — every future geopolitical weekend event is now a Hyperliquid growth catalyst.</p>
-<p><strong>Arthur Hayes is betting big:</strong> The BitMEX founder published his $150 target for HYPE by August 2026. His thesis: "No other project in all of crypto hands as much money back to token holders as Hyperliquid." Maelstrom's fund has a substantial position. He compared HYPE to GMX, which hit $90 during the 2023 sideways market. The key difference? Hyperliquid's volume is 10x GMX at peak.</p>
-<p><strong>Portfolio margin upgrade:</strong> The cherry on top — Hyperliquid announced portfolio margin is moving from pre-alpha to alpha. This means cross-collateral, dynamic margin scaling, and better capital efficiency for accounts under $500K. This is what institutional traders need to move serious size onto the platform.</p>
-<p><strong>The trade:</strong> HYPE held $30 through the March 6 unlock, squeezed shorts at $34 (87% of liquidations were shorts), and now trades at $35. The $34 level flipped from resistance to support. Next targets: $36.6, then $38 (February high), then $43 if the squeeze extends. Stop: daily close below $30. The fundamentals have never been stronger — $5B+ total OI, $5.7B daily volume, 120% YoY gain while altcoins are down 40-70%. This is infrastructure, not speculation.</p>`},
-  {date:"Mar 8, 2026",title:"The Unlock That Didn't Matter: What March 6 Tells Us About HYPE's Buy-Side Depth",
-   body:`<p>The numbers are in. On March 6, 9.92 million HYPE tokens ($316M) unlocked for core contributors. The platform processed $73.4 billion in volume that same day — a single-day record. And the price held $30.</p>
-<p>Let that sink in. A 2.7% supply increase hit the market on a day when the platform was simultaneously handling its highest volume ever due to Iran crisis commodity trading. The result? <strong>Nothing happened to the price.</strong> This is the most important data point of the month.</p>
-<p><strong>Why it matters for your positioning:</strong> Unlock events are supposed to create sell pressure. The March 6 non-event tells us one of two things: either core contributors are staking rather than selling, or the buy-side demand from burns ($2.88M in fees that day alone, 97% going to buybacks) is genuinely absorbing new supply. Both are bullish.</p>
-<p><strong>The setup going into next week:</strong> Smart money wallets are net long. Short liquidation leverage clusters above $34 — a break above that level could trigger a squeeze to $39-43. The Continue Fund and other known large sellers have reportedly finished dumping. The sell-side picture is the cleanest since launch.</p>
-<p><strong>Key levels:</strong> $30 is the new floor (proven by the unlock). $34 is the squeeze trigger. $39-43 is the target range if the squeeze fires. Stop loss: daily close below $28. Next unlock is April 6 — but the market now has a template for absorbing these events.</p>
-<p><strong>The bigger picture:</strong> Hyperliquid processed $73.4B in one day. It's doing $200B+ monthly while competitors collapse. It hit 3.4M daily transactions (ATH). HIP-4 prediction markets are on testnet. This isn't a token riding a narrative — it's infrastructure generating real revenue that gets recycled into supply reduction. In a bear market where everything else is down 20-30%, that matters.</p>`},
-
-  {date:"Mar 6, 2026",title:"HIP-4 Deep Dive: Why Prediction Markets on Hyperliquid Are Different From Polymarket",
-   body:`<p>Everyone's comparing HIP-4 to Polymarket. That comparison misses the point entirely. Let's break down what outcome trading actually enables and why it's a bigger deal than "Hyperliquid does prediction markets now."</p>
-<p><strong>The TL;DR:</strong> HIP-4 introduces fully collateralized contracts that settle within a fixed price range. No leverage, no liquidations. They can power prediction markets (will X happen?), bounded options (pay out if ETH is above $Y on date Z), and structured products — all running natively on HyperCore with unified margin.</p>
-<p><strong>Why it's not just Polymarket-on-Hyperliquid:</strong> Polymarket is an isolated prediction market. Your Polymarket positions have zero connection to your Aave loans, your Uniswap LP, or your perp trades. They live on their own island. HIP-4 outcomes run on HyperCore — the same engine as perps. This means you could go long ETH perps while simultaneously buying an outcome contract that pays if ETH drops below a certain price. Your portfolio margin system recognizes the hedge automatically. Investment banks charge millions to build these combinations for institutional clients.</p>
-<p><strong>The supply impact:</strong> Just like HIP-3 permissionless perps, deploying an outcome market requires staking 500,000 HYPE ($15M+). Each new prediction market = another 500K HYPE locked out of circulation. If HIP-4 sees even half the adoption of HIP-3 (which drove $42B in volume), the supply sink could be massive.</p>
-<p><strong>What to watch:</strong> Testnet is live. Mainnet timing is the catalyst. First markets will be curated by the team and denominated in USDH. Permissionless deployment follows. The $44B prediction market TAM (dominated by sports betting on Kalshi and elections on Polymarket) is ripe for crypto-native competition with better capital efficiency.</p>
-<p><strong>Risk:</strong> Oracle manipulation is the #1 failure mode for prediction markets. Hyperliquid says they'll use "objective settlement data sources" but hasn't disclosed specifics. A Massachusetts judge also recently ruled against Kalshi's sports betting contracts — regulatory risk for the whole category exists.</p>`},
-
-  {date:"Mar 3, 2026",title:"Weekend Warriors: How Hyperliquid Became the World's Go-To Crisis Trading Venue",
-   body:`<p>When US-Iran tensions escalated on Saturday and traditional markets were closed, traders didn't wait for Monday. They went to Hyperliquid. Silver perps saw massive volume. Oil and gold surged. Total platform volume hit $6.5 billion on a single day. HYPE rallied 13-20% while BTC barely moved.</p>
-<p><strong>This is now a pattern, not an anomaly.</strong> Hyperliquid offers perpetual futures on S&P 500, Tesla, Nvidia, gold, silver, oil, and pre-IPO companies. When COMEX gold futures are closed for a 48-hour weekend window, there is literally no traditional venue for expressing macro risk. Hyperliquid fills that gap. The platform processed over $200B in monthly volume for both January and February — while Aster dropped from $177B to under $100B.</p>
-<p><strong>The fee model is the cheat code:</strong> Hyperliquid collects fees on both sides of every trade — longs and shorts. It doesn't care which direction the market moves. Volatility is the product. With 97% of fees flowing into HYPE buyback-and-burns, every geopolitical crisis literally burns HYPE supply. The bear market accelerates the deflationary engine because fearful markets are volatile markets.</p>
-<p><strong>HYPE as a volatility hedge:</strong> Arthur Hayes called it — HYPE is up 23.9% YTD while BTC is down 23.7% and ETH is down 33%. It's matching gold. This isn't because HYPE is "safe." It's because Hyperliquid's revenue grows when markets are chaotic, and that revenue flows directly into reducing HYPE supply. In a Fear & Greed Index of 10, deflationary tokenomics backed by real revenue is the only narrative working.</p>
-<p><strong>What this means for your trades:</strong> Weekend geopolitical events are now HYPE catalysts. Build this into your positioning — consider holding a small HYPE long as a hedge against weekend chaos. The platform's role as crisis infrastructure is becoming consensus, which means the premium gets priced in more efficiently with each event. First-mover advantage still exists for commodity perps, but it won't last forever.</p>`}
-];
-
-function _renderIntelTab(){
-  const catColors={FEATURE:'var(--accent)',PROTOCOL:'var(--purple)',ECOSYSTEM:'var(--yellow)',TRADING:'var(--green)',GOVERNANCE:'var(--fire)'};
-  const sigColors={BULLISH:'var(--green)',BEARISH:'var(--red)',NEUTRAL:'var(--text-dim)',WATCH:'var(--yellow)'};
-  const sigEmoji={BULLISH:'📈',BEARISH:'📉',NEUTRAL:'➖',WATCH:'👀'};
-  const bullish=INTEL_DATA.filter(i=>i.signal==='BULLISH').length;
-  const bearish=INTEL_DATA.filter(i=>i.signal==='BEARISH').length;
-  const neutral=INTEL_DATA.filter(i=>i.signal==='NEUTRAL'||i.signal==='WATCH').length;
-  const avgImp=(INTEL_DATA.reduce((s,i)=>s+(i.importance||3),0)/INTEL_DATA.length).toFixed(1);
-  const netSigColor=bullish>bearish?'var(--green)':bearish>bullish?'var(--red)':'var(--text-dim)';
-  const netSigText=bullish>bearish?'📈 BULLISH LEAN':bearish>bullish?'📉 BEARISH LEAN':'⟺ MIXED';
-
-  // ── Ticker ──
-  const tickEl=$('tickerTrack');
-  if(tickEl){
-    const items=INTEL_DATA.map(it=>{
-      const sc=sigColors[it.signal]||'var(--text-dim)';
-      const em=sigEmoji[it.signal]||'';
-      return `<span class="ticker-item"><span class="ticker-signal" style="color:${sc}">${em} ${it.signal}</span> ${it.title}</span><span class="ticker-sep">◆</span>`;
-    }).join('');
-    tickEl.innerHTML=items+items; // duplicate for seamless loop
-  }
-
-  // ── Summary bar ──
-  const sumEl=$('intelSummary');
-  if(sumEl)sumEl.innerHTML=`<div class="af-live-stats" style="margin-bottom:20px">
-    <div class="af-stat"><div class="lbl">Updates</div><div class="val" style="color:var(--text-bright)">${INTEL_DATA.length}</div></div>
-    <div class="af-stat"><div class="lbl">Bullish</div><div class="val green">${bullish}</div></div>
-    <div class="af-stat"><div class="lbl">Bearish</div><div class="val" style="color:var(--red)">${bearish}</div></div>
-    <div class="af-stat"><div class="lbl">Neutral</div><div class="val" style="color:var(--text-dim)">${neutral}</div></div>
-    <div class="af-stat"><div class="lbl">Avg Importance</div><div class="val" style="color:var(--yellow)">${avgImp}/5</div></div>
-    <div class="af-stat"><div class="lbl">Net Signal</div><div class="val" style="color:${netSigColor}">${netSigText}</div></div>
-  </div>`;
-
-  // ── Hero story (first item) ──
-  const hero=INTEL_DATA[0];
-  const heroEl=$('heroStory');
-  if(heroEl&&hero){
-    heroEl.innerHTML=`
-      <div class="hero-cat">${hero.category} · ${hero.date} · ${'●'.repeat(hero.importance)+'○'.repeat(5-hero.importance)}</div>
-      <h2>${hero.title}</h2>
-      <div class="hero-lede">${hero.eli5}</div>
-      <div class="hero-impact"><span style="color:var(--text-muted);font-size:10px;letter-spacing:0.08em;display:block;margin-bottom:4px">PERP TRADER IMPACT</span>${hero.perp_impact}</div>
-      <div style="margin-top:14px;font-family:var(--mono);font-size:11px;font-weight:700;color:${sigColors[hero.signal]||'var(--text-dim)'}">${sigEmoji[hero.signal]||''} ${hero.signal}</div>`;
-  }
-
-  // ── Sidebar cards (items 1-4) ──
-  const sbEl=$('heroSidebar');
-  if(sbEl){
-    sbEl.innerHTML=INTEL_DATA.slice(1,5).map(it=>{
-      const cc=catColors[it.category]||'var(--text-dim)';
-      const sc=sigColors[it.signal]||'var(--text-dim)';
-      return `<div class="sidebar-card" style="border-left:3px solid ${cc}">
-        <div class="sc-cat" style="color:${cc}">${it.category} · ${it.date}</div>
-        <h4>${it.title}</h4>
-        <div class="sc-signal" style="color:${sc}">${sigEmoji[it.signal]||''} ${it.signal} · ${'●'.repeat(it.importance)+'○'.repeat(5-it.importance)}</div>
-      </div>`;
-    }).join('');
-  }
-
-  // ── Grid (remaining items 5+) ──
-  const gridEl=$('intelGrid');
-  if(gridEl){
-    gridEl.innerHTML=INTEL_DATA.slice(5).map(item=>{
-      const cc=catColors[item.category]||'var(--text-dim)';
-      const sc=sigColors[item.signal]||'var(--text-dim)';
-      const dots='●'.repeat(item.importance||1)+'○'.repeat(5-(item.importance||1));
-      return `<div class="news-card" style="border-left-color:${cc}">
-        <div class="nc-top">
-          <span class="nc-cat" style="color:${cc}">${item.category}</span>
-          <span class="nc-date">${item.date}</span>
-        </div>
-        <h4>${item.title}</h4>
-        <div class="nc-eli5">${item.eli5}</div>
-        <div class="nc-impact"><span style="color:var(--text-muted);font-size:8px;letter-spacing:0.06em;display:block;margin-bottom:3px">PERP TRADER IMPACT</span>${item.perp_impact}</div>
-        <div style="display:flex;align-items:center;margin-top:8px">
-          <span class="nc-signal" style="color:${sc}">${sigEmoji[item.signal]||''} ${item.signal}</span>
-          <span class="nc-dots">${dots}</span>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // ── Blog entries ──
-  const blogEl=$('intelBlog');
-  if(blogEl)blogEl.innerHTML=INTEL_BLOG.map((entry,i)=>`
-    <article class="blog-entry">
-      ${i===0?'<div style="position:absolute;top:0;right:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:var(--bg);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
-      <div class="blog-date">${entry.date}</div>
-      <h3>${entry.title}</h3>
-      <div class="intel-blog-body">${entry.body}</div>
-    </article>
-  `).join('');
-}
-// Render on page load
-setTimeout(_renderIntelTab,100);
 
 // ═══════════════════════════════════════════════════════════════
 //  HYPURR NFT FLOOR PRICE CHART
 // ═══════════════════════════════════════════════════════════════
 let _nftChart=null;
-const HYPURR_FLOOR_HISTORY=[
-  // Historical floor prices in HYPE (from research data)
-  {time:'2025-09-28',value:1463},  // Launch day
-  {time:'2025-09-29',value:1250},  // Day 2 settlement
-  {time:'2025-09-30',value:1315},  // Bounce
-  {time:'2025-10-03',value:1700},  // Week 1 high
-  {time:'2025-10-07',value:1450},  // Settling
-  {time:'2025-10-14',value:1260},  // Early Oct stable
-  {time:'2025-10-21',value:1200},
-  {time:'2025-10-28',value:1180},
-  {time:'2025-11-04',value:1100},
-  {time:'2025-11-11',value:1050},
-  {time:'2025-11-18',value:980},
-  {time:'2025-11-25',value:920},
-  {time:'2025-12-02',value:860},
-  {time:'2025-12-09',value:800},
-  {time:'2025-12-16',value:750},
-  {time:'2025-12-23',value:690},
-  {time:'2025-12-30',value:640},
-  {time:'2026-01-06',value:580},
-  {time:'2026-01-13',value:530},
-  {time:'2026-01-20',value:490},
-  {time:'2026-01-27',value:470},
-  {time:'2026-02-03',value:450},
-  {time:'2026-02-10',value:430},
-  {time:'2026-02-17',value:410},
-  {time:'2026-02-24',value:440},  // Bounce with HYPE rally
-  {time:'2026-03-01',value:480},  // Weekend surge
-  {time:'2026-03-03',value:459},  // Current
-];
 
-function _initNftChart(){
-  if(typeof LightweightCharts==='undefined')return;
-  const wrap=$('nftChartWrap');if(!wrap)return;
-  const s=_wsz('nftChartWrap');
-  _nftChart=LightweightCharts.createChart(wrap,{
-    width:s.w,height:s.h,
-    layout:{background:{color:'#12151c'},textColor:'#5a6580',fontFamily:'JetBrains Mono'},
-    grid:{vertLines:{color:'#1a1e2a'},horzLines:{color:'#1a1e2a'}},
-    timeScale:{borderColor:'#222738',timeVisible:false},
-    rightPriceScale:{borderColor:'#222738'},
-    crosshair:{mode:0}
-  });
-
-  // Area series with Hypurr purple/pink gradient
-  const areaSeries=_nftChart.addAreaSeries({
-    lineColor:'#a78bfa',
-    topColor:'rgba(167,139,250,0.3)',
-    bottomColor:'rgba(167,139,250,0.02)',
-    lineWidth:2,
-    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' HYPE'}
-  });
-  areaSeries.setData(HYPURR_FLOOR_HISTORY);
-
-  // Bid line (current top offer)
-  const bidSeries=_nftChart.addLineSeries({
-    color:'#00e676',lineWidth:1,lineStyle:2,
-    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' WHYPE'},
-    lastValueVisible:true,priceLineVisible:false
-  });
-  // Show bid as horizontal line for the last few data points
-  bidSeries.setData([
-    {time:'2026-02-24',value:420},
-    {time:'2026-03-01',value:450},
-    {time:'2026-03-03',value:440}
-  ]);
-
-  _nftChart.timeScale().fitContent();
-
-  // Attempt live data fetch from OpenSea API (best effort, CORS may block)
-  _fetchNftLiveData();
-}
+// No historical floor data available via API — skip chart, use live CoinGecko stats only
 
 async function _fetchNftLiveData(){
   // CoinGecko free Demo API — /nfts/{id} endpoint
@@ -4787,7 +4422,7 @@ function _tryInitCharts(){
   _initRingHover();
   // NFT chart deferred to showPage('ecosystem') lazy-init
   drawRing();
-  if(typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart();_initBurnRateChart();_initEmChart()}
+  if(typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart()}
 }
 setTimeout(_tryInitCharts,1500);
 </script>
