@@ -962,6 +962,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
       <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
       <div class="af-stat"><div class="lbl">Session</div><div class="val green" id="burnLiveSession">+0 HYPE</div></div>
+      <div class="af-stat"><div class="lbl">Live Rate</div><div class="val cyan" id="burnLiveRate">—</div></div>
     </div>
     <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
   </div>
@@ -1005,9 +1006,9 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     </div>
     <div class="chart-wrap" id="emChartWrap" style="height:300px"></div>
     <div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:1.6">
-      Emissions = staking rewards from the future emissions reserve (distributed daily). Formula: APR = 474/√(totalStaked), per HL docs (2.37% at 400M staked).<br>
-      Burns = AF buyback burns + on-chain fee burns. $9.2M/week burned as of Mar 2 (CoinDesk). 37.5M HYPE AF burned via governance vote Dec 2025.<br>
-      Net flow = emissions − burns. Green/negative = deflationary. USD values at current HYPE price.
+      Emissions = staking rewards from the future emissions reserve (distributed daily). Formula: APR = 474/√(totalStaked).<br>
+      Burns = AF buyback burns + on-chain fee burns. <span id="emBurnNote">Burn rate updates live from on-chain data.</span><br>
+      Net flow = emissions − burns. Green/negative = deflationary. USD values at current HYPE price. <span id="emNetNote"></span>
     </div>
   </div>
 </div>
@@ -1421,7 +1422,12 @@ const D={price:null,priceChg:null,vol24:null,circSupply:null,
   afUsdc:0,afOrders:[],afBid:null,afBidSz:null,
   fees24:null,feesRecent:[],allMids:{},markets:[],totalOI:0,totalPerpVol:0,
   hypeFunding:null,hypePremium:null,hypeOI:null,hypeVol:null,
-  spotMarkets:0,topOI:[],topVol:[]};
+  spotMarkets:0,topOI:[],topVol:[],
+  // Dynamic burn rate tracking - updated from HypurrScan /feesRecent
+  weeklyBurnUsd:9220000, // default, updated from live data
+  dailyAvgFees:1317000,  // default, updated from live data
+  burnRateSamples:[]      // store recent totalBurned readings for rate calc
+};
 
 const F={
   c:n=>{if(n==null)return'—';n=+n;if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toFixed(2)},
@@ -1913,8 +1919,8 @@ function _renderHipVolumes(){
   set('hipTotalOI','$'+F.c(totalOI));
   set('hipStaked',F.c(D.hipMarkets.length*500000)+' HYPE');
 
-  // Heat meter — based on volume relative to weekly avg (~$4B/week = ~$570M/day)
-  const avgDailyVol=570000000;
+  // Heat meter — based on volume relative to avg (dynamic if available, else ~$570M/day est)
+  const avgDailyVol=D.totalPerpVol>0?(D.totalPerpVol*0.15):570000000; // HIP-3 is ~15% of total perp vol on average
   const heatPct=Math.min(100,Math.max(0,(totalVol/avgDailyVol)*50));
   const heatFill=$('hipHeatFill');if(heatFill)heatFill.style.width=heatPct+'%';
   const heatMarker=$('hipHeatMarker');if(heatMarker)heatMarker.style.left=Math.min(98,heatPct)+'%';
@@ -2251,6 +2257,21 @@ function renderAll(){
     if(D.price)set('afHypeUsd','≈ '+F.usd(D.afHype*D.price));
     set('burnFees',F.hype(D.feesBurned)+' HYPE');
     if(D.price)set('burnUsdTotal','$'+F.hype(D.totalBurned*D.price));
+    // Update dynamic burn/emissions note
+    if(D.weeklyBurnUsd>100000){
+      set('emBurnNote','Live burn rate: ~$'+F.c(D.weeklyBurnUsd)+'/week ($'+F.c(D.weeklyBurnUsd/7)+'/day). 37.5M HYPE AF burned via governance vote Dec 2025.');
+    }
+    if(D.staked&&D.price){
+      const dailyEmHype=474*86400/Math.sqrt(D.staked);
+      const dailyBurnUsd=D.weeklyBurnUsd/7;
+      const dailyEmUsd=dailyEmHype*D.price;
+      const net=dailyBurnUsd-dailyEmUsd;
+      const netEl=$('emNetNote');
+      if(netEl){
+        netEl.textContent=net>0?'Currently net deflationary: -$'+F.c(net)+'/day':'Currently net inflationary: +$'+F.c(Math.abs(net))+'/day';
+        netEl.style.color=net>0?'var(--green)':'var(--red)';
+      }
+    }
   }
 
   if(_pData.length>30){computePriceRating();computeSqzMom();computeFibMatrix();computeMomentumPulse();computeCompositeSignal()}
@@ -2265,7 +2286,7 @@ function _updateSentimentPulse(){
   const parts=[];
   // 1. Burn rate vs emissions — net number
   if(D.feesBurned>0&&D.price&&D.staked){
-    const weeklyBurnUsd=9220000;
+    const weeklyBurnUsd=D.weeklyBurnUsd;
     const dailyBurnUsd=weeklyBurnUsd/7;
     const dailyEmissionHype=474*86400/Math.sqrt(D.staked||191000000);
     const dailyEmissionUsd=dailyEmissionHype*D.price;
@@ -2278,7 +2299,7 @@ function _updateSentimentPulse(){
   if(_afFeesCollected>0&&elapsed>60){
     const feeRate=_afFeesCollected/(elapsed/3600);
     const dailyRate=feeRate*24;
-    const avgDaily=1317000;
+    const avgDaily=D.dailyAvgFees;
     const pctOfAvg=((dailyRate/avgDaily)*100).toFixed(0);
     parts.push('💵 Fees pacing '+pctOfAvg+'% of daily avg ($'+F.c(dailyRate)+'/day)');
   } else if(elapsed>30&&_afFeesCollected===0){
@@ -2353,7 +2374,7 @@ async function _shareStats(){
 
   // Deflationary status
   if(D.feesBurned>0&&D.price&&D.staked){
-    const dailyBurn=9220000/7,dailyEmUsd=(474*86400/Math.sqrt(D.staked||191e6))*D.price;
+    const dailyBurn=D.weeklyBurnUsd/7,dailyEmUsd=(474*86400/Math.sqrt(D.staked||191e6))*D.price;
     const net=dailyBurn-dailyEmUsd;
     if(net>0)headlines.push({score:2,text:'🔥 Net deflationary: -$'+F.c(net)+'/day removed from supply'});
   }
@@ -2392,7 +2413,7 @@ async function _shareStats(){
 
   // Supply
   if(D.feesBurned>0&&D.price&&D.staked){
-    const dailyBurn=9220000/7,dailyEmUsd=(474*86400/Math.sqrt(D.staked||191e6))*D.price;
+    const dailyBurn=D.weeklyBurnUsd/7,dailyEmUsd=(474*86400/Math.sqrt(D.staked||191e6))*D.price;
     const net=dailyBurn-dailyEmUsd;
     const sEl=$('shareSupply');
     if(sEl){sEl.textContent=net>0?'-$'+F.c(net)+'/d':'+$'+F.c(Math.abs(net))+'/d';sEl.style.color=net>0?'#00e676':'#ff3d5a'}
@@ -2909,6 +2930,26 @@ async function _afLiveTick(){
       const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
       set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
       set('afFeeBurns',F.hype(D.feesBurned)+' HYPE');
+
+      // Track burn rate over time (sample every tick)
+      D.burnRateSamples.push({time:Date.now(),burned:D.feesBurned});
+      if(D.burnRateSamples.length>720)D.burnRateSamples=D.burnRateSamples.slice(-720); // keep ~1hr
+      // Compute live burn rate if we have at least 2 minutes of data
+      if(D.burnRateSamples.length>24){
+        const first=D.burnRateSamples[0],last=D.burnRateSamples[D.burnRateSamples.length-1];
+        const dtHours=(last.time-first.time)/3600000;
+        const burnedInPeriod=last.burned-first.burned;
+        if(dtHours>0.03&&burnedInPeriod>0&&D.price){
+          const hourlyBurnHype=burnedInPeriod/dtHours;
+          const dailyBurnUsd=hourlyBurnHype*24*D.price;
+          const weeklyBurnUsd=dailyBurnUsd*7;
+          // Only update if reasonable (between $100K and $50M/week)
+          if(weeklyBurnUsd>100000&&weeklyBurnUsd<50000000){
+            D.weeklyBurnUsd=weeklyBurnUsd;
+            D.dailyAvgFees=dailyBurnUsd/0.97; // fees = burns / 0.97 (97% goes to burns)
+          }
+        }
+      }
     }
 
     // 8. Push burn chart data point
@@ -2922,6 +2963,7 @@ async function _afLiveTick(){
     set('afChartMeta','Live · '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
     // Redraw liq heatmap if Charts tab is visible
     if(document.querySelector('#page-charts.active'))_drawLiqHeatmap();
+    if(document.querySelector('#page-burns.active'))drawRing();
     _redrawAfSeries();
   }catch(e){console.warn('af tick',e)}
 }
@@ -2969,6 +3011,11 @@ function _redrawBurnChart(){
       set('burnLiveFees',F.hype(D.feesBurned));
       if(D.price)set('burnLiveUsd','$'+F.hype(last.value*D.price));
       set('burnLiveSession','+'+F.f2(sessionBurned)+' HYPE this session');
+      // Live computed burn rate
+      if(D.weeklyBurnUsd>100000&&D.price){
+        const dailyBurnHype=D.weeklyBurnUsd/7/D.price;
+        set('burnLiveRate',F.c(dailyBurnHype)+' HYPE/day (~$'+F.c(D.weeklyBurnUsd/7)+')');
+      }
     }
     set('burnChartMeta','Session · '+_burnPoints.length+' pts · +'+F.f2(sessionBurned)+' burned');
     _burnChart.timeScale().fitContent();
