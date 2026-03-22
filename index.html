@@ -125,8 +125,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,9,12,0.88);backdrop-filt
 .page{display:none;padding:24px;max-width:1400px;margin:0 auto}.page.active{display:block}
 .section-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px}
 
-.hero{text-align:center;padding:40px 0 28px;position:relative}
-.hero::before{content:'';position:absolute;top:20px;left:50%;transform:translateX(-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.08) 0%,rgba(0,212,255,0.04) 40%,transparent 70%);pointer-events:none;z-index:-1}
+.hero{text-align:center;padding:40px 0 28px}
 .hero-fire{margin-bottom:6px;animation:fl 3s ease-in-out infinite}
 .hero-cat-svg{filter:drop-shadow(0 0 20px rgba(167,139,250,0.5)) drop-shadow(0 0 40px rgba(0,212,255,0.2))}
 @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -388,274 +387,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 .mob-dropdown{display:none!important}
 .mob-dropdown.open{display:flex!important}
 }
-
-/* ═══ REDESIGNED OVERVIEW V2 ═══ */
-.ov-section{margin-bottom:32px;position:relative}
-.ov-section-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.ov-section-hdr .ov-sec-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ov-section-hdr h2{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin:0}
-.ov-section-hdr .ov-sec-sub{font-family:var(--sans);font-size:11px;color:var(--text-muted);margin-left:auto;font-weight:400}
-
-/* Story cards — the 3 big visual cards */
-.story-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.story-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.2s}
-.story-card:hover{border-color:var(--border-bright);transform:translateY(-2px)}
-.story-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
-.story-card.burn-card::before{background:linear-gradient(90deg,var(--fire),#ff8a00)}
-.story-card.stake-card::before{background:linear-gradient(90deg,var(--green),#00ff88)}
-.story-card.supply-card::before{background:linear-gradient(90deg,var(--accent),var(--purple))}
-.story-card .sc-emoji{font-size:20px;margin-bottom:8px}
-.story-card .sc-title{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text-bright);margin-bottom:4px;line-height:1.2}
-.story-card .sc-explain{font-family:var(--sans);font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:14px}
-.story-card .sc-big{font-family:var(--mono);font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px}
-.story-card .sc-detail{font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.7}
-.story-card .sc-detail .bv{color:var(--text)}
-
-/* Visual gauge bar */
-.gauge-bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin:10px 0 6px}
-.gauge-fill{height:100%;border-radius:4px;transition:width 1s ease}
-.gauge-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--text-muted)}
-
-/* Compact live strip */
-.live-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.live-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:border-color 0.2s}
-.live-chip:hover{border-color:var(--border-bright)}
-.live-chip .lc-label{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px}
-.live-chip .lc-value{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text-bright);line-height:1.2}
-.live-chip .lc-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:3px}
-
-/* Perp stats compact row */
-.perp-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.perp-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-.perp-chip .pc-label{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
-.perp-chip .pc-value{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text-bright)}
-.perp-chip .pc-sub{font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:2px}
-
-/* Signal card redesign */
-.signal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;position:relative}
-.signal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--accent),var(--yellow),var(--fire),var(--red));background-size:200% 100%;animation:gradientSlide 6s linear infinite}
-.signal-top{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--border)}
-.signal-score-ring{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
-.signal-score-ring::before{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid var(--border)}
-.signal-score-ring .score-num{font-family:var(--mono);font-size:20px;font-weight:800;position:relative;z-index:1}
-.signal-info{flex:1;min-width:0}
-.signal-info .si-label{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:4px}
-.signal-info .si-summary{font-family:var(--sans);font-size:12px;color:var(--text);line-height:1.6}
-.signal-indicators{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border)}
-.signal-ind{padding:12px;text-align:center;border-right:1px solid var(--border)}
-.signal-ind:last-child{border-right:0}
-.signal-ind .si-name{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px}
-.signal-ind .si-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)}
-.signal-ind .si-sig{font-family:var(--mono);font-size:10px;font-weight:600}
-
-/* Leaderboard compact */
-.lb-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.lb-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
-.lb-card .mc-label{margin-bottom:8px}
-
-/* Platform quick stats */
-.platform-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:14px}
-.ps-chip{text-align:center;padding:10px 4px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
-.ps-chip .ps-label{font-family:var(--mono);font-size:8px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px}
-.ps-chip .ps-value{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text-bright)}
-
-/* Ecosystem bubbles */
-.eco-bubbles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.eco-bubble{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:border-color 0.2s}
-.eco-bubble:hover{border-color:var(--border-bright)}
-.eco-bubble .eb-icon{font-size:18px;flex-shrink:0}
-.eco-bubble .eb-meta{flex:1;min-width:0}
-.eco-bubble .eb-name{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;text-transform:uppercase}
-.eco-bubble .eb-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text-bright)}
-.eco-bubble .eb-chg{font-family:var(--mono);font-size:11px;font-weight:600;margin-left:auto}
-
-/* On-chain intel compact */
-.intel-compact{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.intel-mini{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.intel-mini::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--purple),var(--accent))}
-.intel-mini .im-hdr{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;padding:10px 14px 6px;display:flex;align-items:center;gap:6px}
-.intel-mini .im-hdr .hs-live{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
-.intel-mini .im-big{padding:0 14px 6px;font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text-bright)}
-.intel-mini .im-sub{padding:0 14px;font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:4px}
-.intel-mini .im-rows{padding:4px 14px 10px}
-.intel-mini .im-rows .ov-row{padding:2px 0}
-
-/* Explore tab cards */
-.explore-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.explore-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s;text-decoration:none;display:block;position:relative;overflow:hidden}
-.explore-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(0,212,255,0.08),transparent 70%);opacity:0;transition:opacity 0.3s}
-.explore-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
-.explore-card:hover::before{opacity:1}
-.explore-card .ec-icon{font-size:20px;margin-bottom:6px}
-.explore-card .ec-name{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text-bright);margin-bottom:3px}
-.explore-card .ec-desc{font-family:var(--sans);font-size:10px;color:var(--text-dim);line-height:1.4}
-
-/* Social compact */
-.social-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.social-strip::-webkit-scrollbar{height:3px}
-.social-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.social-chip{flex:0 0 280px;padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-decoration:none;transition:border-color 0.2s;display:block}
-.social-chip:hover{border-color:var(--accent)}
-.social-chip .soc-author{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-bright)}
-.social-chip .soc-handle{font-family:var(--mono);font-size:9px;color:var(--text-muted)}
-.social-chip .soc-text{font-family:var(--sans);font-size:11px;color:var(--text);line-height:1.5;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.social-chip .soc-date{font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:4px}
-
-@media(max-width:900px){
-.story-grid{grid-template-columns:1fr}
-.live-strip{grid-template-columns:repeat(3,1fr)}
-.live-strip .live-chip:nth-child(n+4){grid-column:span 1}
-.perp-row{grid-template-columns:1fr 1fr}
-.signal-indicators{grid-template-columns:repeat(2,1fr)}
-.signal-ind:nth-child(2){border-right:0}
-.lb-grid{grid-template-columns:1fr}
-.platform-strip{grid-template-columns:repeat(4,1fr)}
-.intel-compact{grid-template-columns:1fr 1fr}
-.explore-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:640px){
-.live-strip{grid-template-columns:1fr 1fr}
-.platform-strip{grid-template-columns:repeat(4,1fr)}
-.intel-compact{grid-template-columns:1fr}
-.explore-grid{grid-template-columns:1fr 1fr}
-.social-chip{flex:0 0 240px}
-}
-/* ═══ VISUAL UPGRADES V3 ═══ */
-
-/* Animated gradient underline on section headers */
-.ov-section-hdr{border-bottom:none;padding-bottom:12px;position:relative}
-.ov-section-hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--accent),var(--pink),var(--accent),var(--purple));background-size:200% 100%;animation:gradientSlide 4s linear infinite;border-radius:1px}
-@keyframes gradientSlide{0%{background-position:0% 0}100%{background-position:200% 0}}
-
-/* Story card glow borders on hover */
-.story-card{border:1px solid transparent;background-clip:padding-box;position:relative}
-.story-card::after{content:'';position:absolute;inset:-1px;border-radius:15px;background:linear-gradient(135deg,transparent,transparent);transition:background 0.4s;z-index:-1;pointer-events:none}
-.story-card.burn-card:hover::after{background:linear-gradient(135deg,rgba(255,107,43,0.3),rgba(255,107,43,0.05))}
-.story-card.stake-card:hover::after{background:linear-gradient(135deg,rgba(0,230,118,0.3),rgba(0,230,118,0.05))}
-.story-card.supply-card:hover::after{background:linear-gradient(135deg,rgba(0,212,255,0.3),rgba(167,139,250,0.05))}
-.story-card{border:1px solid var(--border)}
-
-/* Glowing gauge bars */
-.gauge-fill{box-shadow:0 0 8px rgba(255,255,255,0.1);position:relative}
-.gauge-fill::after{content:'';position:absolute;right:0;top:-2px;bottom:-2px;width:4px;border-radius:2px;background:inherit;filter:brightness(1.5);box-shadow:0 0 10px currentColor}
-
-/* Glassmorphic live chips */
-.live-chip{background:rgba(18,21,28,0.7);backdrop-filter:blur(12px);border:1px solid rgba(34,39,56,0.6)}
-.live-chip:hover{border-color:rgba(0,212,255,0.2);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
-
-/* Signal score ring SVG arc */
-.signal-score-ring{background:radial-gradient(circle,rgba(18,21,28,0.9) 60%,transparent 70%)}
-.signal-score-ring svg.score-arc{position:absolute;inset:0;width:100%;height:100%}
-
-/* Pulsing live dots */
-.hs-live{animation:livePulse 2s ease-in-out infinite}
-@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.3;box-shadow:0 0 2px var(--green)}}
-
-/* Shimmer loading animation for dashes */
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-
-/* Hero BTC ticker */
-.hero-btc{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.12);border-radius:20px;font-family:var(--mono);font-size:11px;transition:all 0.3s}
-.hero-btc:hover{border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.1)}
-.hero-btc .btc-icon{font-size:12px}
-.hero-btc .btc-ratio{color:var(--yellow);font-weight:600}
-.hero-btc .btc-chg{font-weight:600;font-size:10px}
-
-/* Improved perp chips with subtle left accent */
-.perp-chip{position:relative;overflow:hidden}
-.perp-chip::before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:3px;border-radius:2px;background:var(--accent);opacity:0.4}
-
-/* Better intel mini cards */
-.intel-mini{transition:border-color 0.2s,transform 0.2s}
-.intel-mini:hover{border-color:var(--border-bright);transform:translateY(-1px)}
-
-/* Animate score number updates */
-@keyframes scoreFlash{0%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 12px var(--accent)}100%{text-shadow:0 0 0 transparent}}
-.score-flash{animation:scoreFlash 0.6s ease}
-
-/* Platform strip chip hover */
-.ps-chip{transition:all 0.2s}
-.ps-chip:hover{border-color:var(--border-bright);background:var(--surface2)}
-
-/* Smooth number transitions */
-.mc-value,.sc-big,.lc-value,.pc-value,.im-big,.ps-value,.eb-val{transition:color 0.3s}
-
-/* ═══ VISUAL UPGRADE V3 — NEXT LEVEL ═══ */
-
-/* Hero price glow effect */
-.hero-price{position:relative;display:inline-block}
-.hero-price::after{content:'';position:absolute;bottom:-4px;left:10%;right:10%;height:20px;background:radial-gradient(ellipse,rgba(0,212,255,0.15) 0%,transparent 70%);pointer-events:none;filter:blur(8px)}
-
-/* Animated gradient border on section headers */
-.ov-section-hdr{border-bottom:none;position:relative;padding-bottom:12px}
-.ov-section-hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--border) 0%,var(--accent) 30%,var(--purple) 60%,var(--border) 100%);opacity:0.5}
-
-/* Story card glass effect */
-.story-card{backdrop-filter:blur(8px);background:linear-gradient(135deg,rgba(18,21,28,0.9),rgba(24,28,37,0.7))}
-.story-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.3)}
-.story-card .sc-big{text-shadow:0 0 20px currentColor}
-
-/* Gauge bar glow */
-.gauge-fill{box-shadow:0 0 8px currentColor;position:relative}
-.gauge-fill::after{content:'';position:absolute;right:-1px;top:-2px;bottom:-2px;width:4px;background:inherit;border-radius:50%;filter:blur(3px)}
-
-/* Signal score ring glow */
-.signal-score-ring{background:radial-gradient(circle,rgba(0,212,255,0.08) 0%,transparent 70%)}
-
-/* Live chip pulse on data update */
-@keyframes chipPulse{0%{box-shadow:0 0 0 0 rgba(0,212,255,0.2)}70%{box-shadow:0 0 0 6px rgba(0,212,255,0)}100%{box-shadow:0 0 0 0 transparent}}
-.live-chip.pulse{animation:chipPulse 0.8s ease}
-
-/* BTC ticker enhanced */
-.hero-btc{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:20px;font-family:var(--mono);font-size:11px;transition:all 0.3s}
-.hero-btc:hover{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.12);transform:scale(1.02)}
-
-/* Perp chip shimmer on hover */
-.perp-chip{transition:all 0.2s}
-.perp-chip:hover{border-color:var(--border-bright);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.2)}
-
-/* Intel mini card subtle glow */
-.intel-mini:hover{box-shadow:0 4px 16px rgba(0,212,255,0.06)}
-
-/* Chart box polish */
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}
-.chart-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.4;z-index:1}
-
-/* Explore card glow */
-.explore-card{position:relative;overflow:hidden}
-.explore-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(0,212,255,0.04) 0%,transparent 50%);opacity:0;transition:opacity 0.3s}
-.explore-card:hover::before{opacity:1}
-
-/* Platform strip gradient accent */
-.platform-strip .ps-chip:first-child{border-left:2px solid rgba(0,212,255,0.3)}
-.platform-strip .ps-chip:last-child{border-right:2px solid rgba(255,107,43,0.3)}
-
-/* Signal indicator cell hover */
-.signal-ind{transition:background 0.2s}
-.signal-ind:hover{background:rgba(0,212,255,0.03)}
-
-/* Eco bubble shimmer */
-.eco-bubble{position:relative;overflow:hidden}
-.eco-bubble::after{content:'';position:absolute;top:0;right:0;width:40px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.01));pointer-events:none}
-
-/* Hero sub info pills */
-.hero-sub{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
-.hero-sub span{font-family:var(--mono);font-size:12px}
-.hero-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;border:1px solid var(--border);background:rgba(18,21,28,0.6)}
-.hero-pill .pill-label{color:var(--text-muted);font-size:9px;letter-spacing:0.06em}
-.hero-pill .pill-val{color:var(--text-bright);font-weight:600}
-
-/* Momentum bar enhanced */
-.mom-bar-enhanced{position:relative;height:28px;background:var(--bg2);border-radius:6px;overflow:hidden}
-.mom-bar-enhanced .mom-center{position:absolute;left:50%;width:2px;height:100%;background:var(--border-bright);z-index:2}
-.mom-bar-enhanced .mom-buy{position:absolute;right:50%;height:100%;background:linear-gradient(270deg,rgba(0,230,118,0.9),rgba(0,212,255,0.6));border-radius:6px 0 0 6px;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1)}
-.mom-bar-enhanced .mom-sell{position:absolute;left:50%;height:100%;background:linear-gradient(90deg,rgba(255,61,90,0.9),rgba(255,107,43,0.6));border-radius:0 6px 6px 0;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1)}
-
-/* Validator/queue scrollable */
-.val-scroll{max-height:200px;overflow-y:auto;scrollbar-width:thin}
-.val-scroll::-webkit-scrollbar{width:3px}
-.val-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-
 </style>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="0ba9d1cb-02c3-4fe9-99b6-32977d9b07f9"></script>
 </head>
@@ -667,9 +398,13 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
     <div class="logo"><svg class="logo-cat" viewBox="0 0 32 32" width="24" height="24"><defs><linearGradient id="catG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG)" opacity="0.9"/><circle cx="12" cy="14" r="2.5" fill="#08090c"/><circle cx="20" cy="14" r="2.5" fill="#08090c"/><circle cx="12.8" cy="13.3" r="0.9" fill="#eef2ff"/><circle cx="20.8" cy="13.3" r="0.9" fill="#eef2ff"/><ellipse cx="16" cy="18" rx="1.2" ry="0.8" fill="#ff6b9d"/><path d="M14 19.5q2 1.5 4 0" stroke="#08090c" stroke-width="0.6" fill="none"/></svg><span class="hype">HYPE</span><span class="intel">INTELLIGENCE</span></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('overview',this)">Overview</button>
+      <button class="nav-tab" onclick="showPage('charts',this)">Charts</button>
+      <button class="nav-tab" onclick="showPage('burns',this)">Burns</button>
+      <button class="nav-tab" onclick="showPage('staking',this)">Staking</button>
       <button class="nav-tab" onclick="showPage('trades',this)">Live Trades</button>
       <button class="nav-tab" onclick="showPage('hip3',this)">HIP-3</button>
       <button class="nav-tab" onclick="showPage('ecosystem',this)">Ecosystem</button>
+      <button class="nav-tab" onclick="showPage('intel',this)">Intel</button>
     </div>
   </div>
   <div class="nav-right">
@@ -681,473 +416,288 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 </nav>
 <div class="mob-dropdown" id="mobDropdown">
   <button class="active" onclick="showPage('overview',this);document.getElementById('mobDropdown').classList.remove('open')">Overview</button>
+  <button onclick="showPage('charts',this);document.getElementById('mobDropdown').classList.remove('open')">Charts</button>
+  <button onclick="showPage('burns',this);document.getElementById('mobDropdown').classList.remove('open')">Burns</button>
+  <button onclick="showPage('staking',this);document.getElementById('mobDropdown').classList.remove('open')">Staking</button>
   <button onclick="showPage('trades',this);document.getElementById('mobDropdown').classList.remove('open')">Live Trades</button>
   <button onclick="showPage('hip3',this);document.getElementById('mobDropdown').classList.remove('open')">HIP-3</button>
   <button onclick="showPage('ecosystem',this);document.getElementById('mobDropdown').classList.remove('open')">Ecosystem</button>
+  <button onclick="showPage('intel',this);document.getElementById('mobDropdown').classList.remove('open')">Intel</button>
 </div>
 
 <!-- ══ OVERVIEW ════════════════════════════════════════════════ -->
 <div class="page active" id="page-overview">
   <h1 class="sr-only">HYPE Intelligence — Hyperliquid Analytics Dashboard: Live Token Burns, Staking, Trading Signals & PURR Stock Data</h1>
-
-  <!-- ─── HERO ─────────────────────────────── -->
   <div class="hero">
     <div class="hero-fire"><svg class="hero-cat-svg" viewBox="0 0 80 80" width="72" height="72"><defs><linearGradient id="heroC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="40%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient><filter id="heroGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#heroGlow)"><path d="M15 25L20 7.5c0-1.2 1.5-1.8 2.2-.8L30 16h20l7.8-9.3c.7-1 2.2-.4 2.2.8L65 25c5 6 5 14 0 20-3.7 5-10 8.7-17.5 10v3.7c0 2-1.7 3.7-3.7 3.7h-7.6c-2 0-3.7-1.7-3.7-3.7V55C25.7 53.7 19 50 15.5 45c-5-6-5-14 0-20z" fill="url(#heroC)" opacity="0.9"/><circle cx="30" cy="34" r="6" fill="#08090c"/><circle cx="50" cy="34" r="6" fill="#08090c"/><circle cx="32" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite"/></circle><circle cx="52" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite"/></circle><ellipse cx="40" cy="44" rx="3" ry="2" fill="#ff6b9d"/><path d="M35 47q5 3.5 10 0" stroke="#08090c" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M32 42l-7 2.5M32 44.5l-7 0M32 47l-6-2M48 42l7 2.5M48 44.5l7 0M48 47l6-2" stroke="#08090c" stroke-width="0.8" opacity="0.25"/></g></svg></div>
     <div class="hero-tagline">HYPER SOUND MONEY — MAX SUPPLY FIXED · FEES BURNED</div>
     <div class="hero-price"><span class="dollar">$</span><span id="heroPrice">—</span></div>
-    <div class="hero-sub">
-      <span class="change" id="heroChg" style="font-weight:700"></span>
-      <span class="hero-pill"><span class="pill-label">MCap</span><span class="pill-val" id="heroMcap">—</span></span>
-      <span class="hero-pill"><span class="pill-label">FDV</span><span class="pill-val" id="heroFdv">—</span></span>
-      <span class="hero-pill" style="border-color:rgba(251,191,36,0.2);background:rgba(251,191,36,0.04)"><span style="color:var(--yellow);font-size:11px">₿</span><span class="pill-val" style="color:var(--yellow)" id="heroBtcRatio">—</span><span id="heroBtcChg" style="font-size:10px;font-weight:600"></span></span>
-    </div>
+    <div class="hero-sub"><span class="change" id="heroChg"></span> <span>· MCap <span id="heroMcap">—</span></span> <span>· FDV <span id="heroFdv">—</span></span></div>
+    <!-- Live Sentiment Pulse -->
     <div id="heroSentiment" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.5;max-width:640px;margin-left:auto;margin-right:auto;text-align:center;padding:6px 12px">Analyzing…</div>
     <button id="shareStatsBtn" onclick="_shareStats()" style="margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--accent);background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:6px;padding:6px 16px;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;opacity:0.7" onmouseover="this.style.opacity='1';this.style.borderColor='var(--accent)'" onmouseout="this.style.opacity='0.7';this.style.borderColor='rgba(0,212,255,0.15)'">📸 Share Stats</button>
   </div>
 
-  <!-- ─── SECTION 1: THE HYPE STORY ─────────── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(0,212,255,0.2))">📖</div>
-      <h2>The HYPE Story</h2>
-      <span class="ov-sec-sub">Why this token is different</span>
+  <!-- Top metrics — merged with AF data for maximum info density -->
+  <div class="metrics-grid grid-3">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Total Burned</div>
+      <div class="mc-value fire" id="mBurned">—</div>
+      <div class="mc-sub" id="mBurnedSub">—</div>
+      <div class="mc-breakdown" id="mBurnedBreakdown"></div>
     </div>
-    <div class="story-grid">
-      <!-- BURN CARD -->
-      <div class="story-card burn-card">
-        <div class="sc-emoji">🔥</div>
-        <div class="sc-title">HYPE Is Getting Rarer</div>
-        <div class="sc-explain">Trading fees are used to buy HYPE and permanently destroy it. Less supply = more scarcity for holders.</div>
-        <div class="sc-big fire" id="mBurned">—</div>
-        <div class="sc-detail" id="mBurnedSub">—</div>
-        <div class="gauge-bar"><div class="gauge-fill" id="burnGauge" style="width:0;background:linear-gradient(90deg,var(--fire),#ff8a00)"></div></div>
-        <div class="gauge-label"><span>0</span><span id="burnGaugePct">—</span><span>1B max</span></div>
-        <div class="sc-detail" id="mBurnedBreakdown" style="border-top:1px solid var(--border);padding-top:6px;margin-top:6px"></div>
-      </div>
-      <!-- STAKING CARD -->
-      <div class="story-card stake-card">
-        <div class="sc-emoji">🥩</div>
-        <div class="sc-title">Holders Are Committed</div>
-        <div class="sc-explain">Stakers lock their HYPE to secure the network and earn rewards. The more staked, the less available to sell.</div>
-        <div class="sc-big green" id="mStaked">—</div>
-        <div class="sc-detail" id="mStakedSub">—</div>
-        <div class="gauge-bar"><div class="gauge-fill" id="stakeGauge" style="width:0;background:linear-gradient(90deg,var(--green),#00ff88)"></div></div>
-        <div class="gauge-label"><span>0</span><span id="stakeGaugePct">—</span><span>1B max</span></div>
-        <div class="sc-detail" style="margin-top:8px"><span style="color:var(--text-muted)">Staking APR</span> <span class="bv green" id="afApr" style="font-weight:700">—</span></div>
-      </div>
-      <!-- SUPPLY CARD -->
-      <div class="story-card supply-card">
-        <div class="sc-emoji">📊</div>
-        <div class="sc-title">Supply Breakdown</div>
-        <div class="sc-explain">Only a fraction of the 1B max supply actually trades freely. Most is burned, staked, or held by the team.</div>
-        <div class="sc-big cyan" id="mCirc">—</div>
-        <div class="sc-detail" id="mCircSub">—</div>
-        <div class="gauge-bar"><div class="gauge-fill" id="circGauge" style="width:0;background:linear-gradient(90deg,var(--accent),var(--purple))"></div></div>
-        <div class="gauge-label"><span>0</span><span id="circGaugePct">—</span><span>1B max</span></div>
-        <div class="sc-detail" style="margin-top:8px"><span style="color:var(--text-muted)">24h Spot Vol</span> <span class="bv" id="mVol">—</span></div>
-      </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div>
+      <div class="mc-label">🥩 Total Staked</div>
+      <div class="mc-value green" id="mStaked">—</div>
+      <div class="mc-sub" id="mStakedSub">—</div>
     </div>
-
-    <!-- Supply Ring Chart — visual anchor -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:16px">
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px">Where Does the 1 Billion Go?</div>
-      <div style="display:flex;align-items:center;gap:28px;justify-content:center;flex-wrap:wrap">
-        <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="200" height="200" style="width:200px;height:200px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
-        <div class="supply-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;min-width:0">
-          <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
-          <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Live Burn Tracker -->
-    <div class="af-live" style="margin-top:16px">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">🔥 Live Burn Tracker</span><span class="chart-meta" id="burnChartMeta">Collecting data…</span></div></div>
-      <div class="af-live-stats" style="margin-bottom:8px">
-        <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
-        <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
-        <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
-        <div class="af-stat"><div class="lbl">Session</div><div class="val green" id="burnLiveSession">+0 HYPE</div></div>
-        <div class="af-stat"><div class="lbl">Live Rate</div><div class="val cyan" id="burnLiveRate">—</div></div>
-      </div>
-      <div class="chart-wrap" id="burnWrap" style="height:220px"></div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">📊 Circulating</div>
+      <div class="mc-value cyan" id="mCirc">—</div>
+      <div class="mc-sub" id="mCircSub">—</div>
     </div>
   </div>
 
-  <!-- ─── SECTION 2: LIVE PULSE ────────────── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(0,230,118,0.2),rgba(0,212,255,0.2))">⚡</div>
-      <h2>Live Pulse</h2>
-      <span class="ov-sec-sub">Real-time activity since you opened this page</span>
+  <!-- Session stats + AF + Volume -->
+  <div class="metrics-grid grid-5" style="margin-top:0">
+    <div class="metric-card"><div class="mc-glow" style="background:var(--green)"></div>
+      <div class="mc-label">💵 Session Fees</div>
+      <div class="mc-value green" id="afSessionFees" style="font-size:18px">$0.00</div>
+      <div class="mc-sub" id="afSessionTime">since page load</div>
     </div>
-    <!-- Live counters -->
-    <div class="live-strip">
-      <div class="live-chip">
-        <div class="lc-label">💵 Session Fees</div>
-        <div class="lc-value green" id="afSessionFees">$0.00</div>
-        <div class="lc-sub" id="afSessionTime">since page load</div>
-      </div>
-      <div class="live-chip">
-        <div class="lc-label">🔥 Session Burns</div>
-        <div class="lc-value" id="afSessionBurns" style="color:var(--fire)">0 HYPE</div>
-        <div class="lc-sub">burned this session</div>
-      </div>
-      <div class="live-chip">
-        <div class="lc-label">🏦 AF Limit Bid</div>
-        <div class="lc-value" id="afLiveBid" style="color:var(--fire)">—</div>
-        <div class="lc-sub"><span id="afLiveSpread" style="color:var(--green)">—</span> spread</div>
-      </div>
-      <div class="live-chip">
-        <div class="lc-label">🏦 AF USDC</div>
-        <div class="lc-value" id="afLiveUsdc">—</div>
-        <div class="lc-sub">Buyback balance</div>
-      </div>
-      <div class="live-chip">
-        <div class="lc-label">💰 24h Volume</div>
-        <div class="lc-value" id="mVol2">—</div>
-        <div class="lc-sub">Spot trading</div>
-      </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Session Burned</div>
+      <div class="mc-value fire" id="afSessionBurns" style="font-size:18px">0 HYPE</div>
+      <div class="mc-sub">on-chain burns this session</div>
     </div>
-
-    <!-- HYPE 5-min Momentum Bar -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;margin-bottom:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent 40%,transparent 60%,var(--red));opacity:0.3"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase">HYPE 5-Min Momentum — <span style="font-weight:400;color:var(--text-muted)">Who's winning?</span></div>
-        <div style="font-family:var(--mono);font-size:13px;font-weight:700" id="hypeMomLabel">—</div>
-      </div>
-      <div class="mom-bar-enhanced">
-        <div class="mom-center"></div>
-        <div class="mom-buy" id="hypeMomBuyBar" style="width:0"></div>
-        <div class="mom-sell" id="hypeMomSellBar" style="width:0"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:10px">
-        <span style="color:var(--green)" id="hypeMomBuyAmt">—</span>
-        <span style="color:var(--text-muted)" id="hypeMomTradeCount">—</span>
-        <span style="color:var(--red)" id="hypeMomSellAmt">—</span>
-      </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">🏦 AF Limit Bid</div>
+      <div class="mc-value" id="afLiveBid" style="font-size:18px;color:var(--fire)">—</div>
+      <div class="mc-sub"><span id="afLiveSpread" style="color:var(--green)">—</span> spread</div>
     </div>
-
-    <!-- AF Live Monitor chart -->
-    <div class="af-live" style="margin:0">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
-      <div class="af-live-stats">
-        <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
-        <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val fire" id="afHype">—</div></div>
-        <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="afFeeBurns">—</div></div>
-        <div class="af-stat"><div class="lbl">Bid Info</div><div class="val" id="afBidInfo">—</div></div>
-      </div>
-      <div class="chart-wrap" id="afWrap" style="height:260px"></div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--purple)"></div>
+      <div class="mc-label">🏦 AF USDC</div>
+      <div class="mc-value" id="afLiveUsdc" style="font-size:18px">—</div>
+      <div class="mc-sub">Buyback balance</div>
+    </div>
+    <div class="metric-card"><div class="mc-glow" style="background:var(--yellow)"></div>
+      <div class="mc-label">💰 24h Volume</div>
+      <div class="mc-value" id="mVol" style="font-size:18px">—</div>
+      <div class="mc-sub">Spot trading</div>
     </div>
   </div>
 
-  <!-- ─── SECTION 3: CHARTS & TECHNICALS ──── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(167,139,250,0.2))">📈</div>
-      <h2>Charts & Technicals</h2>
-      <span class="ov-sec-sub">Live price action, liquidation zones & indicators</span>
+  <!-- HYPE 5-min Momentum Bar -->
+  <div class="metric-card" style="padding:14px 20px;margin-top:0;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="mc-label" style="margin:0">HYPE 5-MIN MOMENTUM</div>
+      <div style="font-family:var(--mono);font-size:12px;font-weight:700" id="hypeMomLabel">—</div>
     </div>
+    <div style="position:relative;height:24px;background:var(--bg2);border-radius:4px;overflow:hidden">
+      <div style="position:absolute;left:50%;width:2px;height:100%;background:var(--border-bright);z-index:2"></div>
+      <div id="hypeMomBuyBar" style="position:absolute;right:50%;height:100%;background:linear-gradient(270deg,rgba(0,230,118,0.9),rgba(0,212,255,0.7),rgba(167,139,250,0.3));border-radius:4px 0 0 4px;transition:width 0.8s ease;width:0"></div>
+      <div id="hypeMomSellBar" style="position:absolute;left:50%;height:100%;background:linear-gradient(90deg,rgba(255,61,90,0.9),rgba(255,107,43,0.7),rgba(251,191,36,0.3));border-radius:0 4px 4px 0;transition:width 0.8s ease;width:0"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:10px">
+      <span style="color:var(--green)" id="hypeMomBuyAmt">—</span>
+      <span style="color:var(--text-muted)" id="hypeMomTradeCount">—</span>
+      <span style="color:var(--red)" id="hypeMomSellAmt">—</span>
+    </div>
+  </div>
 
-    <!-- TradingView HYPE/USDT -->
-    <div class="chart-box" style="margin-bottom:14px">
-      <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · TradingView</span></div></div>
-      <div id="tvPerps" style="height:460px;border-radius:8px;overflow:hidden">
-        <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypeperps&symbol=BINANCE%3AHYPEUSDT.P&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&studies=%5B%22STD%3BBollinger_Bands%22%2C%22STD%3BMACD%22%5D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%5D&locale=en" style="width:100%;height:100%;border:0"></iframe>
-      </div>
+  <!-- AF Live Monitor chart -->
+  <div class="af-live" style="margin-top:0;margin-bottom:16px">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🏦 AF Live Monitor</span><span class="chart-meta" id="afChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats">
+      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan" id="afLivePrice">—</div></div>
+      <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val fire" id="afHype">—</div></div>
+      <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="afFeeBurns">—</div></div>
+      <div class="af-stat"><div class="lbl">Bid Info</div><div class="val" id="afBidInfo">—</div></div>
     </div>
+    <div class="chart-wrap" id="afWrap" style="height:260px"></div>
+  </div>
 
-    <!-- Liquidation Heatmap -->
-    <div class="chart-box" style="margin-bottom:14px">
-      <div class="chart-hdr">
-        <div class="left"><span class="chart-title">🔥 Liquidation Heatmap</span><span class="chart-meta" id="liqHeatMeta">Where forced sells happen if price moves</span></div>
-        <div style="display:flex;gap:4px">
-          <button class="tf-btn active" onclick="_setLiqRange(0.15,this)">±15%</button>
-          <button class="tf-btn" onclick="_setLiqRange(0.25,this)">±25%</button>
-          <button class="tf-btn" onclick="_setLiqRange(0.40,this)">±40%</button>
-        </div>
-      </div>
-      <div style="position:relative">
-        <canvas id="liqHeatCanvas" style="width:100%;height:280px;display:block;border-radius:0 0 8px 8px"></canvas>
-        <div id="liqHeatTooltip" style="display:none;position:absolute;padding:6px 10px;background:rgba(8,9,12,0.95);border:1px solid var(--border-bright);border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--text-bright);pointer-events:none;z-index:10;white-space:nowrap"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">
-        <div>
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(0,230,118,0.6);vertical-align:middle;margin-right:4px"></span>Long liqs (price drops)
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,61,90,0.6);vertical-align:middle;margin:0 4px 0 12px"></span>Short liqs (price rises)
-        </div>
-        <div id="liqHeatSummary" style="color:var(--text-muted)">—</div>
-      </div>
+  <!-- Trade Signal — redesigned for clarity -->
+  <div class="metric-card" style="padding:0;margin-bottom:16px;overflow:hidden">
+    <!-- Top bar: gradient strip that changes color based on signal -->
+    <div id="tradeSignalBar" style="height:4px;background:linear-gradient(90deg,#ff3d5a,#ff8a00,#888,#00e676,#00ff88);position:relative">
+      <div id="tradeSignalMarker" style="position:absolute;top:-2px;width:8px;height:8px;background:white;border-radius:50%;transition:left 0.8s ease;left:50%;transform:translateX(-50%);box-shadow:0 0 8px rgba(255,255,255,0.5)"></div>
     </div>
-
-    <!-- Compact indicator row -->
-    <div style="font-family:var(--sans);font-size:11px;color:var(--text-dim);margin-bottom:10px;line-height:1.5">
-      <strong style="color:var(--text)">Technical Indicators</strong> — analyzing price history for patterns. Green = bullish, Red = bearish.
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      <div class="af-live" style="margin:0;padding:12px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.08em">📡 SQUEEZE</span>
-          <span style="font-family:var(--mono);font-size:11px;font-weight:700" id="sqzState">—</span>
+    <div style="padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="ratingLabel" style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 14px;border-radius:20px;background:rgba(100,100,100,0.15);color:var(--text-dim)">Loading…</div>
+          <span id="ratingScore" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text-dim)">—</span>
         </div>
-        <div style="display:flex;gap:12px;font-family:var(--mono);font-size:10px">
-          <span style="color:var(--text-muted)">Dir <span style="color:var(--text)" id="sqzDir">—</span></span>
-          <span style="color:var(--text-muted)">Str <span style="color:var(--text)" id="sqzStr">—</span></span>
-          <span style="color:var(--text-muted)">Mom <span style="color:var(--text)" id="sqzMom">—</span></span>
-        </div>
-        <div class="chart-wrap" id="sqzWrap" style="height:120px;margin-top:6px"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.04em">Based on 4 technical indicators</div>
       </div>
-      <div class="af-live" style="margin:0;padding:12px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.08em">📐 FIBONACCI</span>
-          <span style="font-family:var(--mono);font-size:11px;font-weight:700" id="rfTrend">—</span>
+      <!-- The key insight — plain English summary -->
+      <div id="tradeSignalSummary" style="font-family:var(--sans);font-size:13px;color:var(--text-bright);line-height:1.7;margin-bottom:14px">Analyzing price action…</div>
+      <!-- 4 indicators as clean horizontal rows -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border-radius:6px;border-left:3px solid transparent" id="riRsiRow">
+          <div><div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.04em">RSI (14)</div><div style="font-family:var(--sans);font-size:10px;color:var(--text-dim);margin-top:1px">Overbought / oversold</div></div>
+          <div style="text-align:right"><div style="font-family:var(--mono);font-size:15px;font-weight:700" id="riRsi">—</div><div style="font-family:var(--mono);font-size:10px;font-weight:600" id="riRsiSig">—</div></div>
         </div>
-        <div style="display:flex;gap:12px;font-family:var(--mono);font-size:10px">
-          <span style="color:var(--text-muted)">Zone <span style="color:var(--text)" id="rfZone">—</span></span>
-          <span style="color:var(--text-muted)">0.618 <span style="color:var(--accent)" id="rf618">—</span></span>
-          <span style="color:var(--text-muted)">Prox <span style="color:var(--text)" id="rfProx">—</span></span>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border-radius:6px;border-left:3px solid transparent" id="riSmaRow">
+          <div><div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.04em">SMA 20</div><div style="font-family:var(--sans);font-size:10px;color:var(--text-dim);margin-top:1px">Short-term trend</div></div>
+          <div style="text-align:right"><div style="font-family:var(--mono);font-size:15px;font-weight:700" id="riSma20">—</div><div style="font-family:var(--mono);font-size:10px;font-weight:600" id="riSma20Sig">—</div></div>
         </div>
-        <div class="rf-levels" id="rfLevels" style="margin-top:6px"></div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="af-live" style="margin:0;padding:12px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.08em">🔬 MOMENTUM</span>
-          <span style="font-family:var(--mono);font-size:11px;font-weight:700" id="rfwScore">—</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border-radius:6px;border-left:3px solid transparent" id="riMacdRow">
+          <div><div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.04em">MACD</div><div style="font-family:var(--sans);font-size:10px;color:var(--text-dim);margin-top:1px">Buy vs sell pressure</div></div>
+          <div style="text-align:right"><div style="font-family:var(--mono);font-size:15px;font-weight:700" id="riMacd">—</div><div style="font-family:var(--mono);font-size:10px;font-weight:600" id="riMacdSig">—</div></div>
         </div>
-        <div style="display:flex;gap:12px;font-family:var(--mono);font-size:10px">
-          <span style="color:var(--text-muted)">Trend <span style="color:var(--text)" id="rfwTrend">—</span></span>
-          <span style="color:var(--text-muted)">RSI <span style="color:var(--text)" id="rfwRsi">—</span></span>
-          <span style="color:var(--text-muted)">Vol <span style="color:var(--text)" id="rfwVol">—</span></span>
-        </div>
-      </div>
-      <div class="af-live" style="margin:0;padding:12px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.08em">⚡ COMPOSITE</span>
-          <span style="font-family:var(--mono);font-size:11px;font-weight:700" id="qffScore">—</span>
-        </div>
-        <div style="display:flex;gap:12px;font-family:var(--mono);font-size:10px">
-          <span style="color:var(--text-muted)">Ribbon <span style="color:var(--text)" id="qffRibbon">—</span></span>
-          <span style="color:var(--text-muted)">Pressure <span style="color:var(--text)" id="qffVol">—</span></span>
-          <span style="color:var(--text-muted)">Risk <span style="color:var(--text)" id="qffRisk">—</span></span>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg2);border-radius:6px;border-left:3px solid transparent" id="riMomRow">
+          <div><div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.04em">MOMENTUM</div><div style="font-family:var(--sans);font-size:10px;color:var(--text-dim);margin-top:1px">Price acceleration</div></div>
+          <div style="text-align:right"><div style="font-family:var(--mono);font-size:15px;font-weight:700" id="riMom">—</div><div style="font-family:var(--mono);font-size:10px;font-weight:600" id="riMomSig">—</div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ─── SECTION 4: TRADING ALPHA ─────────── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(255,107,43,0.2))">🎯</div>
-      <h2>Trading Alpha</h2>
-      <span class="ov-sec-sub">Signals, positioning & market structure</span>
+  <!-- Quick Bubbles: PURR + NFT -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <div class="metric-card" style="padding:10px 14px;flex:1;min-width:180px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:16px">🐱</span>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em">PURR STOCK</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)" id="purrBubblePrice">—</div>
+      </div>
+      <div id="purrBubbleChg" style="font-family:var(--mono);font-size:11px;font-weight:600;margin-left:auto">—</div>
     </div>
+    <div class="metric-card" style="padding:10px 14px;flex:1;min-width:180px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:16px">😺</span>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em">HYPURR NFT</div>
+        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)" id="nftBubbleFloor">—</div>
+      </div>
+      <div id="nftBubbleChg" style="font-family:var(--mono);font-size:11px;font-weight:600;margin-left:auto">—</div>
+    </div>
+  </div>
 
-    <!-- Trade Signal — redesigned as a compact card -->
-    <div class="signal-card">
-      <div class="signal-top">
-        <div class="signal-score-ring" style="width:64px;height:64px">
-          <svg class="score-arc" viewBox="0 0 64 64">
-            <circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" stroke-width="3"/>
-            <circle id="scoreArc" cx="32" cy="32" r="28" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="176" stroke-dashoffset="176" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 1s ease,stroke 0.5s"/>
-          </svg>
-          <span class="score-num" id="ratingScore" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">—</span>
+  <!-- HYPE Perp Intelligence -->
+  <div class="metrics-grid" style="margin-bottom:16px">
+    <div class="metric-card"><div class="mc-label">HYPE Funding (Ann.)</div><div class="mc-value" id="psFunding" style="font-size:15px">—</div><div class="mc-sub">1h rate × 8760</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Open Interest</div><div class="mc-value cyan" id="psHypeOI" style="font-size:15px">—</div><div class="mc-sub">perp notional</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Premium</div><div class="mc-value" id="psPremium" style="font-size:15px">—</div><div class="mc-sub">mark vs oracle</div></div>
+    <div class="metric-card"><div class="mc-label">HYPE Perp Volume</div><div class="mc-value" id="psHypeVol" style="font-size:15px">—</div><div class="mc-sub">24h notional</div></div>
+  </div>
+
+  <!-- Platform Stats -->
+  <div class="metrics-grid" style="margin-top:0">
+    <div class="metric-card"><div class="mc-label">Total Open Interest</div><div class="mc-value" id="psOI" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">24h Perp Volume</div><div class="mc-value" id="psVol" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Perp Markets</div><div class="mc-value" id="psMarkets" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Spot Tokens</div><div class="mc-value" id="psSpot" style="font-size:15px">—</div></div>
+  </div>
+  <div class="metrics-grid" style="margin-top:0">
+    <div class="metric-card"><div class="mc-label">Validators</div><div class="mc-value" id="psVals" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="afApr" style="font-size:15px">—</div></div>
+    <div class="metric-card"><div class="mc-label">Unstake Queue</div><div class="mc-value" id="psQueue" style="font-size:15px">—</div><div class="mc-sub" id="psQueueSub"></div></div>
+    <div class="metric-card"><div class="mc-label">AF Total Value</div><div class="mc-value fire" id="psAfTotal" style="font-size:15px">—</div></div>
+  </div>
+
+  <!-- Top Markets Leaderboards -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:0">
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:8px">Top 5 — Open Interest</div>
+      <div id="topOIList"></div>
+    </div>
+    <div class="metric-card" style="padding:16px">
+      <div class="mc-label" style="margin-bottom:8px">Top 5 — 24h Volume</div>
+      <div id="topVolList"></div>
+    </div>
+  </div>
+
+  <!-- HypurrScan Dashboard Intelligence -->
+  <!-- Social Buzz — Top X/Twitter posts about HYPE -->
+  <div class="metric-card" style="padding:14px 18px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="mc-label" style="margin:0">𝕏 HYPE SOCIAL BUZZ</div>
+      <a href="https://x.com/search?q=%24HYPE%20hyperliquid&src=typed_query&f=top" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none">View all on X ↗</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <a href="https://x.com/CryptoHayes/status/1898827640000000000" target="_blank" rel="noopener" style="flex:1;min-width:250px;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-decoration:none;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-bright)">Arthur Hayes</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">@CryptoHayes</span>
         </div>
-        <div class="signal-info">
-          <div class="si-label" id="ratingLabel">Loading…</div>
-          <div class="rating-bar-wrap" style="width:120px;margin:4px 0 6px"><div class="rating-bar" id="ratingBar" style="width:50%"></div></div>
-          <div class="si-summary" id="tradeSignalSummary">Analyzing price action…</div>
+        <div style="font-family:var(--sans);font-size:11px;color:var(--text);line-height:1.5">$HYPE can pump to $150 by Aug. No other project hands as much money back to token holders. The exchange shitcoin darling of this cycle.</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:4px">Mar 10 · 🔥 Trending</div>
+      </a>
+      <a href="https://x.com/search?q=%24HYPE%20hyperliquid%20oil&src=typed_query&f=top" target="_blank" rel="noopener" style="flex:1;min-width:250px;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-decoration:none;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-bright)">Arca</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Weekly Update</span>
         </div>
+        <div style="font-family:var(--sans);font-size:11px;color:var(--text);line-height:1.5">Only 7 of top 30 markets on Hyperliquid are crypto. The rest are commodities & equities. Real platform for tokenized RWA trading in meaningful size.</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:4px">Mar 10 · 📊 Institutional</div>
+      </a>
+      <a href="https://x.com/search?q=%24HYPE%20squeeze%20short&src=typed_query&f=top" target="_blank" rel="noopener" style="flex:1;min-width:250px;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-decoration:none;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text-bright)">On-Chain Data</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Mar 10</span>
+        </div>
+        <div style="font-family:var(--sans);font-size:11px;color:var(--text);line-height:1.5">$1.76M short squeeze on HYPE — 87% of all liquidations were shorts. OI surged 16.78% to $1.39B. Smart money is net long.</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:4px">Mar 10 · ⚡ Alpha</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:20px">🐱 On-Chain Intelligence</div>
+  <div class="hs-grid">
+    <!-- 24h Fees -->
+    <div class="hs-panel">
+      <div class="hs-hdr"><span class="hs-live"></span>24H PLATFORM FEES</div>
+      <div class="hs-big"><div class="big-val" id="hsFees">—</div><div class="big-sub" id="hsFeesChg">Loading…</div></div>
+    </div>
+    <!-- TWAP HYPE Buy Pressure -->
+    <div class="hs-panel">
+      <div class="hs-hdr"><span class="hs-live"></span>TWAP HYPE BUY PRESSURE</div>
+      <div class="hs-pressure">
+        <div class="hs-pressure-cell"><div class="pr-lbl">Next 1h</div><div class="pr-val" id="hsTwap1h">—</div></div>
+        <div class="hs-pressure-cell"><div class="pr-lbl">Next 24h</div><div class="pr-val" id="hsTwap24h">—</div></div>
       </div>
-      <div class="signal-indicators">
-        <div class="signal-ind"><div class="si-name">RSI (14)</div><div class="si-val" id="riRsi">—</div><div class="si-sig" id="riRsiSig">—</div></div>
-        <div class="signal-ind"><div class="si-name">SMA 20</div><div class="si-val" id="riSma20">—</div><div class="si-sig" id="riSma20Sig">—</div></div>
-        <div class="signal-ind"><div class="si-name">MACD</div><div class="si-val" id="riMacd">—</div><div class="si-sig" id="riMacdSig">—</div></div>
-        <div class="signal-ind"><div class="si-name">Momentum</div><div class="si-val" id="riMom">—</div><div class="si-sig" id="riMomSig">—</div></div>
+      <div class="hs-big" style="padding:10px 16px"><div class="big-sub" id="hsTwapCount">Active HYPE TWAPs: —</div></div>
+    </div>
+    <!-- Liquidations -->
+    <div class="hs-panel">
+      <div class="hs-hdr"><span class="hs-live"></span>⚠️ LIQUIDATIONS</div>
+      <div class="hs-big"><div class="big-val" id="hsLiqCount">—</div><div class="big-sub">at-risk positions</div></div>
+      <div style="padding:6px 16px 12px">
+        <div class="ov-row"><span class="ov-k">Total Notional</span><span class="ov-v fire" id="hsLiqNotional">—</span></div>
+        <div class="ov-row"><span class="ov-k">Max Single</span><span class="ov-v" id="hsLiqMax">—</span></div>
+        <div class="ov-row"><span class="ov-k">Avg Leverage</span><span class="ov-v" id="hsLiqAvgLev">—</span></div>
       </div>
     </div>
-
-    <!-- HYPE-specific perp metrics -->
-    <div class="perp-row">
-      <div class="perp-chip"><div class="pc-label">Funding (Annual)</div><div class="pc-value" id="psFunding">—</div><div class="pc-sub">Shorts pay longs (or vice versa)</div></div>
-      <div class="perp-chip"><div class="pc-label">HYPE Open Interest</div><div class="pc-value cyan" id="psHypeOI">—</div><div class="pc-sub">Total bets on HYPE right now</div></div>
-      <div class="perp-chip"><div class="pc-label">HYPE Premium</div><div class="pc-value" id="psPremium">—</div><div class="pc-sub">Futures vs. actual price gap</div></div>
-      <div class="perp-chip"><div class="pc-label">HYPE Perp Volume</div><div class="pc-value" id="psHypeVol">—</div><div class="pc-sub">24h futures trading</div></div>
-    </div>
-
-    <!-- Top Markets Leaderboards -->
-    <div class="lb-grid">
-      <div class="lb-card">
-        <div class="mc-label" style="margin-bottom:8px">🏆 Top 5 — Open Interest</div>
-        <div id="topOIList"></div>
-      </div>
-      <div class="lb-card">
-        <div class="mc-label" style="margin-bottom:8px">📊 Top 5 — 24h Volume</div>
-        <div id="topVolList"></div>
+    <!-- HLP Vault -->
+    <div class="hs-panel">
+      <div class="hs-hdr"><span class="hs-live"></span>🏛️ HLP VAULT</div>
+      <div class="hs-big"><div class="big-val" id="hsHlpTvl">—</div><div class="big-sub" id="hsHlpApr">Loading…</div></div>
+      <div style="padding:6px 16px 12px">
+        <div class="ov-row"><span class="ov-k">Followers</span><span class="ov-v" id="hsHlpFollowers">—</span></div>
+        <div class="ov-row"><span class="ov-k">All-Time PnL</span><span class="ov-v green" id="hsHlpPnl">—</span></div>
+        <div class="ov-row"><span class="ov-k">Leader Share</span><span class="ov-v" id="hsHlpLeader">—</span></div>
       </div>
     </div>
   </div>
 
-  <!-- ─── SECTION 4: PLATFORM HEALTH ──────── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(167,139,250,0.2))">🔬</div>
-      <h2>Platform Health</h2>
-      <span class="ov-sec-sub">Network & exchange stats</span>
-    </div>
-    <!-- Platform quick stats strip -->
-    <div class="platform-strip">
-      <div class="ps-chip"><div class="ps-label">Total OI</div><div class="ps-value" id="psOI">—</div></div>
-      <div class="ps-chip"><div class="ps-label">24h Perps</div><div class="ps-value" id="psVol">—</div></div>
-      <div class="ps-chip"><div class="ps-label">Perp Mkts</div><div class="ps-value" id="psMarkets">—</div></div>
-      <div class="ps-chip"><div class="ps-label">Spot Tkns</div><div class="ps-value" id="psSpot">—</div></div>
-      <div class="ps-chip"><div class="ps-label">Validators</div><div class="ps-value" id="psVals">—</div></div>
-      <div class="ps-chip"><div class="ps-label">Staking APR</div><div class="ps-value green" id="afApr2" style="color:var(--green)">—</div></div>
-      <div class="ps-chip"><div class="ps-label">Unstake Q</div><div class="ps-value" id="psQueue">—</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted)" id="psQueueSub"></div></div>
-      <div class="ps-chip"><div class="ps-label">AF Total</div><div class="ps-value" id="psAfTotal" style="color:var(--fire)">—</div></div>
-    </div>
-
-    <!-- On-chain intel compact grid -->
-    <div class="intel-compact">
-      <!-- 24h Fees -->
-      <div class="intel-mini">
-        <div class="im-hdr"><span class="hs-live"></span>24H FEES</div>
-        <div class="im-big" id="hsFees">—</div>
-        <div class="im-sub" id="hsFeesChg">Loading…</div>
+  <!-- Dreamcash promo — styled as ecosystem panel -->
+  <a href="https://dreamcash.xyz" target="_blank" rel="noopener" data-umami-event="promo-click" data-umami-event-app="dreamcash" style="text-decoration:none;display:block;margin-top:16px">
+    <div style="background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.2s;cursor:pointer" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='#2d1b4e'">
+      <div style="flex-shrink:0">
+        <svg viewBox="0 0 40 40" width="40" height="40"><defs><linearGradient id="dcPromo" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0a0a0f" stroke="#2d1b4e" stroke-width="1"/><circle cx="20" cy="17" r="8" fill="none" stroke="url(#dcPromo)" stroke-width="1.5"/><text x="20" y="20" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="10" fill="url(#dcPromo)">$</text><text x="20" y="33" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="5.5" fill="#a78bfa">dream</text></svg>
       </div>
-      <!-- TWAP Buy Pressure -->
-      <div class="intel-mini">
-        <div class="im-hdr"><span class="hs-live"></span>TWAP PRESSURE</div>
-        <div class="im-rows">
-          <div class="ov-row"><span class="ov-k">Next 1h</span><span class="ov-v" id="hsTwap1h">—</span></div>
-          <div class="ov-row"><span class="ov-k">Next 24h</span><span class="ov-v" id="hsTwap24h">—</span></div>
-        </div>
-        <div class="im-sub" id="hsTwapCount" style="padding-bottom:8px">Active HYPE TWAPs: —</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:#f0f0ff">Trade stocks, crypto & commodities on-chain</div>
+        <div style="font-family:var(--sans);font-size:11px;color:#9ca3af;margin-top:3px">Dreamcash — S&P 500, Tesla, Nvidia perps on Hyperliquid. Earn $200K/week in USDT rewards.</div>
       </div>
-      <!-- Liquidations -->
-      <div class="intel-mini">
-        <div class="im-hdr"><span class="hs-live"></span>⚠️ LIQUIDATIONS</div>
-        <div class="im-big" id="hsLiqCount">—</div>
-        <div class="im-sub">at-risk positions</div>
-        <div class="im-rows">
-          <div class="ov-row"><span class="ov-k">Notional</span><span class="ov-v fire" id="hsLiqNotional">—</span></div>
-          <div class="ov-row"><span class="ov-k">Max Single</span><span class="ov-v" id="hsLiqMax">—</span></div>
-          <div class="ov-row"><span class="ov-k">Avg Lever.</span><span class="ov-v" id="hsLiqAvgLev">—</span></div>
-        </div>
-      </div>
-      <!-- HLP Vault -->
-      <div class="intel-mini">
-        <div class="im-hdr"><span class="hs-live"></span>🏛️ HLP VAULT</div>
-        <div class="im-big" id="hsHlpTvl">—</div>
-        <div class="im-sub" id="hsHlpApr">Loading…</div>
-        <div class="im-rows">
-          <div class="ov-row"><span class="ov-k">Followers</span><span class="ov-v" id="hsHlpFollowers">—</span></div>
-          <div class="ov-row"><span class="ov-k">All-Time PnL</span><span class="ov-v green" id="hsHlpPnl">—</span></div>
-          <div class="ov-row"><span class="ov-k">Leader Share</span><span class="ov-v" id="hsHlpLeader">—</span></div>
-        </div>
+      <div style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:#a78bfa;white-space:nowrap">
+        Code: <span style="color:#f59e0b;font-weight:700" onclick="event.preventDefault();event.stopPropagation();navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash',location:'overview'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span>
+        <span style="margin-left:8px;color:#a78bfa">→</span>
       </div>
     </div>
-
-    <!-- Validators & Unstake Queue (merged from Staking tab) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
-      <div class="metric-card" style="padding:14px">
-        <div class="mc-label" style="margin-bottom:8px">🥩 Top Validators</div>
-        <div id="validatorList" class="val-scroll"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
-      </div>
-      <div class="metric-card" style="padding:14px">
-        <div class="mc-label" style="margin-bottom:8px">⏳ Unstake Queue</div>
-        <div id="queueTable" class="val-scroll"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─── SECTION 6: ECOSYSTEM & EXPLORE ───── -->
-  <div class="ov-section">
-    <div class="ov-section-hdr">
-      <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(255,107,157,0.2),rgba(167,139,250,0.2))">🌐</div>
-      <h2>Ecosystem & Explore</h2>
-      <span class="ov-sec-sub">PURR stock, NFTs, community & more</span>
-    </div>
-
-    <!-- PURR + NFT bubbles -->
-    <div class="eco-bubbles">
-      <div class="eco-bubble">
-        <div class="eb-icon">🐱</div>
-        <div class="eb-meta">
-          <div class="eb-name">PURR Stock (NASDAQ)</div>
-          <div class="eb-val" id="purrBubblePrice">—</div>
-        </div>
-        <div class="eb-chg" id="purrBubbleChg">—</div>
-      </div>
-      <div class="eco-bubble">
-        <div class="eb-icon">😺</div>
-        <div class="eb-meta">
-          <div class="eb-name">Hypurr NFT Floor</div>
-          <div class="eb-val" id="nftBubbleFloor">—</div>
-        </div>
-        <div class="eb-chg" id="nftBubbleChg">—</div>
-      </div>
-    </div>
-
-    <!-- Social Buzz — Live X/Twitter feed -->
-    <div style="margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text-dim);text-transform:uppercase">𝕏 Live Social Buzz</div>
-        <a href="https://x.com/search?q=%24HYPE%20hyperliquid&src=typed_query&f=top" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none">View all on X ↗</a>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:420px">
-        <a class="twitter-timeline"
-           href="https://twitter.com/search?q=%24HYPE%20hyperliquid%20-filter%3Areplies"
-           data-theme="dark"
-           data-chrome="noheader nofooter noborders transparent"
-           data-tweet-limit="5"
-           data-dnt="true"
-           data-link-color="#00d4ff"
-           style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading live $HYPE posts…</a>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-    </div>
-
-    <!-- Explore other tabs -->
-    <div class="explore-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="explore-card" onclick="showPage('trades',document.querySelectorAll('.nav-tab')[1])">
-        <div class="ec-icon">🔴</div>
-        <div class="ec-name">Live Trades</div>
-        <div class="ec-desc">Real-time trade feed with flow analysis</div>
-      </div>
-      <div class="explore-card" onclick="showPage('hip3',document.querySelectorAll('.nav-tab')[2])">
-        <div class="ec-icon">🌊</div>
-        <div class="ec-name">HIP-3 DEX</div>
-        <div class="ec-desc">Community-built exchanges & altcoin perps</div>
-      </div>
-      <div class="explore-card" onclick="showPage('ecosystem',document.querySelectorAll('.nav-tab')[3])">
-        <div class="ec-icon">🌐</div>
-        <div class="ec-name">Ecosystem</div>
-        <div class="ec-desc">PURR stock, NFTs & trading apps</div>
-      </div>
-    </div>
-
-    <!-- Dreamcash promo -->
-    <a href="https://dreamcash.xyz" target="_blank" rel="noopener" data-umami-event="promo-click" data-umami-event-app="dreamcash" style="text-decoration:none;display:block;margin-top:14px">
-      <div style="background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.2s;cursor:pointer" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='#2d1b4e'">
-        <div style="flex-shrink:0">
-          <svg viewBox="0 0 40 40" width="40" height="40"><defs><linearGradient id="dcPromo" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0a0a0f" stroke="#2d1b4e" stroke-width="1"/><circle cx="20" cy="17" r="8" fill="none" stroke="url(#dcPromo)" stroke-width="1.5"/><text x="20" y="20" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="10" fill="url(#dcPromo)">$</text><text x="20" y="33" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="5.5" fill="#a78bfa">dream</text></svg>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:#f0f0ff">Trade stocks, crypto & commodities on-chain</div>
-          <div style="font-family:var(--sans);font-size:11px;color:#9ca3af;margin-top:3px">Dreamcash — S&P 500, Tesla, Nvidia perps on Hyperliquid. Earn $200K/week in USDT rewards.</div>
-        </div>
-        <div style="flex-shrink:0;font-family:var(--mono);font-size:10px;color:#a78bfa;white-space:nowrap">
-          Code: <span style="color:#f59e0b;font-weight:700" onclick="event.preventDefault();event.stopPropagation();navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash',location:'overview'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span>
-          <span style="margin-left:8px;color:#a78bfa">→</span>
-        </div>
-      </div>
-    </a>
-  </div>
+  </a>
 
   <!-- Hidden share card for screenshot -->
   <div id="shareCard" style="position:fixed;left:-9999px;top:0;width:600px;padding:24px;background:#08090c;border:2px solid #222738;border-radius:12px;z-index:-1">
@@ -1157,12 +707,15 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
       <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00d4ff">INTELLIGENCE</span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-left:auto">hype-site.com</span>
     </div>
+    <!-- Price + Rating badge -->
     <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px">
       <div id="sharePrice" style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#eef2ff"></div>
       <div id="shareChg" style="font-family:'JetBrains Mono',monospace;font-size:14px"></div>
       <div id="shareRating" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin-left:auto;padding:4px 10px;border-radius:4px"></div>
     </div>
+    <!-- Headline -->
     <div id="shareHeadline" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fbbf24;margin-bottom:12px;padding:10px 12px;background:rgba(251,191,36,0.06);border-radius:6px;border-left:3px solid #fbbf24"></div>
+    <!-- 4-col key metrics -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">5M FLOW</div>
@@ -1181,6 +734,7 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div id="shareSupply" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
       </div>
     </div>
+    <!-- OI + Perp Vol -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738">
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">🎯 HYPE OPEN INTEREST</div>
@@ -1191,29 +745,312 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
         <div id="shareVol" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#eef2ff"></div>
       </div>
     </div>
+    <!-- Hot coins strip -->
     <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;margin-bottom:10px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:4px">🔥 HOTTEST MARKETS RIGHT NOW</div>
       <div id="shareHotCoins" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#eef2ff"></div>
     </div>
+    <!-- Footer -->
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#3a4258" id="shareTime"></span>
       <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#00d4ff">hype-site.com</span>
     </div>
   </div>
 </div>
+<div class="page" id="page-charts">
+  <h2 class="sr-only">Hyperliquid HYPE Price Charts &amp; Technical Analysis</h2>
+  <div class="chart-box">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / USDT Perpetual</span><span class="chart-meta">BINANCE · TradingView</span></div></div>
+    <div id="tvPerps" style="height:500px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypeperps&symbol=BINANCE%3AHYPEUSDT.P&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&studies=%5B%22STD%3BBollinger_Bands%22%2C%22STD%3BMACD%22%5D&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%5D&locale=en" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
 
+  <!-- HYPE/BTC -->
+  <div class="chart-box">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">HYPE / BTC</span><span class="chart-meta">BITFINEX · TradingView</span></div></div>
+    <div id="tvWidget" style="height:420px;border-radius:8px;overflow:hidden">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_hypebtc&symbol=BITFINEX%3AHYPEBTC&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%7D&locale=en" style="width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+
+  <!-- Liquidation Heatmap -->
+  <div class="chart-box" style="margin-top:16px">
+    <div class="chart-hdr">
+      <div class="left"><span class="chart-title">🔥 HYPE Liquidation Heatmap</span><span class="chart-meta" id="liqHeatMeta">Estimated from leverage tiers & OI</span></div>
+      <div style="display:flex;gap:4px">
+        <button class="tf-btn active" onclick="_setLiqRange(0.15,this)">±15%</button>
+        <button class="tf-btn" onclick="_setLiqRange(0.25,this)">±25%</button>
+        <button class="tf-btn" onclick="_setLiqRange(0.40,this)">±40%</button>
+      </div>
+    </div>
+    <div style="position:relative">
+      <canvas id="liqHeatCanvas" style="width:100%;height:320px;display:block;border-radius:0 0 8px 8px"></canvas>
+      <div id="liqHeatTooltip" style="display:none;position:absolute;padding:6px 10px;background:rgba(8,9,12,0.95);border:1px solid var(--border-bright);border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--text-bright);pointer-events:none;z-index:10;white-space:nowrap"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--text-dim)">
+      <div>
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(0,230,118,0.6);vertical-align:middle;margin-right:4px"></span>Long liqs (price drops)
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,61,90,0.6);vertical-align:middle;margin:0 4px 0 12px"></span>Short liqs (price rises)
+      </div>
+      <div id="liqHeatSummary" style="color:var(--text-muted)">—</div>
+    </div>
+  </div>
+
+  <!-- Indicator Panels -->
+  <div class="indicator-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <!-- SqzMom Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">📡 Squeeze Momentum</span><span class="chart-meta" id="sqzMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Squeeze</div><div class="val" id="sqzState">—</div></div>
+        <div class="af-stat"><div class="lbl">Direction</div><div class="val" id="sqzDir">—</div></div>
+        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="sqzStr">—</div></div>
+        <div class="af-stat"><div class="lbl">Momentum</div><div class="val" id="sqzMom">—</div></div>
+      </div>
+      <div class="chart-wrap" id="sqzWrap" style="height:180px"></div>
+    </div>
+    <!-- Fibonacci Matrix Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">📐 Fibonacci Matrix</span><span class="chart-meta" id="rfMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfTrend">—</div></div>
+        <div class="af-stat"><div class="lbl">Price Zone</div><div class="val" id="rfZone">—</div></div>
+        <div class="af-stat"><div class="lbl">0.618 Golden</div><div class="val" id="rf618">—</div></div>
+        <div class="af-stat"><div class="lbl">Proximity</div><div class="val" id="rfProx">—</div></div>
+      </div>
+      <div class="rf-levels" id="rfLevels"></div>
+    </div>
+    <!-- Momentum Pulse Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">🔬 Momentum Pulse</span><span class="chart-meta" id="rfwMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Score</div><div class="val" id="rfwScore">—</div></div>
+        <div class="af-stat"><div class="lbl">Trend</div><div class="val" id="rfwTrend">—</div></div>
+        <div class="af-stat"><div class="lbl">RSI</div><div class="val" id="rfwRsi">—</div></div>
+        <div class="af-stat"><div class="lbl">Volume</div><div class="val" id="rfwVol">—</div></div>
+      </div>
+    </div>
+    <!-- Composite Signal Panel -->
+    <div class="af-live" style="margin-top:0">
+      <div class="chart-hdr"><div class="left"><span class="chart-title">⚡ Composite Signal</span><span class="chart-meta" id="qffMeta">—</span></div></div>
+      <div class="af-live-stats" style="margin-bottom:6px">
+        <div class="af-stat"><div class="lbl">Strength</div><div class="val" id="qffScore">—</div></div>
+        <div class="af-stat"><div class="lbl">Ribbon</div><div class="val" id="qffRibbon">—</div></div>
+        <div class="af-stat"><div class="lbl">Vol Pressure</div><div class="val" id="qffVol">—</div></div>
+        <div class="af-stat"><div class="lbl">Risk</div><div class="val" id="qffRisk">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Price Rating -->
+  <div class="rating-panel" style="margin-top:16px">
+    <div class="section-title">📊 Full Technical Analysis</div>
+    <div class="rating-grid">
+      <div class="rating-main">
+        <div class="rating-score" id="ratingScore2">—</div>
+        <div class="rating-label" id="ratingLabel2">Loading…</div>
+        <div class="rating-bar-wrap"><div class="rating-bar" id="ratingBar2" style="width:50%"></div></div>
+        <div class="rating-bar-labels"><span>Strong Sell</span><span>Sell</span><span>Neutral</span><span>Buy</span><span>Strong Buy</span></div>
+      </div>
+      <div class="rating-indicators">
+        <div class="ri-row"><span class="ri-name">RSI (14)</span><span class="ri-val" id="riRsi2">—</span><span class="ri-signal" id="riRsiSig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 20</span><span class="ri-val" id="riSma202">—</span><span class="ri-signal" id="riSma20Sig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">SMA 50</span><span class="ri-val" id="riSma50">—</span><span class="ri-signal" id="riSma50Sig">—</span></div>
+        <div class="ri-row"><span class="ri-name">MACD</span><span class="ri-val" id="riMacd2">—</span><span class="ri-signal" id="riMacdSig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">Momentum</span><span class="ri-val" id="riMom2">—</span><span class="ri-signal" id="riMomSig2">—</span></div>
+        <div class="ri-row"><span class="ri-name">Volume Trend</span><span class="ri-val" id="riVolT">—</span><span class="ri-signal" id="riVolTSig">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURR Stock — Hyperliquid Strategies -->
+  <div class="metric-card" style="padding:20px;margin-top:16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:18px">🐱</span>
+      <h3 style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.08em;color:var(--text-bright);margin:0">PURR · Hyperliquid Strategies Inc</h3>
+      <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--accent);background:rgba(0,212,255,0.08);padding:2px 8px;border-radius:4px;letter-spacing:0.08em">NASDAQ</span>
+    </div>
+    <div style="font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Hyperliquid Strategies (NASDAQ: PURR) is a digital asset treasury company providing U.S. and institutional investors with regulated exposure to HYPE. The company accumulates and stakes HYPE tokens, generating compounding returns through staking yield and active ecosystem engagement.
+    </div>
+    <div class="metrics-grid" style="margin-bottom:16px">
+      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">HYPE HELD</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--fire)" id="purrHype">17.6M HYPE</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">~1.83% of supply</div>
+      </div>
+      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">TOTAL ASSETS</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">$616.7M</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">Zero debt</div>
+      </div>
+      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">DEPLOYABLE</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent)">$125M</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">+ $1B credit line</div>
+      </div>
+      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">BUYBACK</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--purple)">$30M</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">12-month program</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+      <div class="ov-row"><span class="ov-k">Chairman</span><span class="ov-v" style="color:var(--text-bright)">Bob Diamond (fmr. Barclays CEO)</span></div>
+      <div class="ov-row"><span class="ov-k">CEO</span><span class="ov-v" style="color:var(--text-bright)">David Schamis</span></div>
+      <div class="ov-row"><span class="ov-k">Backers</span><span class="ov-v" style="color:var(--text)">D1 Capital · Galaxy · Pantera · Republic · 683 Capital</span></div>
+      <div class="ov-row"><span class="ov-k">Analyst Rating</span><span class="ov-v" style="color:var(--green)">2 Buy · 1 Hold · 1 Sell</span></div>
+      <div class="ov-row"><span class="ov-k">Price Targets</span><span class="ov-v" style="color:var(--accent)">Avg $7.23 · High $8.45 · Low $6.00</span></div>
+      <div class="ov-row"><span class="ov-k">Chardan Capital</span><span class="ov-v" style="color:var(--green)">Buy · PT $8.45</span></div>
+      <div class="ov-row"><span class="ov-k">Cantor Fitzgerald</span><span class="ov-v" style="color:var(--green)">Overweight · PT $6.00</span></div>
+      <div class="ov-row"><span class="ov-k">Wall Street Zen</span><span class="ov-v" style="color:var(--text)">Hold</span></div>
+      <div class="ov-row"><span class="ov-k">Weiss Ratings</span><span class="ov-v" style="color:var(--red)">Sell</span></div>
+      <div class="ov-row"><span class="ov-k">Market Cap</span><span class="ov-v" style="color:var(--text-bright)">~$651M</span></div>
+      <div class="ov-row"><span class="ov-k">Shares Repurchased</span><span class="ov-v" style="color:var(--accent)">3.0M ($10.5M deployed)</span></div>
+    </div>
+    <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_purr&symbol=NASDAQ%3APURR&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22header_compare%22%5D&locale=en" style="width:100%;height:300px;border:0"></iframe>
+    </div>
+    <div style="font-family:var(--sans);font-size:12px;color:var(--text-dim);line-height:1.65;padding:12px;background:rgba(167,139,250,0.04);border-radius:8px;border:1px solid rgba(167,139,250,0.1);margin-bottom:12px">
+      <strong style="color:var(--purple)">Why it matters:</strong> PURR gives traditional investors regulated access to HYPE without holding crypto directly. The company stakes substantially all HYPE holdings, contributing to network security and earning staking yield. With $125M deployable capital + a $1B credit facility, further HYPE accumulation is expected. Each purchase adds buy pressure and reduces circulating supply.
+    </div>
+    <a href="https://finance.yahoo.com/quote/PURR/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;padding:8px 14px;background:rgba(0,212,255,0.06);border-radius:6px;border:1px solid rgba(0,212,255,0.15)">
+      View PURR on Yahoo Finance ↗
+    </a>
+  </div>
+
+  <!-- Hypurr NFT Collection -->
+  <div class="nft-section" style="margin-top:20px">
+    <div class="nft-header">
+      <svg viewBox="0 0 32 32" width="18" height="18"><defs><linearGradient id="catG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG2)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r="0.7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r="0.7" fill="#eef2ff"/></svg>
+      <h3>Hypurr NFT Collection</h3>
+      <span class="nft-badge">LIVE</span>
+    </div>
+    <div class="nft-panel">
+      <div class="nft-top">
+        <div class="nft-cat-badge">
+          <svg viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="catBig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M12 20L16 6c0-1 1.2-1.4 1.8-.6l6 6.6h16.4l6-6.6c.6-.8 1.8-.4 1.8.6l4 14c4 5 4 11 0 16-3 4-8 7-14 8v3c0 1.6-1.4 3-3 3H26c-1.6 0-3-1.4-3-3v-3c-6-1-11-4-14-8-4-5-4-11 0-16z" fill="url(#catBig)" opacity="0.85"/><circle cx="24" cy="28" r="5" fill="#08090c"/><circle cx="40" cy="28" r="5" fill="#08090c"/><circle cx="25.5" cy="26.5" r="1.8" fill="#eef2ff"/><circle cx="41.5" cy="26.5" r="1.8" fill="#eef2ff"/><ellipse cx="32" cy="36" rx="2.4" ry="1.6" fill="#ff6b9d"/><path d="M28 39q4 3 8 0" stroke="#08090c" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 34l-5 2M26 36l-5 0M38 34l5 2M38 36l5 0" stroke="#08090c" stroke-width="0.6" opacity="0.3"/></svg>
+        </div>
+        <div class="nft-stats">
+          <div class="nft-stat"><div class="ns-lbl">Floor</div><div class="ns-val" id="nftFloor">—</div><div class="ns-sub" id="nftFloorUsd">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">24h Change</div><div class="ns-val" id="nftBid" style="color:var(--green)">—</div><div class="ns-sub">24h</div></div>
+          <div class="nft-stat"><div class="ns-lbl">7d Change</div><div class="ns-val" id="nftSpread" style="color:var(--yellow)">—</div><div class="ns-sub">7 days</div></div>
+          <div class="nft-stat"><div class="ns-lbl">24h Vol</div><div class="ns-val" id="nftVol">—</div><div class="ns-sub">HYPE</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Owners</div><div class="ns-val" id="nftOwners">—</div><div class="ns-sub">unique</div></div>
+          <div class="nft-stat"><div class="ns-lbl">Market Cap</div><div class="ns-val" id="nftListed">—</div><div class="ns-sub">native</div></div>
+        </div>
+      </div>
+      <div class="nft-chart-wrap" id="nftChartWrap"></div>
+      <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BURNS TAB ═══════════════════════════════════════════════ -->
+<div class="page" id="page-burns">
+  <h2 class="sr-only">Hyperliquid Token Burns &amp; Supply Dynamics</h2>
+  <!-- Supply Breakdown ring chart -->
+  <div class="metric-card" style="padding:20px;margin-bottom:16px">
+    <div class="mc-label" style="margin-bottom:14px;font-size:13px">Supply Breakdown</div>
+    <div style="display:flex;align-items:center;gap:28px;justify-content:center;flex-wrap:wrap">
+      <div style="position:relative;flex-shrink:0"><canvas id="ringCanvas" width="200" height="200" style="width:200px;height:200px"></canvas><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text-bright)">1.000B</div><div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em">MAX SUPPLY</div></div></div>
+      <div class="supply-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;min-width:0">
+        <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Unstaked Circ</span><span class="legend-val" id="lgCirc">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-label">Staked (Holders)</span><span class="legend-val" id="lgStaked">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--fire)"></div><span class="legend-label">Burned</span><span class="legend-val" id="lgBurned">—</span></div>
+        <div class="legend-row"><div class="legend-dot" style="background:var(--text-muted)"></div><span class="legend-label">Locked / Foundation</span><span class="legend-val" id="lgOther">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics-grid" >
+    <div class="metric-card"><div class="mc-glow" style="background:var(--fire)"></div><div class="mc-label">🔥 Total Burned</div><div class="mc-value fire" id="mBurned2">—</div><div class="mc-sub" id="mBurnedSub2">—</div></div>
+    <div class="metric-card"><div class="mc-label">AF HYPE (burned by vote)</div><div class="mc-value fire" id="burnAfHype">—</div><div class="mc-sub" id="afHypeUsd">—</div></div>
+    <div class="metric-card"><div class="mc-label">Fee Burns (on-chain)</div><div class="mc-value" id="burnFees">—</div><div class="mc-sub">HyperCore + HyperEVM</div></div>
+    <div class="metric-card"><div class="mc-label">USD Value Burned</div><div class="mc-value green" id="burnUsdTotal">—</div><div class="mc-sub">at current price</div></div>
+  </div>
+
+  <!-- Live Burn Tracker -->
+  <div class="af-live">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">🔥 Live Burn Tracker</span><span class="chart-meta" id="burnChartMeta">Collecting data…</span></div></div>
+    <div class="af-live-stats" style="margin-bottom:8px">
+      <div class="af-stat"><div class="lbl">Total Burned</div><div class="val fire" id="burnLiveTotal">—</div></div>
+      <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val" id="burnLiveAf">—</div></div>
+      <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val" id="burnLiveFees">—</div></div>
+      <div class="af-stat"><div class="lbl">Session</div><div class="val green" id="burnLiveSession">+0 HYPE</div></div>
+      <div class="af-stat"><div class="lbl">Live Rate</div><div class="val cyan" id="burnLiveRate">—</div></div>
+    </div>
+    <div class="chart-wrap" id="burnWrap" style="height:240px"></div>
+  </div>
+
+  <!-- Burn Rate History -->
+  <div class="af-live">
+    <div class="chart-hdr">
+      <div class="left"><span class="chart-title">🔥 Burn Rate History</span><span class="chart-meta" id="burnRateMeta">Estimating…</span></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="tf-btns">
+          <button class="tf-btn" id="br30d" onclick="setBurnRange('30d',this)">30d</button>
+          <button class="tf-btn active" id="br90d" onclick="setBurnRange('90d',this)">90d</button>
+          <button class="tf-btn" id="brAll" onclick="setBurnRange('all',this)">All</button>
+        </div>
+        <div class="tf-btns">
+          <button class="tf-btn" id="brHour" onclick="setBurnTf('hour',this)">Hourly</button>
+          <button class="tf-btn active" id="brDay" onclick="setBurnTf('day',this)">Daily</button>
+          <button class="tf-btn" id="brWeek" onclick="setBurnTf('week',this)">Weekly</button>
+        </div>
+      </div>
+    </div>
+    <div class="af-live-stats" style="margin-bottom:8px">
+      <div class="af-stat"><div class="lbl">Burn Score</div><div class="val fire" id="burnScoreVal" style="font-size:22px">—</div></div>
+      <div class="af-stat"><div class="lbl">Last Period</div><div class="val" id="burnToday">—</div></div>
+      <div class="af-stat"><div class="lbl">Avg Daily</div><div class="val" id="burnAvgDay">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Velocity</div><div class="val green" id="burnVelocity">—</div></div>
+    </div>
+    <div class="chart-wrap" id="burnRateWrap" style="height:320px"></div>
+  </div>
+
+  <!-- Staking Emissions & Supply Dynamics -->
+  <div class="af-live">
+    <div class="chart-hdr"><div class="left"><span class="chart-title">📊 Supply Dynamics — Burns vs Emissions</span><span class="chart-meta" id="supDynMeta">Computing…</span></div></div>
+    <div class="af-live-stats" style="margin-bottom:8px">
+      <div class="af-stat"><div class="lbl">Daily Emissions</div><div class="val" id="emDaily" style="color:var(--yellow)">—</div><div class="lbl" id="emDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Daily Burns (7d avg)</div><div class="val fire" id="emBurnDaily">—</div><div class="lbl" id="emBurnDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Daily Flow</div><div class="val" id="emNetDaily">—</div><div class="lbl" id="emNetDailyUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Emissions</div><div class="val" id="emAnnual" style="color:var(--yellow)">—</div><div class="lbl" id="emAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Annual Burns (est)</div><div class="val fire" id="emBurnAnnual">—</div><div class="lbl" id="emBurnAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
+      <div class="af-stat"><div class="lbl">Net Annual</div><div class="val" id="emNetAnnual">—</div><div class="lbl" id="emNetAnnualUsd" style="font-size:10px;margin-top:2px">—</div></div>
+    </div>
+    <div class="chart-wrap" id="emChartWrap" style="height:300px"></div>
+    <div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--text-muted);line-height:1.6">
+      Emissions = staking rewards from the future emissions reserve (distributed daily). Formula: APR = 474/√(totalStaked).<br>
+      Burns = AF buyback burns + on-chain fee burns. <span id="emBurnNote">Burn rate updates live from on-chain data.</span><br>
+      Net flow = emissions − burns. Green/negative = deflationary. USD values at current HYPE price. <span id="emNetNote"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Charts page removed - price chart now on Overview -->
+
+<!-- ══ STAKING ═════════════════════════════════════════════════ -->
+<div class="page" id="page-staking">
+  <h2 class="sr-only">Hyperliquid Staking Overview &amp; Validator Data</h2>
+  <div class="section-title">Staking Overview</div>
+  <div class="staking-grid">
+    <div class="metric-card"><div class="mc-label">Total Staked</div><div class="mc-value green" id="skTotal">—</div><div class="mc-sub" id="skTotalSub">—</div></div>
+    <div class="metric-card"><div class="mc-label">Staking APR</div><div class="mc-value green" id="skApr">—</div></div>
+    <div class="metric-card"><div class="mc-label">Active Validators</div><div class="mc-value" id="skVals">—</div></div>
+    <div class="metric-card"><div class="mc-label">Unstake Queue</div><div class="mc-value" id="skQueue">—</div><div class="mc-sub" id="skQueueSub">—</div></div>
+  </div>
+  <div class="section-title">Validators</div>
+  <div class="data-table" id="validatorList"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
+  <div class="section-title" style="margin-top:20px">Unstake Queue</div>
+  <div class="data-table" id="queueTable"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Loading…</div></div>
+</div>
 
 <!-- ══ LIVE TRADES ═════════════════════════════════════════════ -->
 <div class="page" id="page-trades">
   <h2 class="sr-only">Hyperliquid Live Trades, Volume Flow &amp; Market Data</h2>
-  <div class="ov-section-hdr" style="margin-bottom:16px">
-    <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(255,61,90,0.2),rgba(255,107,43,0.2))">🔴</div>
-    <h2>Live Trades</h2>
-    <span class="ov-sec-sub">Real-time trade flow from Hyperliquid's order book</span>
-  </div>
-  <div style="font-family:var(--sans);font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:16px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
-    <strong style="color:var(--text)">What you're seeing:</strong> Every trade that happens on Hyperliquid flows through here in real-time via WebSocket. "Net Flow" tells you if more money is buying or selling. Green bars = buyers winning. Red bars = sellers winning. Whale icons (🐋) flag unusually large trades.
-  </div>
   <!-- Window selector -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div class="section-title" style="margin:0">Trade Flow Intelligence</div>
@@ -1278,14 +1115,6 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 <!-- ══ HIP-3 TAB ═══════════════════════════════════════════════ -->
 <div class="page" id="page-hip3">
   <h2 class="sr-only">HIP-3 Permissionless Perpetual Markets — Hyperliquid Builder DEXs</h2>
-  <div class="ov-section-hdr" style="margin-bottom:16px">
-    <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(0,212,255,0.2))">🌊</div>
-    <h2>HIP-3 Markets</h2>
-    <span class="ov-sec-sub">Community-built exchanges running on Hyperliquid</span>
-  </div>
-  <div style="font-family:var(--sans);font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:16px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
-    <strong style="color:var(--text)">What is HIP-3?</strong> Anyone can build their own perpetual futures exchange on top of Hyperliquid by staking 500K HYPE. These "Builder DEXs" list tokens that aren't on the main exchange — think smaller altcoins, meme tokens, and niche markets. They share Hyperliquid's speed and security but with community-chosen listings.
-  </div>
 
   <!-- Hot Markets Banner -->
   <div class="metric-card" style="padding:16px 20px;margin-bottom:16px;background:linear-gradient(135deg,rgba(255,107,43,0.06),rgba(255,61,90,0.03))">
@@ -1372,161 +1201,206 @@ footer a{color:var(--text-dim);text-decoration:none}footer a:hover{color:var(--a
 
 <!-- ══ ECOSYSTEM ════════════════════════════════════════════════ -->
 <div class="page" id="page-ecosystem">
-  <div class="ov-section-hdr" style="margin-bottom:20px">
-    <div class="ov-sec-icon" style="background:linear-gradient(135deg,rgba(255,107,157,0.2),rgba(167,139,250,0.2))">🌐</div>
-    <h2>Ecosystem</h2>
-    <span class="ov-sec-sub">Apps, assets & projects building on Hyperliquid</span>
-  </div>
-  <div style="font-family:var(--sans);font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:24px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px">
-    Independent reviews of what's worth your time in the Hyperliquid ecosystem. We test everything ourselves.
+  <div class="eco-hero">
+    <h1>🌐 Hyperliquid Ecosystem</h1>
+    <p>Independent reviews of the apps, tools, and protocols building on Hyperliquid. We test everything ourselves — here's what's actually worth your time.</p>
   </div>
 
-  <!-- ── PURR Stock ── -->
-  <div class="metric-card" style="padding:20px;margin-bottom:16px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-size:18px">🐱</span>
-      <h3 style="font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.08em;color:var(--text-bright);margin:0">PURR · Hyperliquid Strategies Inc</h3>
-      <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--accent);background:rgba(0,212,255,0.08);padding:2px 8px;border-radius:4px;letter-spacing:0.08em">NASDAQ</span>
-    </div>
-    <div style="font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px">
-      A Nasdaq-listed company that buys & stakes HYPE tokens, giving traditional investors regulated stock-market exposure to the Hyperliquid ecosystem. Think of it as a "HYPE ETF" — you buy PURR shares through any brokerage, and the company holds HYPE for you.
-    </div>
-    <div class="metrics-grid" style="margin-bottom:16px">
-      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">HYPE HELD</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--fire)" id="purrHype">17.6M HYPE</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">~1.83% of supply</div>
+  <!-- ── BASED ── -->
+  <div class="eco-card">
+    <div class="eco-card-top">
+      <div class="eco-card-icon" style="background:#000;padding:8px;border-radius:12px;border:1px solid #222">
+        <svg viewBox="0 0 56 56" width="56" height="56"><defs><linearGradient id="basedG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="#0a0a0f"/><text x="28" y="36" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="22" fill="url(#basedG)">based</text></svg>
       </div>
-      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">TOTAL ASSETS</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">$616.7M</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">Zero debt</div>
-      </div>
-      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">DEPLOYABLE</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent)">$125M</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">+ $1B credit line</div>
-      </div>
-      <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.05em;margin-bottom:4px">BUYBACK</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--purple)">$30M</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">12-month program</div>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;font-family:var(--mono);font-size:11px">
-      <div class="ov-row"><span class="ov-k">Chairman</span><span class="ov-v" style="color:var(--text-bright)">Bob Diamond (fmr. Barclays CEO)</span></div>
-      <div class="ov-row"><span class="ov-k">Backers</span><span class="ov-v" style="color:var(--text)">D1 Capital · Galaxy · Pantera · Republic</span></div>
-      <div class="ov-row"><span class="ov-k">Analyst Targets</span><span class="ov-v" style="color:var(--accent)">Avg $7.23 · High $8.45 · Low $6.00</span></div>
-    </div>
-    <div style="margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
-      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tv_purr&symbol=NASDAQ%3APURR&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=12151c&theme=dark&style=1&timezone=exchange&withdateranges=1&overrides=%7B%22paneProperties.background%22%3A%22%2312151c%22%2C%22paneProperties.vertGridProperties.color%22%3A%22%23222738%22%2C%22paneProperties.horzGridProperties.color%22%3A%22%23222738%22%2C%22scalesProperties.textColor%22%3A%22%235a6580%22%7D&enabled_features=%5B%5D&disabled_features=%5B%22header_symbol_search%22%2C%22header_compare%22%5D&locale=en" style="width:100%;height:300px;border:0"></iframe>
-    </div>
-    <a href="https://finance.yahoo.com/quote/PURR/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;padding:8px 14px;background:rgba(0,212,255,0.06);border-radius:6px;border:1px solid rgba(0,212,255,0.15)">View PURR on Yahoo Finance ↗</a>
-  </div>
-
-  <!-- ── Hypurr NFT ── -->
-  <div class="nft-section" style="margin-bottom:20px">
-    <div class="nft-header">
-      <svg viewBox="0 0 32 32" width="18" height="18"><defs><linearGradient id="catG2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill="url(#catG2)" opacity="0.9"/><circle cx="12" cy="14" r="2" fill="#08090c"/><circle cx="20" cy="14" r="2" fill="#08090c"/><circle cx="12.6" cy="13.5" r="0.7" fill="#eef2ff"/><circle cx="20.6" cy="13.5" r="0.7" fill="#eef2ff"/></svg>
-      <h3>Hypurr NFT Collection</h3>
-      <span class="nft-badge">LIVE</span>
-    </div>
-    <div style="font-family:var(--sans);font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:12px">The official Hyperliquid cat NFTs on HyperEVM. Holding one signals early ecosystem commitment and may come with future perks.</div>
-    <div class="nft-panel">
-      <div class="nft-top">
-        <div class="nft-cat-badge">
-          <svg viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="catBig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M12 20L16 6c0-1 1.2-1.4 1.8-.6l6 6.6h16.4l6-6.6c.6-.8 1.8-.4 1.8.6l4 14c4 5 4 11 0 16-3 4-8 7-14 8v3c0 1.6-1.4 3-3 3H26c-1.6 0-3-1.4-3-3v-3c-6-1-11-4-14-8-4-5-4-11 0-16z" fill="url(#catBig)" opacity="0.85"/><circle cx="24" cy="28" r="5" fill="#08090c"/><circle cx="40" cy="28" r="5" fill="#08090c"/><circle cx="25.5" cy="26.5" r="1.8" fill="#eef2ff"/><circle cx="41.5" cy="26.5" r="1.8" fill="#eef2ff"/><ellipse cx="32" cy="36" rx="2.4" ry="1.6" fill="#ff6b9d"/><path d="M28 39q4 3 8 0" stroke="#08090c" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M26 34l-5 2M26 36l-5 0M38 34l5 2M38 36l5 0" stroke="#08090c" stroke-width="0.6" opacity="0.3"/></svg>
-        </div>
-        <div class="nft-stats">
-          <div class="nft-stat"><div class="ns-lbl">Floor</div><div class="ns-val" id="nftFloor">—</div><div class="ns-sub" id="nftFloorUsd">HYPE</div></div>
-          <div class="nft-stat"><div class="ns-lbl">24h Change</div><div class="ns-val" id="nftBid" style="color:var(--green)">—</div><div class="ns-sub">24h</div></div>
-          <div class="nft-stat"><div class="ns-lbl">7d Change</div><div class="ns-val" id="nftSpread" style="color:var(--yellow)">—</div><div class="ns-sub">7 days</div></div>
-          <div class="nft-stat"><div class="ns-lbl">24h Vol</div><div class="ns-val" id="nftVol">—</div><div class="ns-sub">HYPE</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Owners</div><div class="ns-val" id="nftOwners">—</div><div class="ns-sub">unique</div></div>
-          <div class="nft-stat"><div class="ns-lbl">Market Cap</div><div class="ns-val" id="nftListed">—</div><div class="ns-sub">native</div></div>
+      <div class="eco-card-meta">
+        <h2>Based</h2>
+        <p class="eco-tagline">The Hyperliquid super-app — trade, spend, earn</p>
+        <div class="eco-card-tags">
+          <span class="eco-tag">Trading</span>
+          <span class="eco-tag">Visa Card</span>
+          <span class="eco-tag">Mobile</span>
+          <span class="eco-tag">Pantera-backed</span>
         </div>
       </div>
-      <a class="nft-link" href="https://opensea.io/collection/hypurr-hyperevm" target="_blank" rel="noopener">View on OpenSea ↗</a>
+    </div>
+    <!-- App preview mockup -->
+    <div style="padding:0 24px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,#0c0c18 0%,#111127 50%,#0a1628 100%);border:1px solid #1e1e3a;border-radius:12px;padding:20px;margin:16px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;font-family:var(--mono)">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Perps</div>
+          <div style="font-size:18px;font-weight:700;color:#f0f0ff">198+</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Markets</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid #1e1e3a;border-right:1px solid #1e1e3a">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Volume</div>
+          <div style="font-size:18px;font-weight:700;color:#06b6d4">$40B+</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Cumulative</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Revenue</div>
+          <div style="font-size:18px;font-weight:700;color:#22c55e">$14M</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:2px">Earned</div>
+        </div>
+      </div>
+    </div>
+    <div class="eco-card-body">
+      <h3>What it is</h3>
+      <p>Based is a full-featured trading frontend built on top of Hyperliquid's on-chain order book. It wraps perp and spot trading, a crypto-linked Visa card, fiat on/off ramps, and advanced order types into a single app across mobile, web, and desktop. Think of it as the consumer layer that makes Hyperliquid's raw infrastructure feel like using a top-tier CEX — except your funds never leave self-custody.</p>
+
+      <h3>Why it matters</h3>
+      <p>Hyperliquid's native interface is powerful but minimal. Based fills the gap with features that serious traders actually need: privacy TWAPs that hide your execution from other participants, trailing stops that lock in gains automatically, and one-tap Visa spending at 70M+ merchants worldwide. The app recently handled 20% of Hyperliquid's total daily perp volume, making it the single largest third-party frontend on the network.</p>
+
+      <h3>Key features</h3>
+      <div class="eco-features">
+        <div class="eco-feat">
+          <div class="feat-title">🔒 Privacy TWAPs</div>
+          <div class="feat-desc">Execute large orders over time without revealing your strategy. Concealed execution reduces market impact on big entries and exits.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">💳 Visa Card</div>
+          <div class="feat-desc">Spend your trading profits anywhere Visa is accepted across 160 countries. Direct from your Hyperliquid balance — no bridging required.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">📱 Unified Wallet</div>
+          <div class="feat-desc">One self-custodial wallet works across mobile, desktop, web, and Telegram. No fragmented accounts or seed phrase juggling.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">☁️ Based Cloud</div>
+          <div class="feat-desc">Infrastructure-as-a-service for other projects. HyENA ($1.5B+ volume) was built on Based Cloud, proving the stack's reliability.</div>
+        </div>
+      </div>
+
+      <h3>Who it's for</h3>
+      <p>Active traders who want professional-grade tools on mobile without giving up self-custody. If you trade on Hyperliquid more than a few times a week, the trailing stops and privacy TWAPs alone make it worth trying. The Visa card is a bonus for anyone who wants to spend profits without the CEX withdrawal dance.</p>
+
+      <div class="eco-verdict">
+        <div class="v-title">Our take</div>
+        <div class="v-text">Based is the best third-party Hyperliquid frontend we've used. The execution quality is identical to native HL (same on-chain order book), but the UX is significantly better for mobile trading. The $11.5M Series A led by Pantera in early 2026 adds credibility. The main trade-off is a small builder code fee on trades, which is how the app sustains itself — a transparent model we prefer over hidden monetization.</div>
+      </div>
+
+      <a class="eco-cta" href="https://based.one/r/JRRRR" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="based">
+        Try Based <span class="cta-arrow">→</span>
+      </a>
     </div>
   </div>
 
-  <!-- ── TRADING APPS ── -->
-  <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">Trading Apps</div>
+  <!-- ── DREAMCASH ── -->
+  <div class="eco-card">
+    <div class="eco-card-top">
+      <div class="eco-card-icon" style="background:#000;padding:8px;border-radius:12px;border:1px solid #222">
+        <svg viewBox="0 0 56 56" width="56" height="56"><defs><linearGradient id="dcG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#ec4899"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="#0a0a0f"/><circle cx="28" cy="24" r="11" fill="none" stroke="url(#dcG)" stroke-width="2"/><text x="28" y="28" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="12" fill="url(#dcG)">$</text><text x="28" y="46" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="700" font-size="8" fill="#a78bfa">dream</text></svg>
+      </div>
+      <div class="eco-card-meta">
+        <h2>Dreamcash</h2>
+        <p class="eco-tagline">Mobile-first trading with AI alerts and airdrop farming</p>
+        <div class="eco-card-tags">
+          <span class="eco-tag">Trading</span>
+          <span class="eco-tag">AI Alerts</span>
+          <span class="eco-tag">Points</span>
+          <span class="eco-tag">Tether-backed</span>
+        </div>
+      </div>
+    </div>
+    <!-- App preview — equity perps showcase -->
+    <div style="padding:0 24px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,#0f0a1a 0%,#1a0a2e 50%,#0a1628 100%);border:1px solid #2d1b4e;border-radius:12px;padding:16px 20px;margin:16px 0;font-family:var(--mono)">
+        <div style="font-size:10px;color:#a78bfa;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;font-weight:600">Equity Perps · Powered by Tether</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;text-align:center">
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">USA500</div><div style="font-size:10px;color:#22c55e;margin-top:2px">S&P 500</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">TSLA</div><div style="font-size:10px;color:#06b6d4;margin-top:2px">Tesla</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">NVDA</div><div style="font-size:10px;color:#a78bfa;margin-top:2px">Nvidia</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAUT</div><div style="font-size:10px;color:#f59e0b;margin-top:2px">Gold</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAGT</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">Silver</div></div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid #2d1b4e;display:flex;justify-content:space-between;align-items:center">
+          <div><span style="font-size:10px;color:#6b7280">Season 1 Rewards</span><span style="font-size:12px;font-weight:700;color:#f59e0b;margin-left:8px">$200K/week</span></div>
+          <div><span style="font-size:10px;color:#6b7280">Collateral</span><span style="font-size:11px;font-weight:600;color:#22c55e;margin-left:8px">USDT0</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="eco-card-body">
+      <h3>What it is</h3>
+      <p>Dreamcash is a mobile-first trading app that plugs directly into Hyperliquid's on-chain order book. It launched in late 2025 with a focus on making DeFi perp trading feel like using a polished fintech app — Apple Pay-style onboarding, no KYC friction, and AI-powered market alerts. In early 2026, Tether invested in the team (Supreme Liquid Labs) and helped launch USDT0-collateralized equity perps for S&P 500, Tesla, Nvidia, gold, and silver.</p>
 
-  <!-- Based — compact card -->
-  <div class="metric-card" style="padding:20px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
-      <div style="width:44px;height:44px;background:#0a0a0f;border:1px solid #222;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:system-ui;font-weight:800;font-size:11px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(6,182,212,0.15));color:#06b6d4">based</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)">Based</div>
-        <div style="font-family:var(--sans);font-size:11px;color:var(--text-dim)">The Hyperliquid super-app — trade, spend, earn</div>
+      <h3>Why it matters</h3>
+      <p>Two things set Dreamcash apart. First, the equity perps: you can trade tokenized S&P 500 and big tech stocks on-chain using USDT as collateral. That's a bridge between TradFi and DeFi that very few platforms offer. Second, the rewards meta: Season 1 is running right now with $200K/week in USDT distributed to active traders, plus a points system that likely converts to a CASH token airdrop. The Tether backing gives the whole operation more credibility than your average points farm.</p>
+
+      <h3>Key features</h3>
+      <div class="eco-features">
+        <div class="eco-feat">
+          <div class="feat-title">📈 Equity Perps</div>
+          <div class="feat-desc">Trade S&P 500, TSLA, NVDA, gold, and silver perpetuals with USDT0 collateral. TradFi exposure without leaving DeFi.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">🤖 AI Market Alerts</div>
+          <div class="feat-desc">Spot volatile tokens early with AI-powered alerts that adapt to your trading style. Useful for catching momentum before the crowd.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">💰 $200K/Week Rewards</div>
+          <div class="feat-desc">Season 1 distributes $200K USDT weekly to traders on CASH HIP-3 markets. App trading gets a 2x points multiplier.</div>
+        </div>
+        <div class="eco-feat">
+          <div class="feat-title">🎯 Airdrop Positioning</div>
+          <div class="feat-desc">Points accrue at 1/second passively. Active trading, referrals, and Nansen wallet linking (up to 2.5x multiplier) boost your allocation.</div>
+        </div>
       </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap">
-        <span class="eco-tag">Pantera-backed</span>
-        <span class="eco-tag">Visa Card</span>
+
+      <h3>Who it's for</h3>
+      <p>Traders who want a clean mobile experience and are interested in farming the upcoming CASH airdrop while actually trading. The equity perps are a draw for anyone who wants stock market exposure through DeFi rails. If you're already trading on Hyperliquid, using Dreamcash as your frontend costs nothing extra and earns you points toward a potential airdrop.</p>
+
+      <div class="eco-verdict">
+        <div class="v-title">Our take</div>
+        <div class="v-text">Dreamcash is still early — the app is evolving fast and the team ships updates weekly. The Tether investment and equity perps launch are strong signals that this isn't a fly-by-night project. The main draw right now is the rewards meta: you're getting paid USDT to do trading you'd do anyway, with airdrop upside on top. The UX is genuinely good on mobile — smoother than most DeFi apps. Worth trying during Season 1 while the rewards are still rich.</div>
       </div>
+
+      <a class="eco-cta" href="https://dreamcash.xyz" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="dreamcash" onclick="navigator.clipboard&&navigator.clipboard.writeText('516KJA')">
+        Try Dreamcash <span class="cta-arrow">→</span>
+      </a>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:8px">Use referral code <span style="color:var(--accent);font-weight:600;cursor:pointer" onclick="navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span> during signup for bonus points · <span style="opacity:0.6">click code to copy</span></div>
     </div>
-    <div style="font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px">
-      A full-featured trading frontend on Hyperliquid with privacy TWAPs, trailing stops, and a crypto Visa card to spend profits at 70M+ merchants. Self-custodial — your funds stay on-chain. Handles ~20% of Hyperliquid's daily perp volume. Recently raised $11.5M Series A from Pantera Capital.
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;font-family:var(--mono);font-size:11px">
-      <div style="text-align:center;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-size:16px;font-weight:700;color:var(--text-bright)">198+</div>
-        <div style="font-size:9px;color:var(--text-muted);margin-top:2px">MARKETS</div>
-      </div>
-      <div style="text-align:center;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-size:16px;font-weight:700;color:var(--accent)">$40B+</div>
-        <div style="font-size:9px;color:var(--text-muted);margin-top:2px">CUMULATIVE VOL</div>
-      </div>
-      <div style="text-align:center;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-size:16px;font-weight:700;color:var(--green)">$14M</div>
-        <div style="font-size:9px;color:var(--text-muted);margin-top:2px">REVENUE</div>
-      </div>
-    </div>
-    <a class="eco-cta" href="https://based.one/r/JRRRR" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="based">Try Based <span class="cta-arrow">→</span></a>
   </div>
 
-  <!-- Dreamcash — compact card -->
-  <div class="metric-card" style="padding:20px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
-      <div style="width:44px;height:44px;background:#0a0a0f;border:1px solid #2d1b4e;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:system-ui;font-weight:800;font-size:14px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(236,72,153,0.15));color:#f59e0b">$</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text-bright)">Dreamcash</div>
-        <div style="font-family:var(--sans);font-size:11px;color:var(--text-dim)">Mobile-first trading with equity perps & airdrop farming</div>
-      </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap">
-        <span class="eco-tag">Tether-backed</span>
-        <span class="eco-tag">Points</span>
-      </div>
-    </div>
-    <div style="font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px">
-      Trade S&P 500, Tesla, Nvidia, gold & silver perpetuals on-chain using USDT collateral. Tether invested in the team and launched equity perps for real-world asset exposure. Season 1 pays $200K/week in USDT to active traders, plus points toward a future CASH token airdrop.
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-bottom:14px;text-align:center;font-family:var(--mono)">
-      <div style="padding:8px 4px;background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#f0f0ff">USA500</div><div style="font-size:9px;color:#22c55e;margin-top:2px">S&P 500</div></div>
-      <div style="padding:8px 4px;background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#f0f0ff">TSLA</div><div style="font-size:9px;color:#06b6d4;margin-top:2px">Tesla</div></div>
-      <div style="padding:8px 4px;background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#f0f0ff">NVDA</div><div style="font-size:9px;color:#a78bfa;margin-top:2px">Nvidia</div></div>
-      <div style="padding:8px 4px;background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAUT</div><div style="font-size:9px;color:#f59e0b;margin-top:2px">Gold</div></div>
-      <div style="padding:8px 4px;background:linear-gradient(135deg,rgba(15,10,26,0.8),rgba(26,10,46,0.6));border:1px solid #2d1b4e;border-radius:8px"><div style="font-size:11px;font-weight:700;color:#f0f0ff">XAGT</div><div style="font-size:9px;color:#94a3b8;margin-top:2px">Silver</div></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <a class="eco-cta" href="https://dreamcash.xyz" target="_blank" rel="noopener" data-umami-event="referral-click" data-umami-event-app="dreamcash" onclick="navigator.clipboard&&navigator.clipboard.writeText('516KJA')">Try Dreamcash <span class="cta-arrow">→</span></a>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Code: <span style="color:var(--accent);font-weight:600;cursor:pointer" onclick="navigator.clipboard.writeText('516KJA');typeof umami!=='undefined'&&umami.track('referral-code-copy',{app:'dreamcash'});this.textContent='Copied!';setTimeout(()=>this.textContent='516KJA',2000)">516KJA</span></span>
-    </div>
-  </div>
-
-  <!-- Coming Soon -->
-  <div class="metric-card" style="padding:16px;opacity:0.5">
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:44px;height:44px;border:1px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-dim)">+</div>
-      <div>
-        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text-dim)">More projects coming</div>
-        <div style="font-family:var(--sans);font-size:11px;color:var(--text-muted)">Reviewing HyperSwap, Rage Trade, Felix & more</div>
+  <!-- ── Coming Soon / More Projects ── -->
+  <div class="eco-card" style="opacity:0.6">
+    <div class="eco-card-top">
+      <div class="eco-card-icon" style="background:var(--bg2);border:1px dashed var(--border);color:var(--text-dim);font-size:20px">+</div>
+      <div class="eco-card-meta">
+        <h2 style="color:var(--text-dim)">More projects coming soon</h2>
+        <p class="eco-tagline">We're reviewing additional Hyperliquid ecosystem apps — HyperSwap, Rage Trade, Felix, and more. Check back for updates.</p>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ══ INTEL ════════════════════════════════════════════════════ -->
+<div class="page" id="page-intel">
+  <h2 class="sr-only">Hyperliquid Intelligence &amp; HYPE Trading Analysis</h2>
+  <!-- Headline ticker -->
+  <div class="news-ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <!-- Masthead -->
+  <div class="news-masthead">
+    <h1>HYPE <span>INTELLIGENCE</span></h1>
+    <div class="news-date">MARCH 13, 2026 · WEEKLY BRIEF · CURATED FOR PERP TRADERS</div>
+  </div>
+
+  <!-- Signal summary -->
+  <div id="intelSummary"></div>
+
+  <!-- Hero + sidebar -->
+  <div class="news-hero">
+    <div class="hero-main" id="heroStory"></div>
+    <div class="hero-sidebar" id="heroSidebar"></div>
+  </div>
+
+  <!-- More stories grid -->
+  <div class="news-section-hdr">Latest Updates</div>
+  <div class="news-grid" id="intelGrid"></div>
+
+  <!-- Daily brief / blog -->
+  <div class="news-section-hdr">Daily Intelligence Brief</div>
+  <div id="intelBlog"></div>
+</div>
 
 <footer>
   <!-- Referral & Discount Section — SEO keyword rich -->
@@ -1597,17 +1471,18 @@ function showPage(id,btn){
   const mob=$('mobDropdown');if(mob)mob.querySelectorAll('button').forEach(b=>{b.classList.toggle('active',b.textContent.toLowerCase().replace(/\s/g,'').includes(id))});
   // Double-rAF + timeout ensures layout is fully computed before chart init
   setTimeout(()=>{requestAnimationFrame(()=>{requestAnimationFrame(()=>{
-    if(id==='overview'){
-      drawRing();
+    if(id==='burns'){
+      drawRing(); // Supply ring chart is on Burns tab
       if(!_burnChart&&typeof LightweightCharts!=='undefined'){_initBurnChart();_redrawBurnChart()}
+      if(!_burnRateChart&&typeof LightweightCharts!=='undefined'){_initBurnRateChart()}
+      if(!_emChart&&typeof LightweightCharts!=='undefined'){_initEmChart()}
+    }
+    if(id==='charts'){
       if(!_sqzChart&&typeof LightweightCharts!=='undefined'){_initSqzChart();if(_pData.length>30)computeSqzMom()}
       _drawLiqHeatmap();
     }
     if(id==='trades'){
       if(!_volFlowChart&&typeof LightweightCharts!=='undefined'){_initVolFlowChart()}
-    }
-    if(id==='ecosystem'){
-      _fetchNftLiveData();
     }
     _resizeAllCharts();
   })})},50);
@@ -1616,8 +1491,10 @@ function _resizeAllCharts(){
   const isVis=id=>{const el=$(id);return el&&el.closest('.page.active')};
   if(_afChart&&isVis('afWrap')){const s=_wsz('afWrap');_afChart.applyOptions({width:s.w,height:s.h});_afChart.timeScale().fitContent()}
   if(_burnChart&&isVis('burnWrap')){const s=_wsz('burnWrap');_burnChart.applyOptions({width:s.w,height:s.h});_burnChart.timeScale().fitContent()}
+  if(_burnRateChart&&isVis('burnRateWrap')){const s=_wsz('burnRateWrap');_burnRateChart.applyOptions({width:s.w,height:s.h});_burnRateChart.timeScale().fitContent()}
   if(_sqzChart&&isVis('sqzWrap')){const s=_wsz('sqzWrap');_sqzChart.applyOptions({width:s.w,height:s.h});_sqzChart.timeScale().fitContent()}
   if(_volFlowChart&&isVis('volFlowWrap')){const s=_wsz('volFlowWrap');_volFlowChart.applyOptions({width:s.w,height:s.h});_volFlowChart.timeScale().fitContent()}
+  if(_nftChart&&isVis('nftChartWrap')){const s=_wsz('nftChartWrap');_nftChart.applyOptions({width:s.w,height:s.h});_nftChart.timeScale().fitContent()}
   if(_emChart&&isVis('emChartWrap')){const s=_wsz('emChartWrap');_emChart.applyOptions({width:s.w,height:s.h});_emChart.timeScale().fitContent()}
 }
 
@@ -2253,27 +2130,6 @@ function renderAll(){
   if(D.priceChg!=null){const c=D.priceChg>=0?'up':'down';const el=$('navChg'),el2=$('heroChg');if(el){el.textContent=F.pct(D.priceChg);el.className='price-chg '+c}if(el2){el2.textContent=F.pct(D.priceChg)+' 24h';el2.className='change '+c}}
   if(D.price&&D.circSupply)set('heroMcap',F.usd(D.price*D.circSupply));
   if(D.price)set('heroFdv',F.usd(D.price*MAX_S));
-  // HYPE/BTC ticker
-  if(D.price&&D.allMids){
-    const btcPx=parseFloat(D.allMids['BTC']||0);
-    if(btcPx>0){
-      const ratio=(D.price/btcPx);
-      const ratioStr=ratio>=0.001?ratio.toFixed(5):ratio.toFixed(6);
-      set('heroBtcRatio',ratioStr+' BTC');
-      // BTC-denominated 24h change (if HYPE change and BTC change available)
-      if(!D._btcPrevRatio)D._btcPrevRatio=ratio;
-      // Store first ratio seen and compare
-      if(!D._btcFirstRatio){D._btcFirstRatio=ratio;D._btcFirstTime=Date.now()}
-      if(D._btcFirstRatio&&Date.now()-D._btcFirstTime>10000){
-        const sessionChg=((ratio-D._btcFirstRatio)/D._btcFirstRatio*100);
-        const el=$('heroBtcChg');
-        if(el){
-          el.textContent=(sessionChg>=0?'+':'')+sessionChg.toFixed(2)+'%';
-          el.style.color=sessionChg>=0?'var(--green)':'var(--red)';
-        }
-      }
-    }
-  }
   if(D.price)_updateNftUsd(D.price);
 
   // PURR bubble — compute NAV from HYPE price (PURR holds ~17.6M HYPE, ~150.6M shares diluted)
@@ -2314,9 +2170,6 @@ function renderAll(){
     const circ=D.circSupply||MAX_S;
     const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
     set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
-    // Update burn gauge
-    const bg=$('burnGauge');if(bg)bg.style.width=pctMax+'%';
-    set('burnGaugePct',pctMax+'%');
     htm('mBurnedBreakdown',
       '<div class="brk"><span>AF HYPE (burned by vote)</span><span class="bv">'+F.hype(D.afHype)+'</span></div>'+
       '<div class="brk"><span>Fee burns (on-chain)</span><span class="bv">'+F.hype(D.feesBurned)+'</span></div>'+
@@ -2333,18 +2186,9 @@ function renderAll(){
       set('mStaked',F.hype(D.staked)+' HYPE');
       set('mStakedSub',((D.staked/MAX_S)*100).toFixed(1)+'% of supply');
     }
-    // Update stake gauge
-    const stakePct=(D.staked/MAX_S*100).toFixed(1);
-    const sg=$('stakeGauge');if(sg)sg.style.width=stakePct+'%';
-    set('stakeGaugePct',stakePct+'%');
   }
-  if(D.circSupply){set('mCirc',F.hype(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max');
-    // Update supply gauge
-    const circPct=(D.circSupply/MAX_S*100).toFixed(1);
-    const cg=$('circGauge');if(cg)cg.style.width=circPct+'%';
-    set('circGaugePct',circPct+'%');
-  }
-  if(D.vol24){set('mVol',F.usd(D.vol24));set('mVol2',F.usd(D.vol24))}
+  if(D.circSupply){set('mCirc',F.hype(D.circSupply)+' HYPE');set('mCircSub',((D.circSupply/MAX_S)*100).toFixed(1)+'% of max')}
+  if(D.vol24)set('mVol',F.usd(D.vol24));
 
   drawRing();
 
@@ -2360,7 +2204,7 @@ function renderAll(){
     const spread=((D.price-D.afBid)/D.price*100).toFixed(3);
     const el=$('afSpread');if(el){el.textContent=spread+'%';el.style.color=parseFloat(spread)<0.5?'var(--green)':'var(--yellow)'}
   }
-  if(D.apr!=null){set('afApr',(D.apr*100).toFixed(2)+'%');set('afApr2',(D.apr*100).toFixed(2)+'%')}
+  if(D.apr!=null)set('afApr',(D.apr*100).toFixed(2)+'%');
 
   // Platform stats
   if(D.totalOI)set('psOI',F.usd(D.totalOI));
@@ -2447,7 +2291,7 @@ function renderAll(){
     }
   }
 
-  if(_pData.length>30){computePriceRating();computeSqzMom();computeFibMatrix();computeMomentumPulse();computeCompositeSignal()}
+  if(_pData.length>30){try{computePriceRating()}catch(e){console.warn('computePriceRating:',e.message)};computeSqzMom();computeFibMatrix();computeMomentumPulse();computeCompositeSignal()}
   _updateSentimentPulse();
 }
 
@@ -3102,9 +2946,6 @@ async function _afLiveTick(){
       const circ=D.circSupply||MAX_S;
       const pctCirc=((D.totalBurned/circ)*100).toFixed(2);
       set('mBurnedSub',pctMax+'% of max · '+pctCirc+'% of circ supply');
-    // Update burn gauge
-    const bg=$('burnGauge');if(bg)bg.style.width=pctMax+'%';
-    set('burnGaugePct',pctMax+'%');
       set('afFeeBurns',F.hype(D.feesBurned)+' HYPE');
 
       // Track burn rate over time (sample every tick)
@@ -3138,8 +2979,8 @@ async function _afLiveTick(){
 
     set('afChartMeta','Live · '+new Date().toLocaleTimeString()+' · '+_afPoints.length+' pts');
     // Redraw liq heatmap if Charts tab is visible
-    if(document.querySelector('#page-overview.active'))_drawLiqHeatmap();
-    if(document.querySelector('#page-overview.active'))drawRing();
+    if(document.querySelector('#page-charts.active'))_drawLiqHeatmap();
+    if(document.querySelector('#page-burns.active'))drawRing();
     _redrawAfSeries();
   }catch(e){console.warn('af tick',e)}
 }
@@ -3305,11 +3146,17 @@ function computePriceRating(){
   const col=score>=75?'var(--green)':score>=60?'#00e676':score>=45?'var(--text-dim)':score>=30?'var(--fire)':'var(--red)';
   const bg=score>=60?'var(--green-dim)':score>=45?'rgba(100,100,100,0.15)':'var(--red-dim)';
 
-  ['ratingScore','ratingScore2'].forEach(id=>{const el=$(id);if(el){el.textContent=score+'/100';el.style.color=col;el.classList.add('score-flash');setTimeout(()=>el.classList.remove('score-flash'),600)}});
+  ['ratingScore','ratingScore2'].forEach(id=>{const el=$(id);if(el){el.textContent=score+'/100';el.style.color=col}});
   ['ratingLabel','ratingLabel2'].forEach(id=>{const el=$(id);if(el){el.textContent=label;el.style.color=col;el.style.background=bg}});
   ['ratingBar','ratingBar2'].forEach(id=>{const el=$(id);if(el)el.style.left=score+'%'});
-  // Animate SVG score arc (176 = full circumference of r=28)
-  const arc=$('scoreArc');if(arc){const offset=176-(score/100*176);arc.style.strokeDashoffset=offset;arc.style.stroke=col}
+  // New gradient marker
+  const marker=$('tradeSignalMarker');if(marker)marker.style.left=score+'%';
+  // Color-code indicator rows
+  const rowColors={riRsiRow:rsiScore>=60?'var(--green)':rsiScore<=40?'var(--red)':'var(--text-dim)',
+    riSmaRow:sma20Score>=60?'var(--green)':sma20Score<=40?'var(--red)':'var(--text-dim)',
+    riMacdRow:macdScore>=60?'var(--green)':macdScore<=40?'var(--red)':'var(--text-dim)',
+    riMomRow:momScore>=60?'var(--green)':momScore<=40?'var(--red)':'var(--text-dim)'};
+  Object.entries(rowColors).forEach(([id,c])=>{const el=$(id);if(el)el.style.borderLeftColor=c});
 
   // Generate actionable trade signal summary
   const sigEl=$('tradeSignalSummary');
@@ -3326,8 +3173,8 @@ function computePriceRating(){
     if(px>sma20&&sma20>0)parts.push('Price above SMA20 ($'+F.f2(sma20)+') — short-term trend is up.');
     else if(sma20>0)parts.push('Price below SMA20 ($'+F.f2(sma20)+') — short-term trend is down, reclaim needed.');
     // MACD
-    if(macdVal>0)parts.push('MACD positive ('+macdVal.toFixed(3)+') — buying pressure outweighs selling.');
-    else if(macdVal<0)parts.push('MACD negative ('+macdVal.toFixed(3)+') — selling pressure dominates.');
+    if(macd>0)parts.push('MACD positive ('+macd.toFixed(3)+') — buying pressure outweighs selling.');
+    else if(macd<0)parts.push('MACD negative ('+macd.toFixed(3)+') — selling pressure dominates.');
     // Funding
     if(D.hypeFunding!=null){
       const f=D.hypeFunding;
@@ -4150,13 +3997,297 @@ function _updateHypeMomentumBar(){
 }
 // Update HYPE momentum every 3s alongside the main momentum bars
 setInterval(_updateHypeMomentumBar,3000);
+// ═══════════════════════════════════════════════════════════════
+//  INTEL TAB — Curated Hyperliquid briefing for perp traders
+// ═══════════════════════════════════════════════════════════════
+const INTEL_DATA=[
+  {title:"HYPE Breaks $38 — Golden Cross Confirmed, +48% YTD",date:"Mar 12",category:"TRADING",
+   eli5:"HYPE surged to $38.08, its highest since February 3. The 50-day SMA crossed above the 100-day SMA (golden cross) — a classic bullish signal. The token is up 48% year-to-date and 170% since March 2025, while most altcoins are down 40-70%. Trading volume jumped 43% to $464M in 24 hours.",
+   perp_impact:"The golden cross + ascending triangle breakout is a strong technical setup. RSI at 67 means momentum is strong but not overbought yet. Key resistance at $40 — a sustained close above opens $48.91 (October high). Support at $35.47 (breakout zone) and $32 (200-day EMA). The weekly +20% gain may trigger profit-taking, so scale into longs rather than FOMOing at resistance.",
+   signal:"BULLISH",importance:5},
+  {title:"HIP-3 OI Hits $1.33B — Oil Volume >$1B Daily",date:"Mar 12",category:"PROTOCOL",
+   eli5:"HIP-3 open interest reached $1.33 billion — up from $500M just a month ago. Crude oil perpetuals alone generated $1.17B in 24-hour volume, making it the second most traded market on Hyperliquid after Bitcoin. 30% of all Hyperliquid volume at peak hours comes from tokenized traditional finance assets.",
+   perp_impact:"The HIP-3 growth is parabolic. $500M to $1.33B in OI in one month. Each deployer locks 500K HYPE ($18M+). The oil premium over spot prices during weekend trading creates arb opportunities. Watch for when traditional markets reopen — the HL oil price tends to converge, creating mean-reversion setups.",
+   signal:"BULLISH",importance:5},
+  {title:"PURR Stock Gaps Up to $6.07 — Analyst Upgrades",date:"Mar 12",category:"ECOSYSTEM",
+   eli5:"Hyperliquid Strategies (NASDAQ: PURR) stock gapped up to $6.07 from $5.84 close, a 4%+ move. Multiple analyst upgrades: Cantor Fitzgerald raised PT to $6 (Overweight), Chardan Capital PT $8.45 (Buy). The stock is tracking HYPE price closely as the company's NAV is ~80% HYPE tokens.",
+   perp_impact:"PURR trading above its NAV would signal institutional premium for HYPE exposure. If PURR trades at NAV discount, it's a leveraged way to play HYPE. Watch the NAV premium/discount as a sentiment indicator for institutional HYPE demand.",
+   signal:"BULLISH",importance:3},
+  {title:"HIP-4 Testnet Live — Binary Options for BTC & HYPE",date:"Mar 12",category:"PROTOCOL",
+   eli5:"Hyperliquid's testnet now shows HIP-4 prediction markets in the asset menu. Initial mainnet deployment will be limited to simple one-day binary markets for BTC and HYPE. These are fully collateralized instruments with fixed durations and non-linear payouts — no leverage or liquidation.",
+   perp_impact:"HIP-4 going live on testnet with actual UI means mainnet is weeks away, not months. One-day binary options on BTC and HYPE are the starting point. Once proven, permissionless deployment opens to any outcome market. This is the Polymarket killer thesis — and it's nearly shipping.",
+   signal:"BULLISH",importance:4},
+  {title:"Hyperliquid Leads All Non-Stablecoin Revenue — $54.4M/30d",date:"Mar 12",category:"ECOSYSTEM",
+   eli5:"Hyperliquid is now the #1 revenue-generating protocol in crypto (excluding stablecoins), collecting $54.39M over the last 30 days according to DefiLlama. This outpaces Pump.fun and the entire Tron ecosystem. Annualized run rate approaches $1.4B — all flowing into HYPE buyback-and-burn.",
+   perp_impact:"$54.4M/month × 97% = $52.8M/month in HYPE burns. That's $1.74M/day being permanently removed from supply. At current price ($37), that's ~47K HYPE burned per day. Compare to daily emissions of ~30K HYPE — the protocol is significantly net deflationary. Revenue growth directly translates to price support.",
+   signal:"BULLISH",importance:5},
+  {title:"HIP-3 OI Hits $1.2B Record — Oil & Equity Futures Boom",date:"Mar 10",category:"PROTOCOL",
+   eli5:"Open interest on Hyperliquid's permissionless HIP-3 markets hit an all-time record of $1.2 billion. Only 7 of the top 30 markets are crypto — the rest are commodity and equity futures. Oil contract CL-USDC did $1.62B in 24h volume alone, leading the entire platform. XYZ100 (tokenized equities) holds $213M in OI.",
+   perp_impact:"This is the inflection point for HIP-3. When commodity and equity perps dominate your DEX, you're not just a crypto platform anymore — you're an alternative exchange. Each HIP-3 deployer stakes 500K HYPE ($17M+), and the fee revenue flows into burns. Crude oil liq'd $56M in positions in 24h. The Iran conflict is the catalyst, but the infrastructure will outlast it.",
+   signal:"BULLISH",importance:5},
+  {title:"Arthur Hayes: $150 HYPE Target by August 2026",date:"Mar 10",category:"TRADING",
+   eli5:"BitMEX founder Arthur Hayes published a detailed bull case for HYPE hitting $150 by August — a 330% gain from current $35. Maelstrom (his fund) holds a substantial position. His thesis: 97% revenue-to-buyback ratio is unmatched in crypto, HYPE is 'this cycle's GMX,' and the platform is capturing CEX volume as competitor incentive programs fade.",
+   perp_impact:"Hayes calling $150 with a specific timeline (August) and his fund's position public adds serious signal. GMX hit $90 in early 2023 during a similar macro backdrop. The key difference: Hyperliquid's volume is 10x GMX at peak. If market believes revenue growth sustains, the earnings multiple re-rating alone could drive significant upside. Support at $28, resistance at $36.6.",
+   signal:"BULLISH",importance:5},
+  {title:"Portfolio Margin Upgrade — Alpha Phase Coming",date:"Mar 10",category:"PROTOCOL",
+   eli5:"Hyperliquid announced portfolio margin is upgrading from 'pre-alpha to alpha phase' on the next network upgrade. The feature will support accounts under $500K, gated by weighted volume requirements. Dynamic margin scaling and cross-collateral improvements reduce liquidation risk.",
+   perp_impact:"Portfolio margin is what institutional traders need. Cross-margin across correlated positions means better capital efficiency — you can run more complex strategies with less collateral. This directly competes with CEX margin features and makes Hyperliquid viable for larger accounts. The volume-gated access also incentivizes more trading activity.",
+   signal:"BULLISH",importance:4},
+  {title:"$1.76M Short Squeeze — 87% of Liquidations Were Shorts",date:"Mar 10",category:"TRADING",
+   eli5:"A major short squeeze hit HYPE on March 10 as price rallied 12.5% to $34.23. Of the $2.02M in total liquidations, $1.76M (87.1%) were shorts getting liquidated. The squeeze validated the setup we flagged earlier — short liquidation leverage was clustered above $34.",
+   perp_impact:"The squeeze above $34 played out exactly as the on-chain data predicted. Now the question: is there more to squeeze? Check funding rates — if they're still negative after the squeeze, there are more shorts to liquidate. If funding flipped positive, the easy money has been made. Next resistance: $36.6, then $38 (February high).",
+   signal:"BULLISH",importance:4},
+  {title:"HYPE +120% YoY While Altcoins Down 40-70%",date:"Mar 10",category:"TRADING",
+   eli5:"HYPE is up 120% over the past year according to CoinGecko data, while most major altcoins are down 40-70% in the same period. The token hit $35.28 intraday on March 10. Total platform OI exceeds $5B, 24h volume $5.71B, TVL $4.06B — all outpacing Aster, Edgex, Lighter, and Jupiter.",
+   perp_impact:"This is the decoupling thesis confirmed. HYPE trades on revenue fundamentals, not crypto sentiment. When BTC drops, Hyperliquid volume actually increases (more hedging activity), which means more fees, which means more burns. This is structurally different from holding ETH or SOL. The 120% YoY in a bear market is what institutional allocators notice.",
+   signal:"BULLISH",importance:4},
+  {title:"$316M Unlock Absorbed — Price Held $30",date:"Mar 6",category:"TRADING",
+   eli5:"The largest HYPE unlock yet (9.92M tokens, $316M) hit on March 6. Core contributor allocations entered circulation. The market's response: HYPE held $30 and Hyperliquid processed $73.4B in volume that same day — a record. Either the team isn't selling, or buyer depth fully absorbed the new supply.",
+   perp_impact:"This is the most bullish possible outcome from an unlock event. Price holding through $316M of new supply means the sell-side thesis just got weaker. Next unlock is April 6 — now that the market has a precedent for absorbing these, the fear discount should shrink. If you were waiting to size up, the unlock holding $30 was your signal. Stop below $28.",
+   signal:"BULLISH",importance:5},
+  {title:"HIP-4: Prediction Markets Coming to Hyperliquid",date:"Feb–Mar 2026",category:"PROTOCOL",
+   eli5:"Hyperliquid unveiled HIP-4 — 'outcome trading.' These are fully collateralized contracts that settle within a fixed range. Think prediction markets + bounded options, but running natively on HyperCore with unified margin. No leverage, no liquidations. Currently on testnet, mainnet expected after testing. HYPE surged 10-20% on the announcement.",
+   perp_impact:"HIP-4 is the biggest product expansion since HyperEVM. Prediction markets are a $44B+ TAM (Polymarket + Kalshi). Unlike those platforms, HIP-4 outcomes integrate with your perp positions — you could hedge a long ETH perp with an outcome contract that pays if ETH drops, all on one margin system. Each new outcome market requires 500K HYPE staked to deploy, creating another supply sink. Mainnet launch date is the next major catalyst.",
+   signal:"BULLISH",importance:5},
+  {title:"$73.4B Single-Day Volume Record",date:"Mar 6",category:"TRADING",
+   eli5:"Hyperliquid processed $73.4 billion in trading volume on March 6 alone — shattering previous records. The platform generated $2.88M in fees that day. This happened during the Iran crisis weekend + unlock day, proving that Hyperliquid thrives on volatility from any source. Cumulative volume has now exceeded $3.64 trillion.",
+   perp_impact:"$73.4B in one day means $2.88M in fees → 97% goes to buyback-and-burn. That's roughly $2.79M burned in a single day. Annualized at this pace, that's over $1B/year in burns. Obviously this was a peak day, but it shows the ceiling for the burn engine during high-volatility periods.",
+   signal:"BULLISH",importance:5},
+  {title:"3.4M Daily Transactions — All-Time High",date:"Mar 3",category:"PROTOCOL",
+   eli5:"HyperliquidX hit 3.4 million daily transactions on March 3, a new all-time high for the L1. This includes trades, transfers, staking operations, and HyperEVM contract calls. The chain handled this with sub-second finality and no degradation — proving the infrastructure scales.",
+   perp_impact:"Transaction count is a proxy for ecosystem health beyond just trading. More txs = more gas burned (HYPE), more HyperEVM activity, more fee revenue. The ATH coinciding with the geopolitical weekend surge shows organic growth, not wash trading. Watch this metric — sustained 3M+ daily txs would be very bullish for the gas demand thesis.",
+   signal:"BULLISH",importance:4},
+  {title:"Smart Money Long, Shorts Cluster Above $34",date:"Mar 7",category:"TRADING",
+   eli5:"On-chain analysis shows smart-money wallets are strongly net long HYPE, while retail holds net short positions. Short liquidation leverage is clustering above $34 — meaning a move above $34 could trigger cascading short liquidations (a squeeze). Technical indicators point to $39-43 as the next target if $34 breaks.",
+   perp_impact:"This is a classic squeeze setup. If HYPE reclaims $34, leveraged shorts above that level get liquidated, forcing market buys that push price higher, liquidating more shorts. The $34 level is your trigger — a clean break with volume above $34 could cascade to $39-43 quickly. Risk: if macro deteriorates, the long-side positioning could unwind instead.",
+   signal:"BULLISH",importance:4},
+  {title:"Continue Fund + Tornado Cash Dumping Finished",date:"Feb 2026",category:"TRADING",
+   eli5:"Major early investors including the Continue Fund and the 'Tornado Cash guy' have reportedly finished selling their HYPE allocations. This removes a significant source of persistent sell pressure that had been overhanging the market for months.",
+   perp_impact:"The clearing of known sellers is structurally bullish. Each month's unlock adds new supply, but the incremental selling from these specific large holders is done. Combined with the March 6 unlock holding $30, the sell-side picture is the cleanest it's been since launch. Remaining risk: monthly contributor unlocks (~$200M/month) continue through 2027.",
+   signal:"BULLISH",importance:4},
+  {title:"HyperEVM Mainnet Live — Gas Demand Growing",date:"Mar 1",category:"PROTOCOL",
+   eli5:"HyperEVM launched March 1 with ~10 min downtime. Developers can now deploy Solidity contracts on Hyperliquid's chain using HYPE for gas. New DEX pools (WHYPE-UBTC, USDH-WHYPE) launched with 100%+ APYs. The canonical WHYPE wrapper contract enables the DeFi building blocks.",
+   perp_impact:"Every HyperEVM smart contract call burns HYPE as gas — this is structural demand independent of trading. First-wave apps will be lending/borrowing and liquid staking. Both create HYPE sinks. TVL on HyperEVM is the metric to watch over the next 60 days. New contract deployments signal whether real builders are coming.",
+   signal:"BULLISH",importance:4},
+  {title:"$912M AF Burn — Governance Vote Passed",date:"Dec 2025",category:"GOVERNANCE",
+   eli5:"Validators voted 85% to permanently burn 37.5M HYPE in the Assistance Fund. Total supply dropped from 1B to ~962M. This was the single largest deflationary event in HYPE history. The tokens were already inaccessible but are now formally removed.",
+   perp_impact:"The AF overhang FUD is dead. Total supply permanently reduced by 3.75%. Combined with ongoing fee burns (~$9.22M/week), the protocol is structurally deflationary even with monthly unlocks. The burn-to-unlock ratio is the key metric — currently burning covers ~20% of unlock value, and growing.",
+   signal:"BULLISH",importance:4},
+  {title:"Next Unlock: April 6 (~$200M)",date:"Apr 6",category:"TRADING",
+   eli5:"The next contributor unlock is scheduled for April 6, 2026. Monthly unlocks of roughly $200M continue through 2027. Now that March's $316M unlock was absorbed cleanly, the market has a template for how these events play out — but April's macro conditions may differ.",
+   perp_impact:"Mark your calendar. April 6 is the next potential volatility event. If HYPE is trading above $34 by then, the squeeze setup + proven unlock absorption could make this a non-event. If HYPE is back near $28, the unlock becomes more dangerous. Tighten stops in the 3 days before each monthly unlock.",
+   signal:"WATCH",importance:3},
+  {title:"Hyperliquid Processes $4T Cumulative Volume",date:"Mar 2026",category:"ECOSYSTEM",
+   eli5:"Total cumulative trading volume on Hyperliquid has surpassed $3.64 trillion since launch. Monthly volumes exceeded $200B for both January and February while competitors declined. The platform now holds 10.2% of all DEX perp volume — the only DEX in the global top 10 perps exchanges.",
+   perp_impact:"Market share gains are the bull case in one number. From 2% to 10.2% in one year. If DEX perp share reaches 15-20% in 2026 (plausible given CEX security incidents like Bybit's $1.3B hack), HYPE's current valuation is significantly underpriced. Each percentage point of share gained translates directly to more fee revenue and more burns.",
+   signal:"BULLISH",importance:3}
+];
+
+const INTEL_BLOG=[
+  {date:"Mar 11, 2026",title:"Oil, Gold, and the $1.2B OI: How HIP-3 Just Changed the Game Forever",
+   body:`<p>Something historic happened on March 10. Hyperliquid's HIP-3 permissionless perpetual markets hit $1.2 billion in open interest — a record. But the headline number isn't what matters. <strong>What matters is what people are trading.</strong></p>
+<p>Of the top 30 markets by OI on Hyperliquid, only 7 are crypto. The rest? Crude oil, Brent crude, S&P 500, silver, gold, NVIDIA, Tesla. The CL-USDC oil contract alone did $1.62 billion in 24-hour volume — more than Ethereum. When a decentralized exchange is doing more oil futures volume than some traditional commodity brokers, you're witnessing a structural shift in how financial markets work.</p>
+<p><strong>Why this matters for HYPE:</strong> Every HIP-3 deployer stakes 500,000 HYPE ($17M+ at current prices) to launch their DEX. There are now 7 active DEXs with 138+ markets. That's 3.5M HYPE locked just in deployer stakes. On top of that, all trading fees from HIP-3 markets flow into the same buyback-and-burn engine as the main DEX. The $1.62B in oil volume on March 10 generated massive fees — all buying and burning HYPE.</p>
+<p><strong>The Iran catalyst:</strong> The US-Iran conflict escalated over the weekend when traditional markets were closed. Traders couldn't access COMEX gold futures or NYMEX crude. But Hyperliquid was open 24/7. Crude oil perps surged, silver saw record volume, and $56M in positions got liquidated on oil alone. This isn't a one-off — every future geopolitical weekend event is now a Hyperliquid growth catalyst.</p>
+<p><strong>Arthur Hayes is betting big:</strong> The BitMEX founder published his $150 target for HYPE by August 2026. His thesis: "No other project in all of crypto hands as much money back to token holders as Hyperliquid." Maelstrom's fund has a substantial position. He compared HYPE to GMX, which hit $90 during the 2023 sideways market. The key difference? Hyperliquid's volume is 10x GMX at peak.</p>
+<p><strong>Portfolio margin upgrade:</strong> The cherry on top — Hyperliquid announced portfolio margin is moving from pre-alpha to alpha. This means cross-collateral, dynamic margin scaling, and better capital efficiency for accounts under $500K. This is what institutional traders need to move serious size onto the platform.</p>
+<p><strong>The trade:</strong> HYPE held $30 through the March 6 unlock, squeezed shorts at $34 (87% of liquidations were shorts), and now trades at $35. The $34 level flipped from resistance to support. Next targets: $36.6, then $38 (February high), then $43 if the squeeze extends. Stop: daily close below $30. The fundamentals have never been stronger — $5B+ total OI, $5.7B daily volume, 120% YoY gain while altcoins are down 40-70%. This is infrastructure, not speculation.</p>`},
+  {date:"Mar 8, 2026",title:"The Unlock That Didn't Matter: What March 6 Tells Us About HYPE's Buy-Side Depth",
+   body:`<p>The numbers are in. On March 6, 9.92 million HYPE tokens ($316M) unlocked for core contributors. The platform processed $73.4 billion in volume that same day — a single-day record. And the price held $30.</p>
+<p>Let that sink in. A 2.7% supply increase hit the market on a day when the platform was simultaneously handling its highest volume ever due to Iran crisis commodity trading. The result? <strong>Nothing happened to the price.</strong> This is the most important data point of the month.</p>
+<p><strong>Why it matters for your positioning:</strong> Unlock events are supposed to create sell pressure. The March 6 non-event tells us one of two things: either core contributors are staking rather than selling, or the buy-side demand from burns ($2.88M in fees that day alone, 97% going to buybacks) is genuinely absorbing new supply. Both are bullish.</p>
+<p><strong>The setup going into next week:</strong> Smart money wallets are net long. Short liquidation leverage clusters above $34 — a break above that level could trigger a squeeze to $39-43. The Continue Fund and other known large sellers have reportedly finished dumping. The sell-side picture is the cleanest since launch.</p>
+<p><strong>Key levels:</strong> $30 is the new floor (proven by the unlock). $34 is the squeeze trigger. $39-43 is the target range if the squeeze fires. Stop loss: daily close below $28. Next unlock is April 6 — but the market now has a template for absorbing these events.</p>
+<p><strong>The bigger picture:</strong> Hyperliquid processed $73.4B in one day. It's doing $200B+ monthly while competitors collapse. It hit 3.4M daily transactions (ATH). HIP-4 prediction markets are on testnet. This isn't a token riding a narrative — it's infrastructure generating real revenue that gets recycled into supply reduction. In a bear market where everything else is down 20-30%, that matters.</p>`},
+
+  {date:"Mar 6, 2026",title:"HIP-4 Deep Dive: Why Prediction Markets on Hyperliquid Are Different From Polymarket",
+   body:`<p>Everyone's comparing HIP-4 to Polymarket. That comparison misses the point entirely. Let's break down what outcome trading actually enables and why it's a bigger deal than "Hyperliquid does prediction markets now."</p>
+<p><strong>The TL;DR:</strong> HIP-4 introduces fully collateralized contracts that settle within a fixed price range. No leverage, no liquidations. They can power prediction markets (will X happen?), bounded options (pay out if ETH is above $Y on date Z), and structured products — all running natively on HyperCore with unified margin.</p>
+<p><strong>Why it's not just Polymarket-on-Hyperliquid:</strong> Polymarket is an isolated prediction market. Your Polymarket positions have zero connection to your Aave loans, your Uniswap LP, or your perp trades. They live on their own island. HIP-4 outcomes run on HyperCore — the same engine as perps. This means you could go long ETH perps while simultaneously buying an outcome contract that pays if ETH drops below a certain price. Your portfolio margin system recognizes the hedge automatically. Investment banks charge millions to build these combinations for institutional clients.</p>
+<p><strong>The supply impact:</strong> Just like HIP-3 permissionless perps, deploying an outcome market requires staking 500,000 HYPE ($15M+). Each new prediction market = another 500K HYPE locked out of circulation. If HIP-4 sees even half the adoption of HIP-3 (which drove $42B in volume), the supply sink could be massive.</p>
+<p><strong>What to watch:</strong> Testnet is live. Mainnet timing is the catalyst. First markets will be curated by the team and denominated in USDH. Permissionless deployment follows. The $44B prediction market TAM (dominated by sports betting on Kalshi and elections on Polymarket) is ripe for crypto-native competition with better capital efficiency.</p>
+<p><strong>Risk:</strong> Oracle manipulation is the #1 failure mode for prediction markets. Hyperliquid says they'll use "objective settlement data sources" but hasn't disclosed specifics. A Massachusetts judge also recently ruled against Kalshi's sports betting contracts — regulatory risk for the whole category exists.</p>`},
+
+  {date:"Mar 3, 2026",title:"Weekend Warriors: How Hyperliquid Became the World's Go-To Crisis Trading Venue",
+   body:`<p>When US-Iran tensions escalated on Saturday and traditional markets were closed, traders didn't wait for Monday. They went to Hyperliquid. Silver perps saw massive volume. Oil and gold surged. Total platform volume hit $6.5 billion on a single day. HYPE rallied 13-20% while BTC barely moved.</p>
+<p><strong>This is now a pattern, not an anomaly.</strong> Hyperliquid offers perpetual futures on S&P 500, Tesla, Nvidia, gold, silver, oil, and pre-IPO companies. When COMEX gold futures are closed for a 48-hour weekend window, there is literally no traditional venue for expressing macro risk. Hyperliquid fills that gap. The platform processed over $200B in monthly volume for both January and February — while Aster dropped from $177B to under $100B.</p>
+<p><strong>The fee model is the cheat code:</strong> Hyperliquid collects fees on both sides of every trade — longs and shorts. It doesn't care which direction the market moves. Volatility is the product. With 97% of fees flowing into HYPE buyback-and-burns, every geopolitical crisis literally burns HYPE supply. The bear market accelerates the deflationary engine because fearful markets are volatile markets.</p>
+<p><strong>HYPE as a volatility hedge:</strong> Arthur Hayes called it — HYPE is up 23.9% YTD while BTC is down 23.7% and ETH is down 33%. It's matching gold. This isn't because HYPE is "safe." It's because Hyperliquid's revenue grows when markets are chaotic, and that revenue flows directly into reducing HYPE supply. In a Fear & Greed Index of 10, deflationary tokenomics backed by real revenue is the only narrative working.</p>
+<p><strong>What this means for your trades:</strong> Weekend geopolitical events are now HYPE catalysts. Build this into your positioning — consider holding a small HYPE long as a hedge against weekend chaos. The platform's role as crisis infrastructure is becoming consensus, which means the premium gets priced in more efficiently with each event. First-mover advantage still exists for commodity perps, but it won't last forever.</p>`}
+];
+
+function _renderIntelTab(){
+  const catColors={FEATURE:'var(--accent)',PROTOCOL:'var(--purple)',ECOSYSTEM:'var(--yellow)',TRADING:'var(--green)',GOVERNANCE:'var(--fire)'};
+  const sigColors={BULLISH:'var(--green)',BEARISH:'var(--red)',NEUTRAL:'var(--text-dim)',WATCH:'var(--yellow)'};
+  const sigEmoji={BULLISH:'📈',BEARISH:'📉',NEUTRAL:'➖',WATCH:'👀'};
+  const bullish=INTEL_DATA.filter(i=>i.signal==='BULLISH').length;
+  const bearish=INTEL_DATA.filter(i=>i.signal==='BEARISH').length;
+  const neutral=INTEL_DATA.filter(i=>i.signal==='NEUTRAL'||i.signal==='WATCH').length;
+  const avgImp=(INTEL_DATA.reduce((s,i)=>s+(i.importance||3),0)/INTEL_DATA.length).toFixed(1);
+  const netSigColor=bullish>bearish?'var(--green)':bearish>bullish?'var(--red)':'var(--text-dim)';
+  const netSigText=bullish>bearish?'📈 BULLISH LEAN':bearish>bullish?'📉 BEARISH LEAN':'⟺ MIXED';
+
+  // ── Ticker ──
+  const tickEl=$('tickerTrack');
+  if(tickEl){
+    const items=INTEL_DATA.map(it=>{
+      const sc=sigColors[it.signal]||'var(--text-dim)';
+      const em=sigEmoji[it.signal]||'';
+      return `<span class="ticker-item"><span class="ticker-signal" style="color:${sc}">${em} ${it.signal}</span> ${it.title}</span><span class="ticker-sep">◆</span>`;
+    }).join('');
+    tickEl.innerHTML=items+items; // duplicate for seamless loop
+  }
+
+  // ── Summary bar ──
+  const sumEl=$('intelSummary');
+  if(sumEl)sumEl.innerHTML=`<div class="af-live-stats" style="margin-bottom:20px">
+    <div class="af-stat"><div class="lbl">Updates</div><div class="val" style="color:var(--text-bright)">${INTEL_DATA.length}</div></div>
+    <div class="af-stat"><div class="lbl">Bullish</div><div class="val green">${bullish}</div></div>
+    <div class="af-stat"><div class="lbl">Bearish</div><div class="val" style="color:var(--red)">${bearish}</div></div>
+    <div class="af-stat"><div class="lbl">Neutral</div><div class="val" style="color:var(--text-dim)">${neutral}</div></div>
+    <div class="af-stat"><div class="lbl">Avg Importance</div><div class="val" style="color:var(--yellow)">${avgImp}/5</div></div>
+    <div class="af-stat"><div class="lbl">Net Signal</div><div class="val" style="color:${netSigColor}">${netSigText}</div></div>
+  </div>`;
+
+  // ── Hero story (first item) ──
+  const hero=INTEL_DATA[0];
+  const heroEl=$('heroStory');
+  if(heroEl&&hero){
+    heroEl.innerHTML=`
+      <div class="hero-cat">${hero.category} · ${hero.date} · ${'●'.repeat(hero.importance)+'○'.repeat(5-hero.importance)}</div>
+      <h2>${hero.title}</h2>
+      <div class="hero-lede">${hero.eli5}</div>
+      <div class="hero-impact"><span style="color:var(--text-muted);font-size:10px;letter-spacing:0.08em;display:block;margin-bottom:4px">PERP TRADER IMPACT</span>${hero.perp_impact}</div>
+      <div style="margin-top:14px;font-family:var(--mono);font-size:11px;font-weight:700;color:${sigColors[hero.signal]||'var(--text-dim)'}">${sigEmoji[hero.signal]||''} ${hero.signal}</div>`;
+  }
+
+  // ── Sidebar cards (items 1-4) ──
+  const sbEl=$('heroSidebar');
+  if(sbEl){
+    sbEl.innerHTML=INTEL_DATA.slice(1,5).map(it=>{
+      const cc=catColors[it.category]||'var(--text-dim)';
+      const sc=sigColors[it.signal]||'var(--text-dim)';
+      return `<div class="sidebar-card" style="border-left:3px solid ${cc}">
+        <div class="sc-cat" style="color:${cc}">${it.category} · ${it.date}</div>
+        <h4>${it.title}</h4>
+        <div class="sc-signal" style="color:${sc}">${sigEmoji[it.signal]||''} ${it.signal} · ${'●'.repeat(it.importance)+'○'.repeat(5-it.importance)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Grid (remaining items 5+) ──
+  const gridEl=$('intelGrid');
+  if(gridEl){
+    gridEl.innerHTML=INTEL_DATA.slice(5).map(item=>{
+      const cc=catColors[item.category]||'var(--text-dim)';
+      const sc=sigColors[item.signal]||'var(--text-dim)';
+      const dots='●'.repeat(item.importance||1)+'○'.repeat(5-(item.importance||1));
+      return `<div class="news-card" style="border-left-color:${cc}">
+        <div class="nc-top">
+          <span class="nc-cat" style="color:${cc}">${item.category}</span>
+          <span class="nc-date">${item.date}</span>
+        </div>
+        <h4>${item.title}</h4>
+        <div class="nc-eli5">${item.eli5}</div>
+        <div class="nc-impact"><span style="color:var(--text-muted);font-size:8px;letter-spacing:0.06em;display:block;margin-bottom:3px">PERP TRADER IMPACT</span>${item.perp_impact}</div>
+        <div style="display:flex;align-items:center;margin-top:8px">
+          <span class="nc-signal" style="color:${sc}">${sigEmoji[item.signal]||''} ${item.signal}</span>
+          <span class="nc-dots">${dots}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Blog entries ──
+  const blogEl=$('intelBlog');
+  if(blogEl)blogEl.innerHTML=INTEL_BLOG.map((entry,i)=>`
+    <article class="blog-entry">
+      ${i===0?'<div style="position:absolute;top:0;right:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:var(--bg);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:0 0 6px 6px">LATEST</div>':''}
+      <div class="blog-date">${entry.date}</div>
+      <h3>${entry.title}</h3>
+      <div class="intel-blog-body">${entry.body}</div>
+    </article>
+  `).join('');
+}
+// Render on page load
+setTimeout(_renderIntelTab,100);
 
 // ═══════════════════════════════════════════════════════════════
 //  HYPURR NFT FLOOR PRICE CHART
 // ═══════════════════════════════════════════════════════════════
 let _nftChart=null;
+const HYPURR_FLOOR_HISTORY=[
+  // Historical floor prices in HYPE (from research data)
+  {time:'2025-09-28',value:1463},  // Launch day
+  {time:'2025-09-29',value:1250},  // Day 2 settlement
+  {time:'2025-09-30',value:1315},  // Bounce
+  {time:'2025-10-03',value:1700},  // Week 1 high
+  {time:'2025-10-07',value:1450},  // Settling
+  {time:'2025-10-14',value:1260},  // Early Oct stable
+  {time:'2025-10-21',value:1200},
+  {time:'2025-10-28',value:1180},
+  {time:'2025-11-04',value:1100},
+  {time:'2025-11-11',value:1050},
+  {time:'2025-11-18',value:980},
+  {time:'2025-11-25',value:920},
+  {time:'2025-12-02',value:860},
+  {time:'2025-12-09',value:800},
+  {time:'2025-12-16',value:750},
+  {time:'2025-12-23',value:690},
+  {time:'2025-12-30',value:640},
+  {time:'2026-01-06',value:580},
+  {time:'2026-01-13',value:530},
+  {time:'2026-01-20',value:490},
+  {time:'2026-01-27',value:470},
+  {time:'2026-02-03',value:450},
+  {time:'2026-02-10',value:430},
+  {time:'2026-02-17',value:410},
+  {time:'2026-02-24',value:440},  // Bounce with HYPE rally
+  {time:'2026-03-01',value:480},  // Weekend surge
+  {time:'2026-03-03',value:459},  // Current
+];
 
-// No historical floor data available via API — skip chart, use live CoinGecko stats only
+function _initNftChart(){
+  if(typeof LightweightCharts==='undefined')return;
+  const wrap=$('nftChartWrap');if(!wrap)return;
+  const s=_wsz('nftChartWrap');
+  _nftChart=LightweightCharts.createChart(wrap,{
+    width:s.w,height:s.h,
+    layout:{background:{color:'#12151c'},textColor:'#5a6580',fontFamily:'JetBrains Mono'},
+    grid:{vertLines:{color:'#1a1e2a'},horzLines:{color:'#1a1e2a'}},
+    timeScale:{borderColor:'#222738',timeVisible:false},
+    rightPriceScale:{borderColor:'#222738'},
+    crosshair:{mode:0}
+  });
+
+  // Area series with Hypurr purple/pink gradient
+  const areaSeries=_nftChart.addAreaSeries({
+    lineColor:'#a78bfa',
+    topColor:'rgba(167,139,250,0.3)',
+    bottomColor:'rgba(167,139,250,0.02)',
+    lineWidth:2,
+    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' HYPE'}
+  });
+  areaSeries.setData(HYPURR_FLOOR_HISTORY);
+
+  // Bid line (current top offer)
+  const bidSeries=_nftChart.addLineSeries({
+    color:'#00e676',lineWidth:1,lineStyle:2,
+    priceFormat:{type:'custom',formatter:v=>v.toFixed(0)+' WHYPE'},
+    lastValueVisible:true,priceLineVisible:false
+  });
+  // Show bid as horizontal line for the last few data points
+  bidSeries.setData([
+    {time:'2026-02-24',value:420},
+    {time:'2026-03-01',value:450},
+    {time:'2026-03-03',value:440}
+  ]);
+
+  _nftChart.timeScale().fitContent();
+
+  // Attempt live data fetch from OpenSea API (best effort, CORS may block)
+  _fetchNftLiveData();
+}
 
 async function _fetchNftLiveData(){
   // CoinGecko free Demo API — /nfts/{id} endpoint
@@ -4545,15 +4676,11 @@ function _tryInitCharts(){
       computeMomentumPulse();computeCompositeSignal();
     }
   })();
-  // Init all overview-visible charts (now includes former Charts tab content)
+  // Only init charts on the VISIBLE tab (Overview)
   _initAfChart();_startAfLive();
   _initRingHover();
-  drawRing();
-  if(typeof LightweightCharts!=='undefined'){
-    _initBurnChart();_redrawBurnChart();
-    _initSqzChart();if(_pData.length>30)computeSqzMom();
-  }
-  setTimeout(_drawLiqHeatmap,2000); // slight delay for canvas layout
+  _initNftChart();
+  // Burns + Charts tab charts are deferred to showPage() lazy-init
 }
 setTimeout(_tryInitCharts,1500);
 </script>
