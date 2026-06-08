@@ -80,34 +80,55 @@ import Layout from '../layouts/Layout.astro';
   let lastShown: Record<string, number> = {};
   let windowMin = 5;
   let renderTimer: any = null;
+  let lastMsg = 0;
+  let hb: any = null;
 
   const $ = (id: string) => document.getElementById(id);
   function status(s: string) { const e = $('wsStatus'); if (e) e.textContent = s; }
 
   function connect() {
     if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    status('connecting…');
     try {
       ws = new WebSocket(WS_URL);
       ws.onopen = () => {
-        reconnects = 0; status('live');
+        reconnects = 0; lastMsg = Date.now(); status('live');
         ws!.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'allMids' } }));
         WS_COINS.forEach((c) => ws!.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin: c } })));
       };
       ws.onmessage = (evt) => {
+        lastMsg = Date.now();
+        if (status && $('wsStatus')?.textContent !== 'live') status('live');
         try {
           const m = JSON.parse(evt.data);
           if (m.channel === 'trades' && Array.isArray(m.data)) processTrades(m.data);
         } catch {}
       };
-      ws.onclose = () => { status('reconnecting…'); reconnect(); };
-      ws.onerror = () => { status('error'); };
+      ws.onclose = () => { status('reconnecting…'); stopHeartbeat(); reconnect(); };
+      ws.onerror = () => { try { ws?.close(); } catch {} };
+      startHeartbeat();
     } catch { reconnect(); }
   }
   function reconnect() {
     reconnects++;
-    const delay = Math.min(15000, 1000 * reconnects);
+    const delay = Math.min(15000, 800 * Math.pow(1.6, Math.min(reconnects, 6)));
     setTimeout(connect, delay);
   }
+  function startHeartbeat() {
+    stopHeartbeat();
+    hb = setInterval(() => {
+      if (ws && ws.readyState === 1) {
+        try { ws.send(JSON.stringify({ method: 'ping' })); } catch {}
+      }
+      // stale guard: no data for 40s → force a reconnect
+      if (lastMsg && Date.now() - lastMsg > 40000) {
+        status('reconnecting…');
+        try { ws?.close(); } catch {}
+      }
+    }, 20000);
+  }
+  function stopHeartbeat() { if (hb) { clearInterval(hb); hb = null; } }
+
 
   function processTrades(trades: any[]) {
     const now = Date.now();

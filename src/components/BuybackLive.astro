@@ -1,0 +1,254 @@
+---
+import { AF_ADDRESS } from '../lib/hl';
+import { shortAddr } from '../lib/format';
+interface Props { showAddr?: boolean; }
+const { showAddr = false } = Astro.props;
+---
+<div class="bb">
+  <div class="bb-main card card-prism">
+    <div class="bb-head">
+      <div class="bb-headline">
+        <span class="eyebrow">Assistance Fund · live</span>
+        <div class="bb-hype mono" data-live id="bbHype"></div>
+        <div class="bb-usd mono" id="bbUsd"></div>
+      </div>
+      <div class="bb-toggle" role="group" aria-label="Chart series">
+        <button data-series="usd" class="active" id="bbTglUsd">Fund value</button>
+        <button data-series="hype" id="bbTglHype">HYPE held</button>
+      </div>
+    </div>
+
+    <div class="bb-canvas-wrap">
+      <canvas id="bbCanvas"></canvas>
+      <div class="bb-empty" id="bbEmpty">Sampling the chain…</div>
+    </div>
+
+    <div class="bb-foot">
+      <span class="badge badge-live"><span class="dot"></span><span id="bbStatus">connecting…</span></span>
+      <span class="dim mono" id="bbMeta">session 0:00</span>
+    </div>
+  </div>
+
+  <div class="bb-stats">
+    <div class="card"><div class="stat-label">Session buyback</div><div class="stat-value up" data-live id="bbSession"></div><div class="stat-sub">HYPE bought since you opened</div></div>
+    <div class="card"><div class="stat-label">Live rate</div><div class="stat-value" data-live id="bbRate"></div><div class="stat-sub">HYPE / hr · this session</div></div>
+    <div class="card"><div class="stat-label">Standing bid</div><div class="stat-value" data-live id="bbBid"></div><div class="stat-sub" id="bbBidSz">limit order</div></div>
+    <div class="card"><div class="stat-label">USDC dry powder</div><div class="stat-value" data-live id="bbUsdc"></div><div class="stat-sub">ready to deploy</div></div>
+    <div class="card"><div class="stat-label">Fee burns</div><div class="stat-value" data-live id="bbFee"></div><div class="stat-sub">on-chain, HYPE</div></div>
+    {showAddr && (
+      <a class="card bb-addr" href={`https://blockscan.com/address/${AF_ADDRESS}`} target="_blank" rel="noopener">
+        <div class="stat-label">AF address</div>
+        <div class="stat-value mono" style="font-size:15px">{shortAddr(AF_ADDRESS)}</div>
+        <div class="stat-sub">view on explorer ↗</div>
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  .bb { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; }
+  .bb-main { padding: 22px; display: flex; flex-direction: column; }
+  .bb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .bb-hype { font-size: clamp(30px, 4vw, 44px); font-weight: 600; color: var(--text-bright); letter-spacing: -0.02em; line-height: 1.05; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .bb-usd { font-size: 15px; color: var(--accent); margin-top: 2px; }
+  .bb-toggle { display: inline-flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; flex-shrink: 0; }
+  .bb-toggle button { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); padding: 6px 11px; border-radius: 999px; transition: all 0.2s; white-space: nowrap; }
+  .bb-toggle button.active { color: #06120f; background: var(--accent); font-weight: 600; }
+  .bb-canvas-wrap { position: relative; margin-top: 16px; flex: 1; min-height: 240px; }
+  #bbCanvas { width: 100%; height: 240px; display: block; }
+  .bb-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); pointer-events: none; }
+  .bb-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .bb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+  .bb-stats .stat-value { font-size: 20px; }
+  .bb-addr:hover { border-color: var(--accent); }
+  @media (max-width: 900px) { .bb { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .bb-stats { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<script>
+  import { hlInfo, AF_ADDRESS, MAX_SUPPLY, F } from '../lib/hl';
+
+  const canvas = document.getElementById('bbCanvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const ctx = canvas.getContext('2d')!;
+    const wrap = canvas.parentElement as HTMLElement;
+    const emptyEl = document.getElementById('bbEmpty');
+
+    const PRISM = ['#b388ff', '#6aa8ff', '#28e0c8', '#ffd166'];
+    const ACCENT = '#28e0c8';
+
+    type Sample = { t: number; hype: number; usd: number };
+    const samples: Sample[] = [];
+    const MAX_PTS = 360; // ~30 min at 5s
+    let series: 'usd' | 'hype' = 'usd';
+    let price = 0;
+    let firstHype: number | null = null;
+    let animHype = 0; // odometer
+    let W = 0, H = 0, started = Date.now();
+
+    const $ = (id: string) => document.getElementById(id);
+    const setStatus = (s: string) => { const e = $('bbStatus'); if (e) e.textContent = s; };
+
+    function size() {
+      const r = wrap.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const h = 240;
+      if (canvas!.width !== Math.round(r.width * dpr) || canvas!.height !== Math.round(h * dpr)) {
+        canvas!.width = Math.round(r.width * dpr);
+        canvas!.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      W = r.width; H = h;
+    }
+
+    function vals(): number[] {
+      return samples.map((s) => (series === 'usd' ? s.usd : s.hype));
+    }
+
+    function draw(now: number) {
+      size();
+      ctx.clearRect(0, 0, W, H);
+      const data = vals();
+      if (data.length < 2) { requestAnimationFrame(draw); return; }
+
+      const padL = 8, padR = 14, padT = 14, padB = 22;
+      const min = Math.min(...data), max = Math.max(...data);
+      const range = max - min || Math.abs(max) * 0.01 || 1;
+      const yMin = min - range * 0.12, yMax = max + range * 0.18;
+      const x = (i: number) => padL + (i / (data.length - 1)) * (W - padL - padR);
+      const y = (v: number) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
+
+      // baseline grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 1;
+      for (let g = 0; g <= 3; g++) {
+        const gy = padT + (g / 3) * (H - padT - padB);
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(W - padR, gy); ctx.stroke();
+      }
+
+      // area fill
+      ctx.beginPath();
+      ctx.moveTo(x(0), y(data[0]));
+      for (let i = 1; i < data.length; i++) ctx.lineTo(x(i), y(data[i]));
+      ctx.lineTo(x(data.length - 1), H - padB);
+      ctx.lineTo(x(0), H - padB);
+      ctx.closePath();
+      const fill = ctx.createLinearGradient(0, padT, 0, H - padB);
+      fill.addColorStop(0, 'rgba(40,224,200,0.28)');
+      fill.addColorStop(1, 'rgba(40,224,200,0.01)');
+      ctx.fillStyle = fill; ctx.fill();
+
+      // line with prism gradient + glow
+      const grad = ctx.createLinearGradient(padL, 0, W - padR, 0);
+      PRISM.forEach((c, i) => grad.addColorStop(i / (PRISM.length - 1), c));
+      ctx.beginPath();
+      ctx.moveTo(x(0), y(data[0]));
+      for (let i = 1; i < data.length; i++) ctx.lineTo(x(i), y(data[i]));
+      ctx.strokeStyle = grad; ctx.lineWidth = 2.2; ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(40,224,200,0.5)'; ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // leading pulsing dot
+      const lx = x(data.length - 1), ly = y(data[data.length - 1]);
+      const pulse = (Math.sin(now / 420) + 1) / 2;
+      ctx.beginPath();
+      ctx.arc(lx, ly, 7 + pulse * 7, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(40,224,200,${0.18 * (1 - pulse)})`; ctx.fill();
+      ctx.beginPath();
+      ctx.arc(lx, ly, 3.4, 0, Math.PI * 2);
+      ctx.fillStyle = '#eafff9'; ctx.shadowColor = ACCENT; ctx.shadowBlur = 12; ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // min/max labels
+      ctx.fillStyle = 'rgba(147,160,182,0.55)';
+      ctx.font = '10px ui-monospace, monospace';
+      ctx.textAlign = 'left';
+      const fmtY = (v: number) => (series === 'usd' ? '$' + F.c(v) : F.c(v));
+      ctx.fillText(fmtY(max), padL + 2, padT + 2);
+      ctx.fillText(fmtY(min), padL + 2, H - padB + 12);
+
+      requestAnimationFrame(draw);
+    }
+
+    // Odometer headline
+    function tick() {
+      const target = samples.length ? samples[samples.length - 1].hype : 0;
+      animHype += (target - animHype) * 0.12;
+      if (Math.abs(target - animHype) < 1) animHype = target;
+      const hEl = $('bbHype');
+      if (hEl) hEl.textContent = Math.round(animHype).toLocaleString('en-US') + ' HYPE';
+      const uEl = $('bbUsd');
+      if (uEl && price) uEl.textContent = F.uc(animHype * price) + ' at $' + F.f2(price);
+      requestAnimationFrame(tick);
+    }
+
+    async function poll() {
+      try {
+        // price (fast, frequent)
+        try {
+          const m = await hlInfo<Record<string, string>>({ type: 'allMids' });
+          const p = parseFloat(m?.['@107'] ?? m?.['HYPE'] ?? '0');
+          if (isFinite(p) && p > 0) price = p;
+        } catch {}
+
+        // AF spot balances
+        let hype = samples.length ? samples[samples.length - 1].hype : 0;
+        try {
+          const s = await hlInfo<any>({ type: 'spotClearinghouseState', user: AF_ADDRESS });
+          if (s?.balances) {
+            const h = s.balances.find((b: any) => b.coin === 'HYPE' || b.token === 150);
+            if (h) hype = parseFloat(h.total ?? h.hold ?? hype);
+            const u = s.balances.find((b: any) => b.coin === 'USDC');
+            if (u) { const usdc = parseFloat(u.total ?? u.hold ?? 0); $('bbUsdc') && ($('bbUsdc')!.textContent = F.uc(usdc)); }
+          }
+        } catch {}
+
+        if (hype > 0) {
+          if (firstHype == null) { firstHype = hype; animHype = hype; }
+          const usd = price ? hype * price : (samples.at(-1)?.usd ?? 0);
+          samples.push({ t: Date.now(), hype, usd });
+          if (samples.length > MAX_PTS) samples.shift();
+          if (emptyEl) emptyEl.style.display = samples.length >= 2 ? 'none' : 'flex';
+
+          // session + rate
+          const sess = hype - (firstHype ?? hype);
+          $('bbSession') && ($('bbSession')!.textContent = (sess >= 0 ? '+' : '') + F.c(sess));
+          const hrs = (Date.now() - started) / 3.6e6;
+          $('bbRate') && ($('bbRate')!.textContent = hrs > 0.002 ? (sess / hrs >= 0 ? '+' : '') + F.c(sess / hrs) : '—');
+        }
+        setStatus('live');
+      } catch { setStatus('retrying…'); }
+
+      // session clock
+      const el = $('bbMeta');
+      if (el) { const s = Math.floor((Date.now() - started) / 1000); el.textContent = 'session ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+    }
+
+    // point-in-time stats (slower cadence)
+    async function slow() {
+      try {
+        const o = await hlInfo<any[]>({ type: 'openOrders', user: AF_ADDRESS });
+        const buys = (Array.isArray(o) ? o : []).filter((x) => x.side === 'B').sort((a, b) => parseFloat(b.limitPx ?? b.px ?? 0) - parseFloat(a.limitPx ?? a.px ?? 0));
+        if (buys.length) { $('bbBid') && ($('bbBid')!.textContent = '$' + F.f2(parseFloat(buys[0].limitPx ?? buys[0].px ?? 0))); $('bbBidSz') && ($('bbBidSz')!.textContent = F.c(parseFloat(buys[0].sz ?? 0)) + ' HYPE bid'); }
+        else { $('bbBid') && ($('bbBid')!.textContent = '—'); $('bbBidSz') && ($('bbBidSz')!.textContent = 'no open bid'); }
+      } catch {}
+      try {
+        const d = await hlInfo<any[]>({ type: 'spotMetaAndAssetCtxs' });
+        const ctxs = Array.isArray(d) ? d[1] || [] : [];
+        const c = ctxs.find((x: any) => x.coin === '@107' || x.coin === 'HYPE/USDC') || ctxs[107];
+        if (c?.totalSupply) { const ts = parseFloat(c.totalSupply); if (ts > 0 && ts < MAX_SUPPLY) $('bbFee') && ($('bbFee')!.textContent = F.c(MAX_SUPPLY - ts)); }
+      } catch {}
+    }
+
+    // toggle
+    document.getElementById('bbTglUsd')?.addEventListener('click', () => { series = 'usd'; document.getElementById('bbTglUsd')!.classList.add('active'); document.getElementById('bbTglHype')!.classList.remove('active'); });
+    document.getElementById('bbTglHype')?.addEventListener('click', () => { series = 'hype'; document.getElementById('bbTglHype')!.classList.add('active'); document.getElementById('bbTglUsd')!.classList.remove('active'); });
+
+    poll(); slow();
+    setInterval(poll, 5000);
+    setInterval(slow, 30000);
+    requestAnimationFrame(draw);
+    requestAnimationFrame(tick);
+  }
+</script>

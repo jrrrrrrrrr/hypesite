@@ -32,12 +32,12 @@ function cta(ind: typeof INDICATORS[number]) {
 
   <section class="wrap section-sm">
     <div class="grid grid-2">
-      {INDICATORS.map((ind) => {
+      {INDICATORS.map((ind, i) => {
         const action = cta(ind);
         return (
           <article class="card card-hover ind-card" style={`--ac:${ind.accent}`}>
             <a class="ind-shot" href={ind.tvUrl} target="_blank" rel="noopener" aria-label={`${ind.name} on TradingView`}>
-              <img src={ind.image} alt={`${ind.name} chart`} loading="lazy" />
+              <img src={ind.image} alt={`${ind.name} chart`} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
               <span class="ind-shot-badge">{ind.badge}</span>
             </a>
             <div class="ind-content">

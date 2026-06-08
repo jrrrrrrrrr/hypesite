@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import BuybackLive from '../components/BuybackLive.astro';
+import BurnHistory from '../components/BurnHistory.astro';
 import { INDICATORS } from '../lib/indicators';
 import { TREASURY_ADDRESSES } from '../lib/site';
 import { shortAddr } from '../lib/format';
@@ -77,6 +79,20 @@ const featured = INDICATORS.slice(0, 4);
     </div>
   </section>
 
+  <!-- ============ LIVE BUYBACK ENGINE ============ -->
+  <section class="wrap section">
+    <div class="ind-head">
+      <div>
+        <span class="eyebrow">Buyback engine · live</span>
+        <h2 class="section-title">Watch the burn, in real time.</h2>
+        <p class="section-lede">The Assistance Fund converts trading fees into HYPE and holds it — effectively removing it from supply. This samples the fund live; the chart climbs as buybacks land.</p>
+      </div>
+      <a href="/burns" class="btn btn-ghost">Full tracker →</a>
+    </div>
+    <div style="margin-top:24px"><BuybackLive /></div>
+    <div style="margin-top:16px"><BurnHistory /></div>
+  </section>
+
   <!-- ============ TREASURY CALLOUT ============ -->
   <section class="wrap section-sm">
     <div class="card card-prism treasury-callout">
@@ -104,9 +120,9 @@ const featured = INDICATORS.slice(0, 4);
       <a href="/indicators" class="btn btn-ghost">View all →</a>
     </div>
     <div class="grid grid-4" style="margin-top:22px">
-      {featured.map((ind) => (
+      {featured.map((ind, i) => (
         <a href="/indicators" class="card card-hover ind-mini" style={`--ac:${ind.accent}`}>
-          <div class="ind-mini-img"><img src={ind.image} alt={ind.name} loading="lazy" /></div>
+          <div class="ind-mini-img"><img src={ind.image} alt={ind.name} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" /></div>
           <div class="ind-mini-body">
             <span class="ind-badge">{ind.badge}</span>
             <h3 class="ind-mini-name">{ind.name}</h3>
