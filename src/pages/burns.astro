@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AF_ADDRESS } from '../lib/hl';
+import { shortAddr } from '../lib/format';
+---
+<Layout title="Buybacks" path="/burns" description="Hyperliquid HYPE buyback tracker — live Assistance Fund holdings, the standing buyback bid, and on-chain fee burns.">
+  <section class="wrap section">
+    <span class="eyebrow">Buyback engine · live</span>
+    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">The HYPE <span class="prism-text">buyback</span> tracker.</h1>
+    <p class="section-lede" style="font-size:16px">
+      Roughly 97% of Hyperliquid trading fees are recycled into HYPE through the Assistance Fund. Those holdings
+      are tracked live below, alongside the fund's standing bid and its on-chain fee burns. The new AQAv2 reserve-yield
+      flow stacks on top of this — see the <a href="/treasury" style="color:var(--accent)">treasury page</a>.
+    </p>
+
+    <div class="grid grid-4" style="margin-top:28px">
+      <div class="card card-prism"><div class="stat-label">AF HYPE holdings</div><div class="stat-value" data-live id="afHype"></div><div class="stat-sub" id="afHypeUsd">buyback stack</div></div>
+      <div class="card"><div class="stat-label">Standing buyback bid</div><div class="stat-value" data-live id="afBid"></div><div class="stat-sub" id="afBidSz">limit order</div></div>
+      <div class="card"><div class="stat-label">AF USDC</div><div class="stat-value" data-live id="afUsdc"></div><div class="stat-sub">dry powder</div></div>
+      <div class="card"><div class="stat-label">Fee burns (on-chain)</div><div class="stat-value" data-live id="feeBurns"></div><div class="stat-sub">HyperCore + EVM</div></div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <h3 style="font-size:17px">Staked share of circulating supply</h3>
+        <span class="mono dim" id="stakeShareLbl" style="font-size:12px">—</span>
+      </div>
+      <div class="bar"><div class="bar-fill" id="stakeBar" style="width:0%"></div></div>
+      <div class="bar-legend">
+        <span><i class="sw" style="background:var(--prism)"></i>Staked <b class="mono" id="legStaked">—</b></span>
+        <span><i class="sw" style="background:var(--surface-3)"></i>Liquid <b class="mono" id="legLiquid">—</b></span>
+      </div>
+    </div>
+
+    <p class="dim mono" style="font-size:11px;margin-top:14px">
+      Assistance Fund address <a href={`https://blockscan.com/address/${AF_ADDRESS}`} target="_blank" rel="noopener" style="color:var(--text-mid)">{shortAddr(AF_ADDRESS)}</a>.
+      AF HYPE was formally recognised as effectively burned by community vote. Figures update live from on-chain state.
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .bar { height: 16px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--prism); border-radius: 999px; transition: width 0.8s var(--ease); }
+  .bar-legend { display: flex; gap: 22px; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-mid); flex-wrap: wrap; }
+  .bar-legend b { color: var(--text-bright); margin-left: 4px; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+</style>
+
+<script>
+  import { hlInfo, hypeMarket, stakeDivisor, AF_ADDRESS, MAX_SUPPLY, F, setText } from '../lib/hl';
+
+  async function load() {
+    let price: number | null = null, circ: number | null = null;
+    try {
+      const m = await hypeMarket();
+      price = m.price;
+      const r = await fetch('/api/cg?id=hyperliquid');
+      if (r.ok) { const d = (await r.json())?.[0]; const c = Number(d?.circulating_supply); if (isFinite(c)) circ = c; }
+    } catch {}
+
+    // AF spot balances
+    try {
+      const s = await hlInfo<any>({ type: 'spotClearinghouseState', user: AF_ADDRESS });
+      if (s?.balances) {
+        const h = s.balances.find((b: any) => b.coin === 'HYPE' || b.token === 150);
+        const afHype = h ? parseFloat(h.total ?? h.hold ?? 0) : 0;
+        setText('afHype', F.c(afHype) + ' HYPE');
+        if (price && afHype) setText('afHypeUsd', F.uc(afHype * price) + ' · buyback stack');
+        const u = s.balances.find((b: any) => b.coin === 'USDC');
+        const afUsdc = u ? parseFloat(u.total ?? u.hold ?? 0) : 0;
+        setText('afUsdc', F.uc(afUsdc));
+      }
+    } catch { setText('afHype', '—'); }
+
+    // AF standing buyback bid
+    try {
+      const o = await hlInfo<any[]>({ type: 'openOrders', user: AF_ADDRESS });
+      const buys = (Array.isArray(o) ? o : []).filter((x) => x.side === 'B')
+        .sort((a, b) => parseFloat(b.limitPx ?? b.px ?? 0) - parseFloat(a.limitPx ?? a.px ?? 0));
+      if (buys.length) {
+        const px = parseFloat(buys[0].limitPx ?? buys[0].px ?? 0);
+        const sz = parseFloat(buys[0].sz ?? 0);
+        setText('afBid', '$' + F.f2(px));
+        setText('afBidSz', F.c(sz) + ' HYPE bid');
+      } else { setText('afBid', '—'); setText('afBidSz', 'no open bid'); }
+    } catch { setText('afBid', '—'); }
+
+    // Fee burns = max supply − total supply
+    try {
+      const d = await hlInfo<any[]>({ type: 'spotMetaAndAssetCtxs' });
+      const ctxs = Array.isArray(d) ? d[1] || [] : [];
+      const c = ctxs.find((x: any) => x.coin === '@107' || x.coin === 'HYPE/USDC') || ctxs[107];
+      if (c?.totalSupply) {
+        const ts = parseFloat(c.totalSupply);
+        if (ts > 0 && ts < MAX_SUPPLY) setText('feeBurns', F.c(MAX_SUPPLY - ts) + ' HYPE');
+      }
+      if (circ == null && c?.circulatingSupply) circ = parseFloat(c.circulatingSupply);
+    } catch { setText('feeBurns', '—'); }
+
+    // Staked share bar
+    try {
+      const vals = await hlInfo<any[]>({ type: 'validatorSummaries' });
+      if (Array.isArray(vals) && vals.length) {
+        let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
+        const div = stakeDivisor(raw);
+        const staked = raw / div;
+        const base = circ && circ > staked ? circ : MAX_SUPPLY;
+        const pct = Math.min(100, (staked / base) * 100);
+        const bar = document.getElementById('stakeBar'); if (bar) (bar as HTMLElement).style.width = pct.toFixed(1) + '%';
+        setText('stakeShareLbl', pct.toFixed(1) + '% staked');
+        setText('legStaked', F.c(staked));
+        setText('legLiquid', F.c(Math.max(0, base - staked)));
+      }
+    } catch {}
+  }
+
+  load();
+  setInterval(load, 60000);
+</script>

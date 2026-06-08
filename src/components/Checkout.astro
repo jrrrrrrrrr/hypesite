@@ -1,0 +1,138 @@
+---
+import { SITE } from '../lib/site';
+---
+<div class="co-overlay" id="coOverlay" hidden>
+  <div class="co-modal" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+    <button class="co-close" id="coClose" aria-label="Close">✕</button>
+
+    <div id="coStep1">
+      <span class="eyebrow">Get access</span>
+      <h3 class="co-title" id="coTitle">Indicator</h3>
+      <div class="co-price" id="coPrice"></div>
+      <p class="co-desc">Pay once, then your TradingView account is granted a private invite to the script — usually within {SITE.accessDeliveryHours}.</p>
+
+      <label class="co-lbl" for="coUser">TradingView username <span class="req">*</span></label>
+      <input id="coUser" class="co-input" placeholder="your TradingView @username" autocomplete="off" spellcheck="false" />
+      <label class="co-lbl" for="coEmail">Email <span class="dim">(optional — for your receipt)</span></label>
+      <input id="coEmail" class="co-input" type="email" placeholder="you@email.com" autocomplete="email" />
+      <p class="co-err" id="coErr" hidden>Please enter your TradingView username — that's where the invite goes.</p>
+
+      <button class="btn btn-primary co-go" id="coGo">Continue to checkout →</button>
+      <p class="co-fine">Access is granted manually to the username above. Make sure it's exact.</p>
+    </div>
+
+    <div id="coStep2" hidden>
+      <span class="eyebrow">Almost there</span>
+      <h3 class="co-title">Finish in the checkout tab</h3>
+      <p class="co-desc">Once your payment clears, <b id="coUser2" class="acc"></b> will be granted access to <b id="coName2" class="acc"></b> on TradingView — usually within {SITE.accessDeliveryHours}.</p>
+      <ol class="co-steps">
+        <li>Complete payment in the tab that just opened.</li>
+        <li>We add your TradingView username to the invite-only script.</li>
+        <li>It appears under <span class="mono">Indicators → Invite-only scripts</span> on TradingView.</li>
+      </ol>
+      <div class="co-actions">
+        <a id="coTvLink" class="btn btn-ghost" target="_blank" rel="noopener">Open script on TradingView ↗</a>
+        <button class="btn btn-primary" id="coDone">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .co-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(4, 5, 8, 0.74); backdrop-filter: blur(6px); animation: coFade 0.2s ease; }
+  .co-overlay[hidden] { display: none; }
+  @keyframes coFade { from { opacity: 0; } }
+  .co-modal { position: relative; width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--border-bright); border-radius: var(--r-lg); padding: 30px; box-shadow: var(--shadow-lg); animation: coRise 0.3s var(--ease); }
+  .co-modal::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; border-radius: var(--r-lg) var(--r-lg) 0 0; background: var(--prism); }
+  @keyframes coRise { from { opacity: 0; transform: translateY(12px); } }
+  .co-close { position: absolute; top: 16px; right: 16px; font-size: 16px; color: var(--text-dim); width: 30px; height: 30px; border-radius: 8px; }
+  .co-close:hover { background: var(--surface-2); color: var(--text-bright); }
+  .co-title { font-size: 24px; margin: 12px 0 4px; }
+  .co-price { font-family: var(--font-mono); font-size: 18px; color: var(--accent); margin-bottom: 12px; }
+  .co-desc { color: var(--text-mid); font-size: 13.5px; line-height: 1.6; margin-bottom: 18px; }
+  .co-lbl { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 7px; }
+  .co-lbl .req { color: var(--accent); }
+  .co-input { width: 100%; background: var(--surface-2); border: 1px solid var(--border-bright); border-radius: var(--r-sm); padding: 11px 13px; color: var(--text-bright); font-family: var(--font-mono); font-size: 14px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .co-input:focus { outline: none; border-color: var(--accent); }
+  .co-input::placeholder { color: var(--text-faint); }
+  .co-err { color: var(--down); font-size: 12.5px; margin: -6px 0 14px; }
+  .co-go { width: 100%; margin-top: 4px; }
+  .co-fine { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-faint); text-align: center; margin-top: 12px; }
+  .co-steps { margin: 6px 0 20px; padding-left: 20px; display: flex; flex-direction: column; gap: 9px; color: var(--text-mid); font-size: 13px; line-height: 1.5; }
+  .co-steps li::marker { color: var(--accent); font-family: var(--font-mono); }
+  .acc { color: var(--text-bright); }
+  .co-actions { display: flex; gap: 10px; }
+  .co-actions .btn { flex: 1; }
+</style>
+
+<script>
+  import { SITE } from '../lib/site';
+
+  const $ = (id: string) => document.getElementById(id);
+  const overlay = $('coOverlay');
+  let current: { id: string; name: string; price: string; buy: string; tv: string } | null = null;
+
+  function open(data: typeof current) {
+    current = data;
+    ($('coStep1') as HTMLElement).hidden = false;
+    ($('coStep2') as HTMLElement).hidden = true;
+    ($('coErr') as HTMLElement).hidden = true;
+    $('coTitle')!.textContent = data!.name;
+    $('coPrice')!.textContent = data!.price ? '$' + data!.price + ' · one-time' : 'Pricing on request';
+    const goBtn = $('coGo')!;
+    goBtn.textContent = data!.buy ? 'Continue to checkout →' : (SITE.contactEmail ? 'Request access →' : 'Contact on TradingView →');
+    // prefill remembered username
+    try { const u = localStorage.getItem('tvUser'); if (u) ($('coUser') as HTMLInputElement).value = u; } catch {}
+    overlay!.hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => ($('coUser') as HTMLInputElement)?.focus(), 60);
+  }
+  function close() { overlay!.hidden = true; document.body.style.overflow = ''; }
+
+  // Open from any [data-checkout] button
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement)?.closest('[data-checkout]') as HTMLElement | null;
+    if (!btn) return;
+    e.preventDefault();
+    open({
+      id: btn.dataset.id || '',
+      name: btn.dataset.name || 'Indicator',
+      price: btn.dataset.price || '',
+      buy: btn.dataset.buy || '',
+      tv: btn.dataset.tv || '',
+    });
+  });
+
+  $('coGo')?.addEventListener('click', () => {
+    const user = (($('coUser') as HTMLInputElement)?.value || '').trim().replace(/^@/, '');
+    const email = (($('coEmail') as HTMLInputElement)?.value || '').trim();
+    if (!user) { ($('coErr') as HTMLElement).hidden = false; return; }
+    try { localStorage.setItem('tvUser', user); } catch {}
+
+    let dest = '';
+    if (current!.buy) {
+      // append buyer details; harmless for providers that ignore them, captured by those that don't
+      const sep = current!.buy.includes('?') ? '&' : '?';
+      dest = current!.buy + sep + 'tv_username=' + encodeURIComponent(user) + (email ? '&email=' + encodeURIComponent(email) : '');
+    } else if (SITE.contactEmail) {
+      const subj = encodeURIComponent('Access request: ' + current!.name);
+      const body = encodeURIComponent(`TradingView username: ${user}\nEmail: ${email || '(none)'}\nIndicator: ${current!.name}`);
+      dest = `mailto:${SITE.contactEmail}?subject=${subj}&body=${body}`;
+    } else {
+      dest = current!.tv || SITE.tradingviewProfile;
+    }
+    window.open(dest, '_blank', 'noopener');
+
+    // advance to step 2
+    $('coUser2')!.textContent = user;
+    $('coName2')!.textContent = current!.name;
+    ($('coTvLink') as HTMLAnchorElement).href = current!.tv || SITE.tradingviewProfile;
+    ($('coStep1') as HTMLElement).hidden = true;
+    ($('coStep2') as HTMLElement).hidden = false;
+  });
+
+  $('coClose')?.addEventListener('click', close);
+  $('coDone')?.addEventListener('click', close);
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay!.hidden) close(); });
+</script>

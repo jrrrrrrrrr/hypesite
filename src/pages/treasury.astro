@@ -1,0 +1,142 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TREASURY_ADDRESSES } from '../lib/site';
+import { shortAddr } from '../lib/format';
+
+const sources = [
+  { label: 'The Block — Coinbase becomes official USDC deployer', url: 'https://www.theblock.co/post/401233/coinbase-hyperliquid-official-deployer-usdc' },
+  { label: 'FXStreet — AQAv2 treasury deployer, USDH transition', url: 'https://www.fxstreet.com/cryptocurrencies/news/coinbase-becomes-official-usdc-treasury-deployer-on-hyperliquid-amid-usdh-transition-202605141853' },
+  { label: 'CryptoBriefing — up to 90% reserve yield to buybacks', url: 'https://cryptobriefing.com/hyperliquid-usdc-yield-hype-buybacks/' },
+];
+---
+<Layout title="AQAv2 USDC Treasury" path="/treasury" description="Tracking Hyperliquid's AQAv2 framework — Coinbase as official USDC treasury deployer, Circle on CCTP, and reserve-yield that flows back into HYPE buybacks.">
+  <section class="wrap section">
+    <span class="eyebrow">Aligned Quote Asset · v2</span>
+    <h1 class="section-title" style="font-size:clamp(32px,5vw,56px)">The USDC <span class="prism-text">treasury</span> that pays HYPE holders.</h1>
+    <p class="section-lede" style="font-size:17px">
+      On 14 May 2026, Coinbase became Hyperliquid's official USDC treasury deployer under the upgraded
+      AQAv2 framework. The headline: most of the yield on USDC sitting on Hyperliquid now flows back to the
+      protocol — and into the same buyback machinery that already absorbs trading fees.
+    </p>
+
+    <div class="grid grid-4" style="margin-top:30px">
+      <div class="card card-prism"><div class="stat-label">USDC on Hyperliquid</div><div class="stat-value">≈ $5B</div><div class="stat-sub">~2× year-over-year*</div></div>
+      <div class="card"><div class="stat-label">Reserve yield to protocol</div><div class="stat-value">up to 90%</div><div class="stat-sub">via AQAv2</div></div>
+      <div class="card"><div class="stat-label">Est. annual buyback fuel</div><div class="stat-value">$135–160M</div><div class="stat-sub">at current rates*</div></div>
+      <div class="card"><div class="stat-label">Validator backing</div><div class="stat-value">HYPE staked</div><div class="stat-sub">Coinbase + Circle</div></div>
+    </div>
+    <p class="dim mono" style="font-size:11px;margin-top:10px">* Figures from public reporting around the 14 May 2026 announcement; see sources below. USDC supply and yields fluctuate.</p>
+  </section>
+
+  <!-- How it works -->
+  <section class="wrap section-sm">
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="font-size:18px;margin-bottom:10px">How AQAv2 works</h3>
+        <ul class="tlist">
+          <li><b>Coinbase</b> — official treasury deployer for USDC, the network's aligned quote asset.</li>
+          <li><b>Circle</b> — technical deployment and cross-chain rails via CCTP (native burn-and-mint USDC across chains).</li>
+          <li><b>Yield share</b> — up to ~90% of the reserve yield on Hyperliquid's USDC is returned to the protocol.</li>
+          <li><b>Into buybacks</b> — that revenue joins trading-fee buybacks via the Assistance Fund, supporting HYPE.</li>
+          <li><b>Validators</b> — Coinbase and Circle both stake HYPE to activate the framework.</li>
+          <li><b>USDH sunset</b> — Native Markets' USDH winds down; holders can redeem for USDC or fiat without fees during the transition.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="font-size:18px;margin-bottom:6px">Reserve-yield → buyback estimator</h3>
+        <p class="dim" style="font-size:13px;margin-bottom:16px">Rough sizing. Adjust the inputs to see annualised buyback fuel.</p>
+        <label class="est-row"><span>USDC on Hyperliquid</span><span class="mono" id="estSupplyV">$5.0B</span></label>
+        <input type="range" id="estSupply" min="1" max="12" step="0.5" value="5" />
+        <label class="est-row"><span>Reserve yield (APY)</span><span class="mono" id="estYieldV">4.0%</span></label>
+        <input type="range" id="estYield" min="2" max="6" step="0.1" value="4" />
+        <label class="est-row"><span>Share to protocol</span><span class="mono" id="estShareV">90%</span></label>
+        <input type="range" id="estShare" min="50" max="100" step="5" value="90" />
+        <div class="est-out">
+          <span class="stat-label">Estimated annual buyback fuel</span>
+          <div class="stat-value prism-text" id="estOut" style="font-size:32px">$180M</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deployer addresses -->
+  <section class="wrap section-sm">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <h3 style="font-size:18px">Official deployer addresses</h3>
+        <span class="badge"><span class="dot"></span>activating AQAv2</span>
+      </div>
+      <p class="dim" style="font-size:13px;margin:8px 0 16px">Coinbase began activating AQAv2 from these two addresses. Click to view on a block explorer.</p>
+      <div class="grid grid-2">
+        {TREASURY_ADDRESSES.map((a, i) => (
+          <div class="addr-card">
+            <span class="stat-label">Deployer {i + 1}</span>
+            <code class="addr-full mono">{a}</code>
+            <div class="addr-actions">
+              <a class="btn btn-ghost" href={`https://blockscan.com/address/${a}`} target="_blank" rel="noopener">Explorer ↗</a>
+              <button class="btn btn-ghost copy-btn" data-addr={a}>Copy</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sources -->
+  <section class="wrap section-sm">
+    <span class="eyebrow">Sources</span>
+    <div class="src-list">
+      {sources.map((s) => (<a href={s.url} target="_blank" rel="noopener" class="src">{s.label} ↗</a>))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .tlist { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .tlist li { font-size: 14px; color: var(--text-mid); line-height: 1.55; padding-left: 18px; position: relative; }
+  .tlist li::before { content: ''; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; border-radius: 2px; background: var(--prism); }
+  .tlist b { color: var(--text-bright); font-weight: 600; }
+
+  .est-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-mid); margin: 14px 0 6px; }
+  input[type='range'] { width: 100%; accent-color: var(--accent); height: 4px; }
+  .est-out { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+  .addr-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .addr-full { font-size: 13px; color: var(--text); word-break: break-all; }
+  .addr-actions { display: flex; gap: 8px; }
+  .copy-btn.copied { color: var(--up); border-color: var(--up); }
+
+  .src-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .src { font-family: var(--font-mono); font-size: 13px; color: var(--text-mid); }
+  .src:hover { color: var(--accent); }
+</style>
+
+<script>
+  // Estimator
+  const supply = document.getElementById('estSupply');
+  const yieldR = document.getElementById('estYield');
+  const share = document.getElementById('estShare');
+  function recalc() {
+    const s = Number(supply?.value) * 1e9;
+    const y = Number(yieldR?.value) / 100;
+    const sh = Number(share?.value) / 100;
+    const out = s * y * sh;
+    const sv = document.getElementById('estSupplyV'); if (sv) sv.textContent = '$' + Number(supply?.value).toFixed(1) + 'B';
+    const yv = document.getElementById('estYieldV'); if (yv) yv.textContent = Number(yieldR?.value).toFixed(1) + '%';
+    const shv = document.getElementById('estShareV'); if (shv) shv.textContent = share?.value + '%';
+    const o = document.getElementById('estOut'); if (o) o.textContent = '$' + (out / 1e6).toFixed(0) + 'M';
+  }
+  [supply, yieldR, share].forEach((el) => el?.addEventListener('input', recalc));
+  recalc();
+
+  // Copy buttons
+  document.querySelectorAll('.copy-btn').forEach((b) => {
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.getAttribute('data-addr') || '');
+        const t = b.textContent; b.textContent = 'Copied ✓'; b.classList.add('copied');
+        setTimeout(() => { b.textContent = t; b.classList.remove('copied'); }, 1500);
+      } catch {}
+    });
+  });
+</script>

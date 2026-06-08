@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Staking" path="/staking" description="HYPE staking on Hyperliquid — live APR, total staked, the validator set, and the unstaking queue.">
+  <section class="wrap section">
+    <span class="eyebrow">Staking · live</span>
+    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">Stake HYPE, <span class="prism-text">secure</span> the chain.</h1>
+    <p class="section-lede" style="font-size:16px">
+      Staking rewards scale inversely with the total amount staked — roughly <span class="mono">APR = 474 / √(total staked)</span> —
+      so the yield drifts as participation changes. Everything below is pulled live from the validator set.
+    </p>
+
+    <div class="grid grid-4" style="margin-top:28px">
+      <div class="card card-prism"><div class="stat-label">Total staked</div><div class="stat-value" data-live id="skTotal"></div><div class="stat-sub" id="skTotalSub">HYPE</div></div>
+      <div class="card"><div class="stat-label">Staking APR</div><div class="stat-value up" data-live id="skApr"></div><div class="stat-sub">reward rate</div></div>
+      <div class="card"><div class="stat-label">Active validators</div><div class="stat-value" data-live id="skVals"></div><div class="stat-sub">securing HYPE</div></div>
+      <div class="card"><div class="stat-label">Unstake queue</div><div class="stat-value" data-live id="skQueue"></div><div class="stat-sub" id="skQueueSub">pending</div></div>
+    </div>
+  </section>
+
+  <section class="wrap section-sm">
+    <h2 style="font-size:20px;margin-bottom:14px">Validators <span class="dim mono" style="font-size:12px;font-weight:400">by stake</span></h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-head vt-grid">
+        <span>Validator</span><span class="r">Stake (HYPE)</span><span class="r">Share</span><span class="r">Commission</span><span class="r">Status</span>
+      </div>
+      <div id="validatorList"><div class="tbl-loading">Loading validators…</div></div>
+    </div>
+  </section>
+
+  <section class="wrap section-sm">
+    <h2 style="font-size:20px;margin-bottom:14px">Unstaking queue</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-head q-grid"><span>Address</span><span class="r">Amount (HYPE)</span><span class="r">Unlocks</span></div>
+      <div id="queueTable"><div class="tbl-loading">Loading queue…</div></div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .tbl-head { display: grid; gap: 8px; padding: 12px 18px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .vt-grid, :global(.vt-row) { grid-template-columns: 2fr 1.2fr 0.8fr 1fr 0.9fr; }
+  .q-grid, :global(.q-row) { grid-template-columns: 1.6fr 1fr 1fr; }
+  .tbl-loading { padding: 18px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+  :global(.vt-row), :global(.q-row) { display: grid; gap: 8px; padding: 12px 18px; font-family: var(--font-mono); font-size: 12.5px; border-bottom: 1px solid var(--border); align-items: center; }
+  :global(.vt-row:last-child), :global(.q-row:last-child) { border-bottom: none; }
+  :global(.vt-row:hover), :global(.q-row:hover) { background: var(--surface-2); }
+  :global(.r) { text-align: right; }
+  :global(.v-name) { color: var(--text-bright); font-family: var(--font-sans); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :global(.v-active) { color: var(--up); }
+  :global(.v-jailed) { color: var(--down); }
+</style>
+
+<script>
+  import { hlInfo, hsGet, hypeMarket, stakeDivisor, F, setText } from '../lib/hl';
+
+  async function loadStaking() {
+    let total = 0, count = 0, price: number | null = null;
+    try { price = (await hypeMarket()).price; } catch {}
+
+    // Validators
+    try {
+      const vals = await hlInfo<any[]>({ type: 'validatorSummaries' });
+      if (Array.isArray(vals) && vals.length) {
+        let rawSum = 0;
+        vals.forEach((v) => (rawSum += parseFloat(v.stake || 0)));
+        const div = stakeDivisor(rawSum);
+        const norm = vals.map((v) => ({
+          name: v.name || F.addr(v.validator || ''),
+          stake: parseFloat(v.stake || 0) / div,
+          commission: v.commission,
+          jailed: !!v.isJailed,
+          active: v.isActive !== false && !v.isJailed,
+        }));
+        norm.forEach((v) => (total += v.stake));
+        count = norm.filter((v) => v.active).length;
+        norm.sort((a, b) => b.stake - a.stake);
+
+        const el = document.getElementById('validatorList');
+        if (el) {
+          el.innerHTML = norm.slice(0, 25).map((v) => {
+            const share = total > 0 ? (v.stake / total) * 100 : 0;
+            let comm = '—';
+            const c = parseFloat(v.commission);
+            if (isFinite(c)) comm = (c < 1 ? c * 100 : c).toFixed(1) + '%';
+            const status = v.jailed ? '<span class="v-jailed">Jailed</span>' : '<span class="v-active">● Active</span>';
+            return `<div class="vt-row"><span class="v-name">${v.name}</span><span class="r">${F.f2(v.stake)}</span><span class="r">${share.toFixed(2)}%</span><span class="r">${comm}</span><span class="r">${status}</span></div>`;
+          }).join('');
+        }
+      }
+    } catch (e) {
+      const el = document.getElementById('validatorList');
+      if (el) el.innerHTML = '<div class="tbl-loading">Couldn’t load validators right now.</div>';
+    }
+
+    setText('skTotal', F.c(total));
+    setText('skVals', String(count || '—'));
+    if (price && total) setText('skTotalSub', F.uc(total * price));
+
+    // APR — try stakingSummary, else formula
+    let apr: number | null = null;
+    try {
+      const s = await hlInfo<any>({ type: 'stakingSummary' });
+      const a = parseFloat(s?.apr);
+      if (isFinite(a)) apr = a < 1 ? a : a / 100;
+      if (apr == null && s?.rewardsRate) { const rr = parseFloat(s.rewardsRate); if (isFinite(rr)) apr = rr; }
+    } catch {}
+    if (apr == null && total > 0) apr = 474 / Math.sqrt(total);
+    setText('skApr', apr != null ? (apr * 100).toFixed(2) + '%' : '—');
+
+    // Queue
+    try {
+      let q = await hsGet<any[]>('/fullUnstakingQueue');
+      if (!Array.isArray(q) || !q.length) q = await hsGet<any[]>('/unstakingQueue');
+      const el = document.getElementById('queueTable');
+      if (Array.isArray(q) && q.length) {
+        let qTotal = 0;
+        const rows = q.slice(0, 30).map((item) => {
+          const amt = parseFloat(item.amount ?? item.wei ?? item.stake ?? 0);
+          qTotal += isFinite(amt) ? amt : 0;
+          const user = item.user || item.address || item.delegator || '';
+          const ts = Number(item.lockedUntilTimestamp ?? item.time ?? item.timestamp ?? 0);
+          const when = ts > 1e12 ? new Date(ts).toLocaleDateString() : ts > 1e9 ? new Date(ts * 1000).toLocaleDateString() : '—';
+          return `<div class="q-row"><span class="mono dim">${F.addr(user)}</span><span class="r">${F.f2(amt)}</span><span class="r dim">${when}</span></div>`;
+        }).join('');
+        if (el) el.innerHTML = rows;
+        setText('skQueue', String(q.length));
+        setText('skQueueSub', F.c(qTotal) + ' HYPE');
+      } else {
+        if (el) el.innerHTML = '<div class="tbl-loading">The unstaking queue is currently empty.</div>';
+        setText('skQueue', '0');
+        setText('skQueueSub', 'empty');
+      }
+    } catch {
+      setText('skQueue', '—');
+    }
+  }
+
+  loadStaking();
+  setInterval(loadStaking, 60000);
+</script>

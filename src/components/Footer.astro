@@ -1,0 +1,50 @@
+---
+import { SITE, NAV } from '../lib/site';
+import PrismLogo from './PrismLogo.astro';
+const year = new Date().getFullYear();
+---
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <a href="/" class="brand" style="display:inline-flex;align-items:center;gap:10px">
+        <PrismLogo size={24} />
+        <span style="font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--text-bright)">HYPE<span class="prism-text">SITE</span></span>
+      </a>
+      <p style="margin-top:12px;max-width:34ch;color:var(--text-dim)">{SITE.tagline}. Independent analytics — not affiliated with Hyperliquid.</p>
+    </div>
+
+    <nav class="foot-col" aria-label="Sections">
+      <h4 class="foot-h">Terminal</h4>
+      {NAV.slice(0, 5).map((n) => <a href={n.href}>{n.label}</a>)}
+    </nav>
+    <nav class="foot-col" aria-label="More">
+      <h4 class="foot-h">More</h4>
+      {NAV.slice(5).map((n) => <a href={n.href}>{n.label}</a>)}
+      <a href="/indicators">Prism Indicators</a>
+    </nav>
+    <div class="foot-col">
+      <h4 class="foot-h">Data</h4>
+      <span class="dim">Hyperliquid API</span>
+      <span class="dim">CoinGecko</span>
+      <span class="dim">HypurrScan</span>
+    </div>
+  </div>
+
+  <div class="wrap foot-bottom">
+    <span>© {year} {SITE.name}</span>
+    <span class="dim">Not financial advice. Crypto is volatile and high-risk. Always do your own research.</span>
+  </div>
+</footer>
+
+<style>
+  .foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 28px; }
+  .foot-col { display: flex; flex-direction: column; gap: 9px; }
+  .foot-col a { color: var(--text-mid); }
+  .foot-h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .foot-bottom {
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 11.5px;
+  }
+  @media (max-width: 760px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
+</style>

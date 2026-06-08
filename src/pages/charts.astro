@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const chartConfig = {
+  autosize: true,
+  symbol: 'MEXC:HYPEUSDT',
+  interval: '240',
+  timezone: 'Etc/UTC',
+  theme: 'dark',
+  style: '1',
+  locale: 'en',
+  backgroundColor: '#0f121a',
+  gridColor: 'rgba(255,255,255,0.035)',
+  hide_top_toolbar: false,
+  allow_symbol_change: true,
+  calendar: false,
+  support_host: 'https://www.tradingview.com',
+};
+---
+<Layout title="Charts" path="/charts" description="Live HYPE price charts with TradingView, plus the Prism indicator toolkit.">
+  <section class="wrap section">
+    <div class="ch-head">
+      <div>
+        <span class="eyebrow">Live charting · TradingView</span>
+        <h1 class="section-title" style="font-size:clamp(30px,4vw,46px)">HYPE, on a real chart.</h1>
+      </div>
+      <a href="/indicators" class="btn btn-primary">Add the Prism toolkit →</a>
+    </div>
+    <p class="section-lede">Full TradingView charting below. Apply the <a href="/indicators" style="color:var(--accent)">Prism indicators</a> to this chart once you have access. Symbol is configurable — change it from the chart toolbar.</p>
+
+    <div class="card chart-wrap">
+      <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+        <script is:inline type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async set:html={JSON.stringify(chartConfig)}></script>
+      </div>
+    </div>
+    <p class="dim mono" style="font-size:11px;margin-top:10px">Chart by TradingView. If the default symbol doesn't load on your region's data feed, use the symbol search in the chart toolbar.</p>
+  </section>
+</Layout>
+
+<style>
+  .ch-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
+  .chart-wrap { margin-top: 24px; padding: 8px; height: 600px; }
+  .tradingview-widget-container { border-radius: var(--r-sm); overflow: hidden; }
+  @media (max-width: 640px) { .chart-wrap { height: 460px; } }
+</style>

@@ -1,0 +1,215 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Live Trades" path="/trades" description="Real-time Hyperliquid trade feed with buy/sell flow intelligence and large-order highlighting.">
+  <section class="wrap section">
+    <div class="lt-head">
+      <div>
+        <span class="eyebrow">Order flow · live</span>
+        <h1 class="section-title" style="font-size:clamp(30px,4.5vw,48px)">Watch the tape.</h1>
+      </div>
+      <div class="tf-btns" role="tablist">
+        <button class="tf-btn active" data-win="5">5m</button>
+        <button class="tf-btn" data-win="15">15m</button>
+        <button class="tf-btn" data-win="60">1h</button>
+        <button class="tf-btn" data-win="240">4h</button>
+      </div>
+    </div>
+    <p class="section-lede">Streaming straight from the Hyperliquid websocket across 25 perp markets. <span class="badge badge-live" style="margin-left:6px"><span class="dot"></span><span id="wsStatus">connecting…</span></span></p>
+
+    <div class="grid grid-3" style="margin-top:24px">
+      <div class="card card-prism" style="grid-column:span 1">
+        <div class="stat-label" id="tfNetLbl">Net flow (5m)</div>
+        <div class="stat-value" id="tfNet">—</div>
+        <div class="bar2" style="margin-top:12px"><div class="bar2-buy" id="prBuy" style="width:50%"></div><div class="bar2-sell" id="prSell" style="width:50%"></div></div>
+        <div class="stat-sub" id="tfPressure">—</div>
+      </div>
+      <div class="card"><div class="stat-label">Buy volume</div><div class="stat-value up" id="tfBuy">—</div><div class="stat-sub" id="tfCountLbl">trades (5m)</div></div>
+      <div class="card"><div class="stat-label">Sell volume</div><div class="stat-value down" id="tfSell">—</div><div class="stat-sub"><span id="tfCount">—</span> · ratio <span id="tfRatio">—</span></div></div>
+    </div>
+
+    <h2 style="font-size:18px;margin:30px 0 14px">Flow by market</h2>
+    <div id="coinFlowCards" class="grid grid-4"><div class="card"><span class="lt-loading">Collecting…</span></div></div>
+
+    <div class="card" style="margin-top:24px;padding:0;overflow:hidden">
+      <div class="feed-hdr">
+        <span class="chart-title">Filtered tape</span>
+        <span class="dim mono" style="font-size:10px">$500+ · 🐟 $10K · 🐋 $100K · 💰💰💰 $500K</span>
+      </div>
+      <div class="tbl-head t-grid"><span>Coin</span><span>Side</span><span class="r">Price</span><span class="r">Size</span><span class="r">Notional</span><span class="r">Time</span></div>
+      <div class="feed-scroll"><div id="liveTrades"><div class="lt-loading">Connecting to the tape…</div></div></div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .lt-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .tf-btns { display: inline-flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+  .tf-btn { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); padding: 6px 13px; border-radius: 999px; transition: all 0.2s; }
+  .tf-btn.active { color: #06120f; background: var(--accent); font-weight: 600; }
+  .bar2 { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--surface-3); }
+  .bar2-buy { background: var(--up); transition: width 0.5s var(--ease); }
+  .bar2-sell { background: var(--down); transition: width 0.5s var(--ease); }
+  .lt-loading { padding: 18px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+  .feed-hdr { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .chart-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--text-bright); }
+  .feed-scroll { max-height: 460px; overflow-y: auto; }
+  .tbl-head { display: grid; gap: 8px; padding: 10px 18px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .t-grid, :global(.t-row) { grid-template-columns: 1.3fr 0.8fr 1fr 0.9fr 1fr 0.8fr; }
+  :global(.t-row) { display: grid; gap: 8px; padding: 8px 18px; font-family: var(--font-mono); font-size: 12px; border-bottom: 1px solid var(--border); align-items: center; }
+  :global(.t-row:last-child) { border-bottom: none; }
+  :global(.r) { text-align: right; }
+  :global(.t-buy) { color: var(--up); }
+  :global(.t-sell) { color: var(--down); }
+  :global(.cf-card) { padding: 13px; }
+  :global(.cf-net) { font-family: var(--font-mono); font-weight: 700; font-size: 15px; margin: 5px 0; }
+  :global(.cf-bar) { display: flex; height: 4px; border-radius: 2px; overflow: hidden; margin: 5px 0; }
+  :global(.cf-foot) { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; }
+</style>
+
+<script>
+  import { WS_URL, F } from '../lib/hl';
+
+  const WS_COINS = ['BTC','ETH','HYPE','SOL','FARTCOIN','XRP','DOGE','SUI','AVAX','LINK','PAXG','PEPE','WIF','ARB','OP','TIA','BONK','INJ','SEI','ONDO','JUP','PUMP','PENGU','XAU','XAG'];
+  type Trade = { coin: string; side: string; px: number; sz: number; time: number; usd: number };
+
+  let ws: WebSocket | null = null, reconnects = 0;
+  let live: Trade[] = [];          // displayed ($500+), max 40
+  let pending: Trade[] = [];
+  let buffer: Trade[] = [];        // all trades, up to 4h
+  let lastShown: Record<string, number> = {};
+  let windowMin = 5;
+  let renderTimer: any = null;
+
+  const $ = (id: string) => document.getElementById(id);
+  function status(s: string) { const e = $('wsStatus'); if (e) e.textContent = s; }
+
+  function connect() {
+    if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+    try {
+      ws = new WebSocket(WS_URL);
+      ws.onopen = () => {
+        reconnects = 0; status('live');
+        ws!.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'allMids' } }));
+        WS_COINS.forEach((c) => ws!.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin: c } })));
+      };
+      ws.onmessage = (evt) => {
+        try {
+          const m = JSON.parse(evt.data);
+          if (m.channel === 'trades' && Array.isArray(m.data)) processTrades(m.data);
+        } catch {}
+      };
+      ws.onclose = () => { status('reconnecting…'); reconnect(); };
+      ws.onerror = () => { status('error'); };
+    } catch { reconnect(); }
+  }
+  function reconnect() {
+    reconnects++;
+    const delay = Math.min(15000, 1000 * reconnects);
+    setTimeout(connect, delay);
+  }
+
+  function processTrades(trades: any[]) {
+    const now = Date.now();
+    for (const t of trades) {
+      const rec: Trade = { coin: t.coin || '?', side: t.side || '?', px: parseFloat(t.px || 0), sz: parseFloat(t.sz || 0), time: t.time || now, usd: parseFloat(t.px || 0) * parseFloat(t.sz || 0) };
+      buffer.push(rec);
+      if (rec.usd >= 500) {
+        const key = rec.coin + rec.side;
+        if (now - (lastShown[key] || 0) > 200) { pending.push(rec); lastShown[key] = now; }
+      }
+    }
+    const cutoff = now - 14400000;
+    if (buffer.length > 6000) buffer = buffer.filter((t) => t.time >= cutoff);
+    if (!renderTimer) renderTimer = setTimeout(flush, 500);
+  }
+
+  function flush() {
+    renderTimer = null;
+    for (const t of pending) live.unshift(t);
+    pending = [];
+    if (live.length > 40) live.length = 40;
+    renderFeed(); renderStats(); renderCoinFlow();
+  }
+
+  function renderFeed() {
+    const el = $('liveTrades'); if (!el) return;
+    if (!live.length) { el.innerHTML = '<div class="lt-loading">Waiting for $500+ trades…</div>'; return; }
+    el.innerHTML = live.map((t) => {
+      const buy = t.side === 'B';
+      const cls = buy ? 't-buy' : 't-sell';
+      const emoji = t.usd >= 500000 ? ' 💰💰💰' : t.usd >= 100000 ? ' 🐋' : t.usd >= 10000 ? ' 🐟' : '';
+      const bg = t.usd >= 10000 ? `background:${buy ? 'rgba(47,224,138,0.06)' : 'rgba(255,77,106,0.06)'}` : '';
+      const px = t.px < 1 ? '$' + F.f4(t.px) : '$' + F.f2(t.px);
+      return `<div class="t-row" style="${bg}"><span>${t.coin}${emoji}</span><span class="${cls}">${buy ? '▲ BUY' : '▼ SELL'}</span><span class="r dim">${px}</span><span class="r">${F.c(t.sz)}</span><span class="r ${cls}">$${F.c(t.usd)}</span><span class="r dim">${F.time(t.time)}</span></div>`;
+    }).join('');
+  }
+
+  function windowTrades() {
+    const cutoff = Date.now() - windowMin * 60000;
+    return buffer.filter((t) => t.time >= cutoff);
+  }
+
+  function renderStats() {
+    const recent = windowTrades();
+    let buyVol = 0, sellVol = 0, n = 0;
+    for (const t of recent) { if (t.side === 'B') buyVol += t.usd; else sellVol += t.usd; n++; }
+    const net = buyVol - sellVol, total = buyVol + sellVol;
+    const ratio = sellVol > 0 ? buyVol / sellVol : buyVol > 0 ? 99 : 1;
+    const buyPct = total > 0 ? (buyVol / total) * 100 : 50;
+
+    const netEl = $('tfNet');
+    if (netEl) { netEl.textContent = (net >= 0 ? '+' : '-') + '$' + F.c(Math.abs(net)); netEl.className = 'stat-value ' + (net > 0 ? 'up' : net < 0 ? 'down' : ''); }
+    $('tfBuy') && ($('tfBuy')!.textContent = '$' + F.c(buyVol));
+    $('tfSell') && ($('tfSell')!.textContent = '$' + F.c(sellVol));
+    $('tfCount') && ($('tfCount')!.textContent = String(n));
+    const rEl = $('tfRatio'); if (rEl) { rEl.textContent = ratio.toFixed(2) + 'x'; }
+    const pb = $('prBuy'), ps = $('prSell');
+    if (pb) (pb as HTMLElement).style.width = buyPct.toFixed(1) + '%';
+    if (ps) (ps as HTMLElement).style.width = (100 - buyPct).toFixed(1) + '%';
+    const prEl = $('tfPressure');
+    if (prEl) {
+      let lbl, color;
+      if (buyPct > 65) { lbl = '🟢 Strong buy'; color = 'var(--up)'; }
+      else if (buyPct > 55) { lbl = '📈 Buying'; color = 'var(--up)'; }
+      else if (buyPct < 35) { lbl = '🔴 Strong sell'; color = 'var(--down)'; }
+      else if (buyPct < 45) { lbl = '📉 Selling'; color = 'var(--down)'; }
+      else { lbl = '⟺ Neutral'; color = 'var(--text-dim)'; }
+      prEl.textContent = `${lbl} (${buyPct.toFixed(0)}%)`; prEl.style.color = color;
+    }
+  }
+
+  function renderCoinFlow() {
+    const el = $('coinFlowCards'); if (!el) return;
+    const recent = windowTrades();
+    const byC: Record<string, { buy: number; sell: number; count: number }> = {};
+    for (const t of recent) {
+      (byC[t.coin] ||= { buy: 0, sell: 0, count: 0 });
+      if (t.side === 'B') byC[t.coin].buy += t.usd; else byC[t.coin].sell += t.usd;
+      byC[t.coin].count++;
+    }
+    const hype = byC['HYPE'];
+    const others = Object.entries(byC).filter(([c]) => c !== 'HYPE').map(([c, d]) => ({ c, ...d, total: d.buy + d.sell })).filter((x) => x.total > 100).sort((a, b) => b.total - a.total).slice(0, 7);
+    const list = [{ c: 'HYPE', ...(hype || { buy: 0, sell: 0, count: 0 }), total: (hype?.buy || 0) + (hype?.sell || 0) }, ...others];
+    el.innerHTML = list.map(({ c, buy, sell, count, total }) => {
+      const buyPct = total > 0 ? (buy / total) * 100 : 50;
+      const net = buy - sell;
+      const col = net > 0 ? 'var(--up)' : net < 0 ? 'var(--down)' : 'var(--text-dim)';
+      return `<div class="card cf-card"><div class="stat-label">${c}</div><div class="cf-net" style="color:${col}">${net >= 0 ? '+' : ''}$${F.c(Math.abs(net))}</div><div class="cf-bar"><div style="width:${buyPct}%;background:var(--up)"></div><div style="width:${100 - buyPct}%;background:var(--down)"></div></div><div class="cf-foot"><span class="up">${buyPct.toFixed(0)}%</span><span class="dim">${count}</span><span class="down">${(100 - buyPct).toFixed(0)}%</span></div></div>`;
+    }).join('');
+  }
+
+  // window buttons
+  document.querySelectorAll('.tf-btn').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tf-btn').forEach((x) => x.classList.remove('active'));
+    b.classList.add('active');
+    windowMin = Number(b.getAttribute('data-win')) || 5;
+    const lbl = windowMin >= 60 ? windowMin / 60 + 'h' : windowMin + 'm';
+    $('tfNetLbl') && ($('tfNetLbl')!.textContent = `Net flow (${lbl})`);
+    $('tfCountLbl') && ($('tfCountLbl')!.textContent = `trades (${lbl})`);
+    renderStats(); renderCoinFlow();
+  }));
+
+  connect();
+  setInterval(() => { renderStats(); renderCoinFlow(); }, 1500);
+</script>

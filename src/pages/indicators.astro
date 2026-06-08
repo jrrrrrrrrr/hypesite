@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Checkout from '../components/Checkout.astro';
+import { INDICATORS } from '../lib/indicators';
+import { SITE } from '../lib/site';
+
+function cta(ind: typeof INDICATORS[number]) {
+  if (ind.buyUrl) {
+    const price = ind.price != null ? `Get access · $${ind.price}` : 'Get access';
+    return { label: price, href: ind.buyUrl, primary: true };
+  }
+  return { label: 'Request access', href: SITE.tradingviewProfile, primary: true };
+}
+---
+<Layout title="Prism Indicators" path="/indicators" description="The Prism suite of TradingView indicators by jrrrrrr — Auto Fib Engine, Prism VRVP, Prism Arc and Prism Coil. Buy access and receive a private TradingView invite.">
+  <section class="wrap section">
+    <span class="eyebrow">Prism suite · TradingView</span>
+    <h1 class="section-title" style="font-size:clamp(34px,5vw,60px)">Trade with the <span class="prism-text">Prism</span> toolkit.</h1>
+    <p class="section-lede" style="font-size:17px">
+      A focused set of TradingView indicators built and maintained on this desk — volume profile, automatic
+      Fibonacci, macro growth arcs and volatility compression. Buy access once and receive a private invite to
+      the script on your TradingView account.
+    </p>
+    <div class="hiw">
+      <span class="hiw-step"><b>01</b> Purchase access</span>
+      <span class="hiw-arrow">→</span>
+      <span class="hiw-step"><b>02</b> Send your TradingView username</span>
+      <span class="hiw-arrow">→</span>
+      <span class="hiw-step"><b>03</b> Invite added to your account</span>
+    </div>
+  </section>
+
+  <section class="wrap section-sm">
+    <div class="grid grid-2">
+      {INDICATORS.map((ind) => {
+        const action = cta(ind);
+        return (
+          <article class="card card-hover ind-card" style={`--ac:${ind.accent}`}>
+            <a class="ind-shot" href={ind.tvUrl} target="_blank" rel="noopener" aria-label={`${ind.name} on TradingView`}>
+              <img src={ind.image} alt={`${ind.name} chart`} loading="lazy" />
+              <span class="ind-shot-badge">{ind.badge}</span>
+            </a>
+            <div class="ind-content">
+              <div class="ind-titlerow">
+                <h2 class="ind-name">{ind.name}</h2>
+                <span class="ind-price mono">{ind.price != null ? `$${ind.price}` : 'Contact'}</span>
+              </div>
+              <p class="ind-tagline">{ind.tagline}</p>
+              <p class="ind-desc">{ind.description}</p>
+              <ul class="ind-features">
+                {ind.features.map((f) => <li>{f}</li>)}
+              </ul>
+              <div class="ind-tags">
+                {ind.tags.map((t) => <span class="tag-chip">{t}</span>)}
+              </div>
+              <div class="ind-actions">
+                <button class="btn btn-primary" data-checkout data-id={ind.id} data-name={ind.name} data-price={ind.price ?? ''} data-buy={ind.buyUrl} data-tv={ind.tvUrl}>{action.label}</button>
+                <a class="btn btn-ghost" href={ind.tvUrl} target="_blank" rel="noopener">View on TradingView ↗</a>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <section class="wrap section-sm">
+    <div class="card card-prism suite-cta">
+      <div>
+        <h3 style="font-size:22px;margin-bottom:6px">Want the full Prism suite?</h3>
+        <p class="section-lede">Bundle access to every indicator, with priority support and new releases included.</p>
+      </div>
+      <a class="btn btn-primary" href={SITE.tradingviewProfile} target="_blank" rel="noopener">Get in touch →</a>
+    </div>
+    <p class="dim mono" style="font-size:11px;margin-top:14px;text-align:center">
+      Indicators are tools, not signals. Nothing here is financial advice. Past performance does not guarantee future results.
+    </p>
+  </section>
+
+  <Checkout />
+</Layout>
+
+<style>
+  .hiw { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 26px; }
+  .hiw-step { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-mid); display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+  .hiw-step b { color: var(--accent); }
+  .hiw-arrow { color: var(--text-faint); }
+
+  .ind-card { padding: 0; overflow: hidden; --ac: var(--accent); }
+  .ind-shot { display: block; position: relative; aspect-ratio: 16 / 9; background: var(--bg-2); border-bottom: 1px solid var(--border); overflow: hidden; }
+  .ind-shot img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+  .ind-shot:hover img { transform: scale(1.04); }
+  .ind-shot::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--ac); opacity: 0.9; }
+  .ind-shot-badge { position: absolute; top: 12px; left: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; color: #06120f; background: var(--ac); font-weight: 700; }
+
+  .ind-content { padding: 22px; }
+  .ind-titlerow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .ind-name { font-size: 23px; }
+  .ind-price { font-size: 15px; color: var(--text-mid); }
+  .ind-tagline { color: var(--text-bright); font-weight: 500; margin: 8px 0 10px; font-size: 14.5px; }
+  .ind-desc { color: var(--text-mid); font-size: 13.5px; line-height: 1.65; }
+  .ind-features { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 16px 0; }
+  .ind-features li { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-mid); padding-left: 16px; position: relative; }
+  .ind-features li::before { content: '✦'; position: absolute; left: 0; color: var(--ac); font-size: 10px; top: 1px; }
+  .ind-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tag-chip { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px; }
+  .ind-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .suite-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px; flex-wrap: wrap; }
+</style>

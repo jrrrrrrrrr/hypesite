@@ -1,0 +1,128 @@
+---
+import PrismLogo from './PrismLogo.astro';
+import { NAV, SITE } from '../lib/site';
+interface Props { path?: string; }
+const { path = '/' } = Astro.props;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="/" class="brand" aria-label={`${SITE.name} home`}>
+      <PrismLogo size={28} />
+      <span class="brand-name">HYPE<span class="prism-text">SITE</span></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      {NAV.map((item) => (
+        <a href={item.href} class:list={['nav-link', { active: isActive(item.href) }]}>
+          {item.label}
+          {item.tag && <span class="nav-tag">{item.tag}</span>}
+        </a>
+      ))}
+    </nav>
+
+    <div class="nav-right">
+      <a href="/" class="ticker" id="hypeTicker" title="HYPE price (live)">
+        <span class="dot"></span>
+        <span class="ticker-sym">HYPE</span>
+        <span class="ticker-price mono" data-live id="tkPrice"></span>
+        <span class="ticker-chg mono" id="tkChg"></span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    {NAV.map((item) => (
+      <a href={item.href} class:list={['m-link', { active: isActive(item.href) }]}>
+        {item.label}{item.tag && <span class="nav-tag">{item.tag}</span>}
+      </a>
+    ))}
+    <a href="/indicators" class="btn btn-primary" style="margin-top:8px">Shop Prism Indicators →</a>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    height: var(--nav-h);
+    backdrop-filter: blur(14px);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { height: 100%; display: flex; align-items: center; gap: 18px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.03em; color: var(--text-bright); }
+  .nav-links { display: flex; align-items: center; gap: 2px; margin-left: 6px; flex: 1; overflow: hidden; }
+  .nav-link {
+    font-size: 13.5px; font-weight: 500; color: var(--text-mid);
+    padding: 7px 11px; border-radius: 8px; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .nav-link:hover { color: var(--text-bright); background: var(--surface-2); }
+  .nav-link.active { color: var(--text-bright); }
+  .nav-tag {
+    font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 5px; border-radius: 5px; color: var(--accent);
+    background: rgba(40, 224, 200, 0.1); border: 1px solid rgba(40, 224, 200, 0.2);
+  }
+  .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ticker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border-bright);
+    background: var(--surface); font-size: 12.5px;
+  }
+  .ticker:hover { border-color: var(--accent); }
+  .ticker-sym { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .ticker-price { font-weight: 600; color: var(--text-bright); }
+  .ticker-chg { font-size: 11.5px; }
+  .menu-btn { display: none; font-size: 20px; color: var(--text-mid); padding: 4px 8px; }
+  .mobile-menu { display: none; flex-direction: column; gap: 4px; padding: 14px 24px 20px; border-bottom: 1px solid var(--border); background: var(--bg-2); }
+  .mobile-menu.open { display: flex; }
+  .m-link { padding: 10px 4px; color: var(--text-mid); font-weight: 500; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+  .m-link.active { color: var(--text-bright); }
+
+  @media (max-width: 1080px) {
+    .nav-links { display: none; }
+    .menu-btn { display: inline-flex; }
+  }
+  @media (max-width: 600px) {
+    .ticker-sym { display: none; }
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  const btn = document.getElementById('menuBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn?.addEventListener('click', () => {
+    const open = menu?.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(!!open));
+    btn.textContent = open ? '✕' : '☰';
+  });
+
+  // Live HYPE ticker (CoinGecko via our proxy)
+  async function loadTicker() {
+    try {
+      const r = await fetch('/api/cg?id=hyperliquid');
+      if (!r.ok) return;
+      const arr = await r.json();
+      const d = Array.isArray(arr) ? arr[0] : null;
+      if (!d) return;
+      const price = Number(d.current_price);
+      const chg = Number(d.price_change_percentage_24h);
+      const pEl = document.getElementById('tkPrice');
+      const cEl = document.getElementById('tkChg');
+      if (pEl && isFinite(price)) {
+        pEl.textContent = '$' + price.toLocaleString('en-US', { maximumFractionDigits: price < 10 ? 4 : 2 });
+      }
+      if (cEl && isFinite(chg)) {
+        cEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+        cEl.classList.add(chg >= 0 ? 'up' : 'down');
+      }
+    } catch {}
+  }
+  loadTicker();
+  setInterval(loadTicker, 30000);
+</script>

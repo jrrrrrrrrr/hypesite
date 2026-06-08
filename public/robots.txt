@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hype-site.com/sitemap-index.xml

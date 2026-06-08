@@ -1,0 +1,221 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { INDICATORS } from '../lib/indicators';
+import { TREASURY_ADDRESSES } from '../lib/site';
+import { shortAddr } from '../lib/format';
+const featured = INDICATORS.slice(0, 4);
+---
+<Layout path="/">
+  <!-- ============ HERO ============ -->
+  <section class="hero wrap">
+    <div class="hero-copy reveal">
+      <span class="eyebrow">Hyperliquid · Live intelligence</span>
+      <h1 class="hero-title">
+        The <span class="prism-text">Hyperliquid</span><br />
+        intelligence terminal.
+      </h1>
+      <p class="section-lede" style="margin-top:18px">
+        Real-time HYPE price, perp volume and open interest, the fee buyback engine,
+        the new <a href="/treasury" style="color:var(--accent)">AQAv2 USDC treasury</a>, staking and HIP-3 markets —
+        plus the <a href="/indicators" style="color:var(--accent)">Prism</a> suite of TradingView indicators.
+      </p>
+      <div class="hero-cta">
+        <a href="/treasury" class="btn btn-primary">Explore the AQAv2 treasury →</a>
+        <a href="/indicators" class="btn">Shop Prism indicators</a>
+      </div>
+    </div>
+
+    <div class="hero-price card card-prism reveal" style="animation-delay:.08s">
+      <div class="hp-top">
+        <span class="badge badge-live"><span class="dot"></span>Live</span>
+        <span class="stat-label">HYPE / USD</span>
+      </div>
+      <div class="hp-price mono" data-live id="ovPrice"></div>
+      <div class="hp-chg mono" id="ovChg"></div>
+      <div class="hp-mini">
+        <div><span class="stat-label">Mkt cap</span><span class="mono" data-live id="ovMcap"></span></div>
+        <div><span class="stat-label">24h vol</span><span class="mono" data-live id="ovCgVol"></span></div>
+        <div><span class="stat-label">ATH</span><span class="mono" data-live id="ovAth"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MARKET STATS ============ -->
+  <section class="wrap section-sm">
+    <div class="grid grid-4">
+      <div class="card"><div class="stat-label">Perp volume · 24h</div><div class="stat-value" data-live id="ovPerpVol"></div><div class="stat-sub">Σ all Hyperliquid perps</div></div>
+      <div class="card"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="ovOi"></div><div class="stat-sub">notional, USD</div></div>
+      <div class="card"><div class="stat-label">Circulating</div><div class="stat-value" data-live id="ovSupply"></div><div class="stat-sub">of 1B max HYPE</div></div>
+      <div class="card"><div class="stat-label">Perp markets</div><div class="stat-value" data-live id="ovMkts"></div><div class="stat-sub">listed on HL</div></div>
+    </div>
+  </section>
+
+  <!-- ============ BUYBACK MODEL ============ -->
+  <section class="wrap section">
+    <span class="eyebrow">Why HYPE is unusual</span>
+    <h2 class="section-title">Three structural buyers, running in parallel.</h2>
+    <p class="section-lede">Most tokens have one source of organic demand, if any. Hyperliquid wired up three — all funded by real activity, all buying continuously.</p>
+    <div class="grid grid-3" style="margin-top:26px">
+      <div class="card card-hover">
+        <div class="kn">01</div>
+        <h3 class="kt">Fee buybacks</h3>
+        <p class="kp">Roughly 97% of trading fees are converted into HYPE on an ongoing, mechanical basis via the Assistance Fund — a real fee-to-buyback engine, not a nominal promise.</p>
+        <a href="/burns" class="klink">Buyback tracker →</a>
+      </div>
+      <div class="card card-hover card-prism">
+        <div class="kn">02</div>
+        <h3 class="kt">AQAv2 reserve yield</h3>
+        <p class="kp">Under AQAv2, up to ~90% of the yield on USDC held on Hyperliquid flows back to the protocol — an estimated <span class="mid">$135–160M/yr</span> in additional buyback fuel at current rates.</p>
+        <a href="/treasury" class="klink">Treasury detail →</a>
+      </div>
+      <div class="card card-hover">
+        <div class="kn">03</div>
+        <h3 class="kt">ETF inflows</h3>
+        <p class="kp">US spot HYPE ETFs (Bitwise, 21Shares) plus a pending Grayscale filing add a third, structurally-additive source of buy-side pressure on the token.</p>
+        <a href="/ecosystem" class="klink">Ecosystem →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TREASURY CALLOUT ============ -->
+  <section class="wrap section-sm">
+    <div class="card card-prism treasury-callout">
+      <div>
+        <span class="eyebrow">New · since 14 May 2026</span>
+        <h2 style="font-size:clamp(22px,2.6vw,30px);margin:12px 0 8px">Coinbase is now Hyperliquid's official USDC treasury deployer.</h2>
+        <p class="section-lede">Coinbase deploys the USDC treasury and Circle runs the cross-chain (CCTP) rails, both staking HYPE to activate AQAv2 — while USDH is wound down. The deployer addresses are public and tracked here.</p>
+        <div class="addr-row">
+          {TREASURY_ADDRESSES.map((a) => (
+            <a class="addr mono" href={`https://blockscan.com/address/${a}`} target="_blank" rel="noopener" title={a}>{shortAddr(a)}</a>
+          ))}
+        </div>
+        <a href="/treasury" class="btn btn-primary" style="margin-top:18px">Open the treasury dashboard →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INDICATORS TEASER ============ -->
+  <section class="wrap section">
+    <div class="ind-head">
+      <div>
+        <span class="eyebrow">Prism suite · TradingView</span>
+        <h2 class="section-title">Indicators built on this desk.</h2>
+      </div>
+      <a href="/indicators" class="btn btn-ghost">View all →</a>
+    </div>
+    <div class="grid grid-4" style="margin-top:22px">
+      {featured.map((ind) => (
+        <a href="/indicators" class="card card-hover ind-mini" style={`--ac:${ind.accent}`}>
+          <div class="ind-mini-img"><img src={ind.image} alt={ind.name} loading="lazy" /></div>
+          <div class="ind-mini-body">
+            <span class="ind-badge">{ind.badge}</span>
+            <h3 class="ind-mini-name">{ind.name}</h3>
+            <p class="ind-mini-tag">{ind.tagline}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 40px; align-items: center; padding-top: 64px; padding-bottom: 28px; }
+  .hero-title { font-size: clamp(40px, 6vw, 76px); font-weight: 800; letter-spacing: -0.04em; }
+  .hero-cta { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+  .hero-price { padding: 26px; }
+  .hp-top { display: flex; align-items: center; justify-content: space-between; }
+  .hp-price { font-size: 52px; font-weight: 600; letter-spacing: -0.03em; margin-top: 14px; color: var(--text-bright); }
+  .hp-chg { font-size: 16px; margin-top: 2px; }
+  .hp-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .hp-mini > div { display: flex; flex-direction: column; gap: 4px; }
+  .hp-mini .mono { font-size: 14px; color: var(--text); }
+
+  .kn { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); letter-spacing: 0.1em; }
+  .kt { font-size: 19px; margin: 8px 0 8px; }
+  .kp { color: var(--text-mid); font-size: 14px; line-height: 1.65; }
+  .klink { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+
+  .treasury-callout { padding: 30px; }
+  .addr-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .addr { font-size: 12px; padding: 7px 11px; border-radius: 8px; border: 1px solid var(--border-bright); background: var(--surface-2); color: var(--text-mid); }
+  .addr:hover { border-color: var(--accent); color: var(--accent); }
+
+  .ind-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .ind-mini { padding: 0; overflow: hidden; --ac: var(--accent); }
+  .ind-mini-img { aspect-ratio: 16 / 9; overflow: hidden; background: var(--bg-2); border-bottom: 1px solid var(--border); }
+  .ind-mini-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
+  .ind-mini:hover .ind-mini-img img { transform: scale(1.05); }
+  .ind-mini-body { padding: 16px; }
+  .ind-badge { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ac); border: 1px solid color-mix(in srgb, var(--ac) 35%, transparent); padding: 2px 7px; border-radius: 5px; }
+  .ind-mini-name { font-size: 17px; margin: 10px 0 6px; }
+  .ind-mini-tag { font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+
+  @media (max-width: 920px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-price { max-width: 460px; }
+  }
+</style>
+
+<script>
+  function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+  function compactUsd(n) {
+    if (n == null || !isFinite(n)) return '—';
+    const a = Math.abs(n);
+    if (a >= 1e12) return '$' + (a / 1e12).toFixed(2) + 'T';
+    if (a >= 1e9) return '$' + (a / 1e9).toFixed(2) + 'B';
+    if (a >= 1e6) return '$' + (a / 1e6).toFixed(2) + 'M';
+    if (a >= 1e3) return '$' + (a / 1e3).toFixed(1) + 'K';
+    return '$' + a.toFixed(2);
+  }
+  function compact(n) {
+    if (n == null || !isFinite(n)) return '—';
+    const a = Math.abs(n);
+    if (a >= 1e9) return (a / 1e9).toFixed(2) + 'B';
+    if (a >= 1e6) return (a / 1e6).toFixed(2) + 'M';
+    if (a >= 1e3) return (a / 1e3).toFixed(1) + 'K';
+    return a.toLocaleString('en-US');
+  }
+
+  async function loadCg() {
+    try {
+      const r = await fetch('/api/cg?id=hyperliquid');
+      if (!r.ok) return;
+      const d = (await r.json())?.[0];
+      if (!d) return;
+      const price = Number(d.current_price);
+      setText('ovPrice', '$' + price.toLocaleString('en-US', { maximumFractionDigits: price < 10 ? 4 : 2 }));
+      const chg = Number(d.price_change_percentage_24h);
+      const c = document.getElementById('ovChg');
+      if (c && isFinite(chg)) { c.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%'; c.className = 'hp-chg mono ' + (chg >= 0 ? 'up' : 'down'); }
+      setText('ovMcap', compactUsd(Number(d.market_cap)));
+      setText('ovCgVol', compactUsd(Number(d.total_volume)));
+      setText('ovAth', '$' + Number(d.ath).toLocaleString('en-US', { maximumFractionDigits: 2 }));
+      setText('ovSupply', compact(Number(d.circulating_supply)));
+    } catch {}
+  }
+
+  async function loadPerps() {
+    try {
+      const r = await fetch('/api/hl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'metaAndAssetCtxs' }) });
+      if (!r.ok) return;
+      const data = await r.json();
+      const meta = data?.[0]?.universe ?? [];
+      const ctxs = data?.[1] ?? [];
+      let vol = 0, oi = 0;
+      for (let i = 0; i < ctxs.length; i++) {
+        const c = ctxs[i] || {};
+        const v = Number(c.dayNtlVlm); if (isFinite(v)) vol += v;
+        const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx);
+        if (isFinite(o) && isFinite(px)) oi += o * px;
+      }
+      setText('ovPerpVol', compactUsd(vol));
+      setText('ovOi', compactUsd(oi));
+      setText('ovMkts', String(meta.length || ctxs.length || '—'));
+    } catch {}
+  }
+
+  loadCg(); loadPerps();
+  setInterval(loadCg, 30000);
+  setInterval(loadPerps, 30000);
+</script>

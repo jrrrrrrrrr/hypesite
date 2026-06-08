@@ -1,0 +1,121 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="HIP-3 Markets" path="/hip3" description="HIP-3 builder-deployed perp markets on Hyperliquid — live volume, open interest, and per-DEX breakdown.">
+  <section class="wrap section">
+    <span class="eyebrow">HIP-3 · builder markets</span>
+    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">Permissionless <span class="prism-text">perp markets</span>.</h1>
+    <p class="section-lede" style="font-size:16px">
+      HIP-3 lets builders deploy their own perpetual markets on Hyperliquid — including pre-IPO equity perps for
+      names like SpaceX, OpenAI and Anthropic. Live aggregate activity across every HIP-3 DEX is below.
+    </p>
+
+    <div class="grid grid-3" style="margin-top:28px">
+      <div class="card card-prism"><div class="stat-label">Total HIP-3 volume · 24h</div><div class="stat-value" data-live id="hipVol"></div><div class="stat-sub" id="hipDexCount">across all DEXs</div></div>
+      <div class="card"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="hipOi"></div><div class="stat-sub">notional, USD</div></div>
+      <div class="card"><div class="stat-label">HYPE staked by deployers</div><div class="stat-value" data-live id="hipStaked"></div><div class="stat-sub">≈ 500K per DEX</div></div>
+    </div>
+  </section>
+
+  <section class="wrap section-sm">
+    <h2 style="font-size:20px;margin-bottom:14px">Builder DEX breakdown</h2>
+    <div id="hipDexCards" class="grid grid-2"><div class="card"><span class="tbl-loading">Loading HIP-3 DEXs…</span></div></div>
+  </section>
+
+  <section class="wrap section-sm">
+    <h2 style="font-size:20px;margin-bottom:14px">Top HIP-3 markets <span class="dim mono" style="font-size:12px;font-weight:400">by volume</span></h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tbl-head m-grid"><span>Market</span><span class="r">Volume</span><span class="r">OI</span><span class="r">Funding</span><span class="r">Price</span></div>
+      <div id="hipMarketsTable"><div class="tbl-loading">Loading markets…</div></div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .tbl-head { display: grid; gap: 8px; padding: 12px 18px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .m-grid, :global(.m-row) { grid-template-columns: 1.8fr 1fr 1fr 0.9fr 0.9fr; }
+  .tbl-loading { padding: 18px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+  :global(.m-row) { display: grid; gap: 8px; padding: 11px 18px; font-family: var(--font-mono); font-size: 12.5px; border-bottom: 1px solid var(--border); align-items: center; }
+  :global(.m-row:last-child) { border-bottom: none; }
+  :global(.m-row:hover) { background: var(--surface-2); }
+  :global(.r) { text-align: right; }
+  :global(.m-name) { color: var(--text-bright); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :global(.m-dex) { color: var(--text-faint); font-size: 10px; }
+  :global(.dex-card) { padding: 18px; }
+  :global(.dex-card h3) { font-size: 17px; }
+  :global(.dex-meta) { display: flex; gap: 18px; margin-top: 10px; font-family: var(--font-mono); font-size: 12px; }
+  :global(.dex-meta .v) { color: var(--text-bright); }
+  :global(.dex-assets) { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  :global(.dex-chip) { font-family: var(--font-mono); font-size: 10px; color: var(--text-mid); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px; }
+</style>
+
+<script>
+  import { hlInfo, F, setText } from '../lib/hl';
+
+  function funding(f: number): string {
+    if (!isFinite(f)) return '—';
+    const pct = f * 100;
+    const s = pct >= 0 ? '+' : '';
+    return `<span style="color:${pct >= 0 ? 'var(--up)' : 'var(--down)'}">${s}${pct.toFixed(4)}%</span>`;
+  }
+
+  async function load() {
+    let dexs: any[] = [];
+    try { dexs = await hlInfo<any[]>({ type: 'perpDexs' }); } catch {}
+    dexs = (Array.isArray(dexs) ? dexs : []).filter(Boolean).slice(0, 20);
+
+    if (!dexs.length) {
+      setText('hipVol', '—'); setText('hipOi', '—'); setText('hipStaked', '—');
+      const c = document.getElementById('hipDexCards'); if (c) c.innerHTML = '<div class="card"><span class="tbl-loading">No HIP-3 DEXs returned.</span></div>';
+      return;
+    }
+
+    const results = await Promise.all(dexs.map(async (dex) => {
+      try {
+        const md = await hlInfo<any[]>({ type: 'metaAndAssetCtxs', dex: dex.name });
+        const meta = md?.[0], ctxs = Array.isArray(md?.[1]) ? md![1] : [];
+        const universe = meta?.universe || meta || [];
+        let vol = 0, oi = 0, n = 0; const assets: any[] = [];
+        (Array.isArray(universe) ? universe : []).forEach((u: any, i: number) => {
+          const c = ctxs[i]; if (!c) return;
+          const mid = parseFloat(c.midPx ?? c.markPx ?? 0);
+          const a = { name: u.name || u.coin || 'Asset' + i, dex: dex.name, vol: parseFloat(c.dayNtlVlm ?? 0), oi: parseFloat(c.openInterest ?? 0) * mid, funding: parseFloat(c.funding ?? 0), px: mid };
+          vol += a.vol; oi += a.oi; n++;
+          if (a.vol > 0 || a.oi > 0) assets.push(a);
+        });
+        assets.sort((x, y) => y.vol - x.vol);
+        return { name: dex.name, fullName: dex.fullName || dex.name, deployer: dex.deployer || '', vol, oi, markets: n, assets };
+      } catch { return null; }
+    }));
+
+    const dexData = results.filter(Boolean).sort((a: any, b: any) => b.vol - a.vol) as any[];
+    let totalVol = 0, totalOI = 0;
+    dexData.forEach((d) => { totalVol += d.vol; totalOI += d.oi; });
+
+    setText('hipVol', F.uc(totalVol));
+    setText('hipOi', F.uc(totalOI));
+    setText('hipDexCount', dexData.length + ' active DEX' + (dexData.length === 1 ? '' : 's'));
+    setText('hipStaked', F.c(dexData.length * 500000) + ' HYPE');
+
+    // DEX cards
+    const cardsEl = document.getElementById('hipDexCards');
+    if (cardsEl) {
+      cardsEl.innerHTML = dexData.map((d) => {
+        const chips = d.assets.slice(0, 5).map((a: any) => `<span class="dex-chip">${a.name}</span>`).join('');
+        return `<div class="card card-hover dex-card"><h3>${d.fullName}</h3><div class="dex-meta"><span class="dim">Vol <b class="v">${F.uc(d.vol)}</b></span><span class="dim">OI <b class="v">${F.uc(d.oi)}</b></span><span class="dim">Mkts <b class="v">${d.markets}</b></span></div><div class="dex-assets">${chips}</div></div>`;
+      }).join('') || '<div class="card"><span class="tbl-loading">No active DEXs.</span></div>';
+    }
+
+    // Top markets table
+    const all = dexData.flatMap((d) => d.assets).sort((a, b) => b.vol - a.vol).slice(0, 25);
+    const tbl = document.getElementById('hipMarketsTable');
+    if (tbl) {
+      tbl.innerHTML = all.length ? all.map((a) => (
+        `<div class="m-row"><span class="m-name">${a.name} <span class="m-dex">· ${a.dex}</span></span><span class="r">${F.uc(a.vol)}</span><span class="r">${F.uc(a.oi)}</span><span class="r">${funding(a.funding)}</span><span class="r">$${F.f4(a.px)}</span></div>`
+      )).join('') : '<div class="tbl-loading">No active markets right now.</div>';
+    }
+  }
+
+  load();
+  setInterval(load, 60000);
+</script>
