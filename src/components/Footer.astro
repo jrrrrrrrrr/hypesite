@@ -15,12 +15,11 @@ const year = new Date().getFullYear();
 
     <nav class="foot-col" aria-label="Sections">
       <h4 class="foot-h">Terminal</h4>
-      {NAV.slice(0, 5).map((n) => <a href={n.href}>{n.label}</a>)}
+      {NAV.filter((n) => n.href !== '/indicators').map((n) => <a href={n.href}>{n.label}</a>)}
     </nav>
-    <nav class="foot-col" aria-label="More">
-      <h4 class="foot-h">More</h4>
-      {NAV.slice(5).map((n) => <a href={n.href}>{n.label}</a>)}
-      <a href="/indicators">Prism Indicators</a>
+    <nav class="foot-col" aria-label="Indicators">
+      <h4 class="foot-h">Indicators</h4>
+      <a href="/indicators">Prism suite</a>
     </nav>
     <div class="foot-col">
       <h4 class="foot-h">Data</h4>

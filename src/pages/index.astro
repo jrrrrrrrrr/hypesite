@@ -3,8 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import BuybackLive from '../components/BuybackLive.astro';
 import BurnHistory from '../components/BurnHistory.astro';
 import { INDICATORS } from '../lib/indicators';
-import { TREASURY_ADDRESSES } from '../lib/site';
-import { shortAddr } from '../lib/format';
 const featured = INDICATORS.slice(0, 4);
 ---
 <Layout path="/">
@@ -17,12 +15,12 @@ const featured = INDICATORS.slice(0, 4);
         intelligence terminal.
       </h1>
       <p class="section-lede" style="margin-top:18px">
-        Real-time HYPE price, perp volume and open interest, the fee buyback engine,
-        the new <a href="/treasury" style="color:var(--accent)">AQAv2 USDC treasury</a>, staking and HIP-3 markets —
-        plus the <a href="/indicators" style="color:var(--accent)">Prism</a> suite of TradingView indicators.
+        Real-time HYPE price, perp &amp; spot volume, open interest, the fee buyback engine,
+        staking, holders and HIP-3 markets — plus the
+        <a href="/indicators" style="color:var(--accent)">Prism</a> suite of TradingView indicators.
       </p>
       <div class="hero-cta">
-        <a href="/treasury" class="btn btn-primary">Explore the AQAv2 treasury →</a>
+        <a href="/burns" class="btn btn-primary">Watch the buyback engine →</a>
         <a href="/indicators" class="btn">Shop Prism indicators</a>
       </div>
     </div>
@@ -34,6 +32,7 @@ const featured = INDICATORS.slice(0, 4);
       </div>
       <div class="hp-price mono" data-live id="ovPrice"></div>
       <div class="hp-chg mono" id="ovChg"></div>
+      <canvas id="ovSpark" class="hp-spark"></canvas>
       <div class="hp-mini">
         <div><span class="stat-label">Mkt cap</span><span class="mono" data-live id="ovMcap"></span></div>
         <div><span class="stat-label">24h vol</span><span class="mono" data-live id="ovCgVol"></span></div>
@@ -42,40 +41,38 @@ const featured = INDICATORS.slice(0, 4);
     </div>
   </section>
 
-  <!-- ============ MARKET STATS ============ -->
+  <!-- ============ DENSE LIVE STATS ============ -->
   <section class="wrap section-sm">
+    <div class="cluster-label">Market &amp; volume</div>
     <div class="grid grid-4">
-      <div class="card"><div class="stat-label">Perp volume · 24h</div><div class="stat-value" data-live id="ovPerpVol"></div><div class="stat-sub">Σ all Hyperliquid perps</div></div>
-      <div class="card"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="ovOi"></div><div class="stat-sub">notional, USD</div></div>
-      <div class="card"><div class="stat-label">Circulating</div><div class="stat-value" data-live id="ovSupply"></div><div class="stat-sub">of 1B max HYPE</div></div>
-      <div class="card"><div class="stat-label">Perp markets</div><div class="stat-value" data-live id="ovMkts"></div><div class="stat-sub">listed on HL</div></div>
+      <div class="card stat"><div class="stat-label">Perp volume · 24h</div><div class="stat-value" data-live id="ovPerpVol"></div><div class="stat-sub">Σ all HL perps</div></div>
+      <div class="card stat"><div class="stat-label">Spot volume · 24h</div><div class="stat-value" data-live id="ovSpotVol"></div><div class="stat-sub">HL spot pairs</div></div>
+      <div class="card stat"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="ovOi"></div><div class="stat-sub">notional, USD</div></div>
+      <div class="card stat"><div class="stat-label">Perp markets</div><div class="stat-value" data-live id="ovMkts"></div><div class="stat-sub">listed on HL</div></div>
     </div>
-  </section>
 
-  <!-- ============ BUYBACK MODEL ============ -->
-  <section class="wrap section">
-    <span class="eyebrow">Why HYPE is unusual</span>
-    <h2 class="section-title">Three structural buyers, running in parallel.</h2>
-    <p class="section-lede">Most tokens have one source of organic demand, if any. Hyperliquid wired up three — all funded by real activity, all buying continuously.</p>
-    <div class="grid grid-3" style="margin-top:26px">
-      <div class="card card-hover">
-        <div class="kn">01</div>
-        <h3 class="kt">Fee buybacks</h3>
-        <p class="kp">Roughly 97% of trading fees are converted into HYPE on an ongoing, mechanical basis via the Assistance Fund — a real fee-to-buyback engine, not a nominal promise.</p>
-        <a href="/burns" class="klink">Buyback tracker →</a>
-      </div>
-      <div class="card card-hover card-prism">
-        <div class="kn">02</div>
-        <h3 class="kt">AQAv2 reserve yield</h3>
-        <p class="kp">Under AQAv2, up to ~90% of the yield on USDC held on Hyperliquid flows back to the protocol — an estimated <span class="mid">$135–160M/yr</span> in additional buyback fuel at current rates.</p>
-        <a href="/treasury" class="klink">Treasury detail →</a>
-      </div>
-      <div class="card card-hover">
-        <div class="kn">03</div>
-        <h3 class="kt">ETF inflows</h3>
-        <p class="kp">US spot HYPE ETFs (Bitwise, 21Shares) plus a pending Grayscale filing add a third, structurally-additive source of buy-side pressure on the token.</p>
-        <a href="/ecosystem" class="klink">Ecosystem →</a>
-      </div>
+    <div class="cluster-label">Supply &amp; burns</div>
+    <div class="grid grid-4">
+      <div class="card stat"><div class="stat-label">Circulating</div><div class="stat-value" data-live id="ovSupply"></div><div class="stat-sub">of 1B max HYPE</div></div>
+      <div class="card stat"><div class="stat-label">Held by AF</div><div class="stat-value" data-live id="ovAfHype"></div><div class="stat-sub">HYPE in the Assistance Fund</div></div>
+      <div class="card stat"><div class="stat-label">AF fund value</div><div class="stat-value" data-live id="ovAfUsd"></div><div class="stat-sub">USD value of the stack</div></div>
+      <div class="card stat"><div class="stat-label">Supply removed</div><div class="stat-value" data-live id="ovBurnPct"></div><div class="stat-sub">AF + fee burns, % of max</div></div>
+    </div>
+
+    <div class="cluster-label">Fees &amp; buybacks</div>
+    <div class="grid grid-4">
+      <div class="card stat"><div class="stat-label">Fees · 24h</div><div class="stat-value" data-live id="ovFees24"></div><div class="stat-sub">→ HYPE buybacks</div></div>
+      <div class="card stat"><div class="stat-label">Fees · 7d</div><div class="stat-value" data-live id="ovFees7"></div><div class="stat-sub">→ HYPE buybacks</div></div>
+      <div class="card stat"><div class="stat-label">Fees · all-time</div><div class="stat-value" data-live id="ovFeesCum"></div><div class="stat-sub">cumulative since launch</div></div>
+      <div class="card stat"><div class="stat-label">Fee burns</div><div class="stat-value" data-live id="ovFeeBurn"></div><div class="stat-sub">HYPE, protocol-level</div></div>
+    </div>
+
+    <div class="cluster-label">Staking &amp; network</div>
+    <div class="grid grid-4">
+      <div class="card stat"><div class="stat-label">Staked</div><div class="stat-value" data-live id="ovStaked"></div><div class="stat-sub">HYPE delegated</div></div>
+      <div class="card stat"><div class="stat-label">Staking ratio</div><div class="stat-value" data-live id="ovStakePct"></div><div class="stat-sub">of circulating</div></div>
+      <div class="card stat"><div class="stat-label">Validators</div><div class="stat-value" data-live id="ovVals"></div><div class="stat-sub">active set</div></div>
+      <div class="card stat" id="cardHolders"><div class="stat-label">HYPE holders</div><div class="stat-value" data-live id="ovHolders"></div><div class="stat-sub">on HyperCore</div></div>
     </div>
   </section>
 
@@ -91,23 +88,6 @@ const featured = INDICATORS.slice(0, 4);
     </div>
     <div style="margin-top:24px"><BuybackLive /></div>
     <div style="margin-top:16px"><BurnHistory /></div>
-  </section>
-
-  <!-- ============ TREASURY CALLOUT ============ -->
-  <section class="wrap section-sm">
-    <div class="card card-prism treasury-callout">
-      <div>
-        <span class="eyebrow">New · since 14 May 2026</span>
-        <h2 style="font-size:clamp(22px,2.6vw,30px);margin:12px 0 8px">Coinbase is now Hyperliquid's official USDC treasury deployer.</h2>
-        <p class="section-lede">Coinbase deploys the USDC treasury and Circle runs the cross-chain (CCTP) rails, both staking HYPE to activate AQAv2 — while USDH is wound down. The deployer addresses are public and tracked here.</p>
-        <div class="addr-row">
-          {TREASURY_ADDRESSES.map((a) => (
-            <a class="addr mono" href={`https://blockscan.com/address/${a}`} target="_blank" rel="noopener" title={a}>{shortAddr(a)}</a>
-          ))}
-        </div>
-        <a href="/treasury" class="btn btn-primary" style="margin-top:18px">Open the treasury dashboard →</a>
-      </div>
-    </div>
   </section>
 
   <!-- ============ INDICATORS TEASER ============ -->
@@ -143,19 +123,15 @@ const featured = INDICATORS.slice(0, 4);
   .hp-top { display: flex; align-items: center; justify-content: space-between; }
   .hp-price { font-size: 52px; font-weight: 600; letter-spacing: -0.03em; margin-top: 14px; color: var(--text-bright); }
   .hp-chg { font-size: 16px; margin-top: 2px; }
-  .hp-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .hp-spark { width: 100%; height: 46px; display: block; margin-top: 14px; }
+  .hp-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
   .hp-mini > div { display: flex; flex-direction: column; gap: 4px; }
   .hp-mini .mono { font-size: 14px; color: var(--text); }
 
-  .kn { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); letter-spacing: 0.1em; }
-  .kt { font-size: 19px; margin: 8px 0 8px; }
-  .kp { color: var(--text-mid); font-size: 14px; line-height: 1.65; }
-  .klink { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
-
-  .treasury-callout { padding: 30px; }
-  .addr-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-  .addr { font-size: 12px; padding: 7px 11px; border-radius: 8px; border: 1px solid var(--border-bright); background: var(--surface-2); color: var(--text-mid); }
-  .addr:hover { border-color: var(--accent); color: var(--accent); }
+  .cluster-label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin: 26px 0 12px; display: flex; align-items: center; gap: 9px; }
+  .cluster-label::before { content: ''; width: 16px; height: 2px; border-radius: 2px; background: var(--prism); }
+  .cluster-label:first-child { margin-top: 4px; }
+  .stat .stat-value { font-size: 23px; }
 
   .ind-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
   .ind-mini { padding: 0; overflow: hidden; --ac: var(--accent); }
@@ -174,64 +150,139 @@ const featured = INDICATORS.slice(0, 4);
 </style>
 
 <script>
+  const AF = '0xfefefefefefefefefefefefefefefefefefefefe';
+  const MAXS = 1e9;
+  let circ = null, price = null, afHype = null, feeBurns = null, staked = null, lastSpark = null;
+
   function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
-  function compactUsd(n) {
-    if (n == null || !isFinite(n)) return '—';
-    const a = Math.abs(n);
-    if (a >= 1e12) return '$' + (a / 1e12).toFixed(2) + 'T';
-    if (a >= 1e9) return '$' + (a / 1e9).toFixed(2) + 'B';
-    if (a >= 1e6) return '$' + (a / 1e6).toFixed(2) + 'M';
-    if (a >= 1e3) return '$' + (a / 1e3).toFixed(1) + 'K';
-    return '$' + a.toFixed(2);
-  }
+  function hideCard(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+  function compactUsd(n) { return (n == null || !isFinite(n)) ? '—' : '$' + compact(n); }
   function compact(n) {
     if (n == null || !isFinite(n)) return '—';
-    const a = Math.abs(n);
-    if (a >= 1e9) return (a / 1e9).toFixed(2) + 'B';
-    if (a >= 1e6) return (a / 1e6).toFixed(2) + 'M';
-    if (a >= 1e3) return (a / 1e3).toFixed(1) + 'K';
-    return a.toLocaleString('en-US');
+    const a = Math.abs(n), s = n < 0 ? '-' : '';
+    if (a >= 1e9) return s + (a / 1e9).toFixed(2) + 'B';
+    if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M';
+    if (a >= 1e3) return s + (a / 1e3).toFixed(1) + 'K';
+    return s + a.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+  function stakeDivisor(raw) { for (const t of [1, 1e2, 1e4, 1e6, 1e8, 1e10, 1e12, 1e14, 1e16, 1e18]) { const x = raw / t; if (x >= 1e7 && x <= 1e9) return t; } return 1; }
+  async function postHl(body) { const r = await fetch('/api/hl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!r.ok) throw new Error('hl'); return r.json(); }
+
+  function recompute() {
+    if (afHype != null && price != null) setText('ovAfUsd', compactUsd(afHype * price));
+    if (afHype != null || feeBurns != null) { const rem = (afHype || 0) + (feeBurns || 0); setText('ovBurnPct', ((rem / MAXS) * 100).toFixed(2) + '%'); }
+    if (staked != null && circ) setText('ovStakePct', ((staked / circ) * 100).toFixed(1) + '%');
+  }
+
+  function drawSpark(prices) {
+    const cv = document.getElementById('ovSpark'); if (!cv || !Array.isArray(prices) || prices.length < 2) return;
+    lastSpark = prices;
+    const ctx = cv.getContext('2d'); const rect = cv.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = rect.width, h = rect.height;
+    const min = Math.min.apply(null, prices), max = Math.max.apply(null, prices), rng = (max - min) || 1;
+    const up = prices[prices.length - 1] >= prices[0], col = up ? '#28e0c8' : '#ff6b8b';
+    ctx.clearRect(0, 0, w, h);
+    const X = (i) => (i / (prices.length - 1)) * w, Y = (p) => h - 3 - ((p - min) / rng) * (h - 6);
+    ctx.beginPath(); ctx.moveTo(X(0), Y(prices[0])); for (let i = 1; i < prices.length; i++) ctx.lineTo(X(i), Y(prices[i]));
+    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+    const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, up ? 'rgba(40,224,200,0.22)' : 'rgba(255,107,139,0.22)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(X(0), Y(prices[0])); for (let i = 1; i < prices.length; i++) ctx.lineTo(X(i), Y(prices[i]));
+    ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.stroke();
   }
 
   async function loadCg() {
     try {
-      const r = await fetch('/api/cg?id=hyperliquid');
-      if (!r.ok) return;
-      const d = (await r.json())?.[0];
-      if (!d) return;
-      const price = Number(d.current_price);
+      const r = await fetch('/api/cg?id=hyperliquid'); if (!r.ok) return;
+      const d = (await r.json())?.[0]; if (!d) return;
+      price = Number(d.current_price);
       setText('ovPrice', '$' + price.toLocaleString('en-US', { maximumFractionDigits: price < 10 ? 4 : 2 }));
-      const chg = Number(d.price_change_percentage_24h);
-      const c = document.getElementById('ovChg');
+      const chg = Number(d.price_change_percentage_24h), c = document.getElementById('ovChg');
       if (c && isFinite(chg)) { c.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%'; c.className = 'hp-chg mono ' + (chg >= 0 ? 'up' : 'down'); }
       setText('ovMcap', compactUsd(Number(d.market_cap)));
       setText('ovCgVol', compactUsd(Number(d.total_volume)));
       setText('ovAth', '$' + Number(d.ath).toLocaleString('en-US', { maximumFractionDigits: 2 }));
-      setText('ovSupply', compact(Number(d.circulating_supply)));
+      circ = Number(d.circulating_supply); setText('ovSupply', compact(circ));
+      if (d.sparkline_in_7d && Array.isArray(d.sparkline_in_7d.price)) drawSpark(d.sparkline_in_7d.price);
+      recompute();
     } catch {}
   }
 
   async function loadPerps() {
     try {
-      const r = await fetch('/api/hl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'metaAndAssetCtxs' }) });
-      if (!r.ok) return;
-      const data = await r.json();
-      const meta = data?.[0]?.universe ?? [];
-      const ctxs = data?.[1] ?? [];
+      const data = await postHl({ type: 'metaAndAssetCtxs' });
+      const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
       let vol = 0, oi = 0;
       for (let i = 0; i < ctxs.length; i++) {
-        const c = ctxs[i] || {};
-        const v = Number(c.dayNtlVlm); if (isFinite(v)) vol += v;
-        const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx);
-        if (isFinite(o) && isFinite(px)) oi += o * px;
+        const c = ctxs[i] || {}; const v = Number(c.dayNtlVlm); if (isFinite(v)) vol += v;
+        const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx); if (isFinite(o) && isFinite(px)) oi += o * px;
       }
-      setText('ovPerpVol', compactUsd(vol));
-      setText('ovOi', compactUsd(oi));
-      setText('ovMkts', String(meta.length || ctxs.length || '—'));
+      setText('ovPerpVol', compactUsd(vol)); setText('ovOi', compactUsd(oi)); setText('ovMkts', String(meta.length || ctxs.length || '—'));
     } catch {}
   }
 
-  loadCg(); loadPerps();
+  async function loadSpot() {
+    try {
+      const data = await postHl({ type: 'spotMetaAndAssetCtxs' });
+      const ctxs = Array.isArray(data) ? (data[1] || []) : [];
+      let svol = 0; ctxs.forEach((c) => { const v = Number(c.dayNtlVlm); if (isFinite(v)) svol += v; });
+      setText('ovSpotVol', compactUsd(svol));
+      const hy = ctxs.find((c) => c.coin === '@107' || c.coin === 'HYPE/USDC') || ctxs[107];
+      if (hy && hy.totalSupply) { const ts = Number(hy.totalSupply); if (ts > 0 && ts < MAXS) { feeBurns = MAXS - ts; setText('ovFeeBurn', compact(feeBurns) + ' HYPE'); recompute(); } }
+    } catch {}
+  }
+
+  async function loadStaking() {
+    try {
+      const vals = await postHl({ type: 'validatorSummaries' });
+      if (Array.isArray(vals) && vals.length) {
+        let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
+        staked = raw / stakeDivisor(raw);
+        setText('ovStaked', compact(staked) + ' HYPE'); setText('ovVals', String(vals.length)); recompute();
+      }
+    } catch {}
+  }
+
+  async function loadAf() {
+    try {
+      const s = await postHl({ type: 'spotClearinghouseState', user: AF });
+      if (s && s.balances) { const h = s.balances.find((b) => b.coin === 'HYPE' || b.token === 150); if (h) { afHype = parseFloat(h.total ?? h.hold ?? 0); setText('ovAfHype', compact(afHype) + ' HYPE'); recompute(); } }
+    } catch {}
+  }
+
+  async function loadFees() {
+    try {
+      const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
+      const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
+      const sorted = items.map((x) => ({ t: Number(x.time), f: Number(x.total_fees) / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+      const last = sorted[sorted.length - 1].f;
+      const at = (agoSec) => { const target = Date.now() / 1000 - agoSec; let best = sorted[0]; for (const it of sorted) { if (it.t <= target) best = it; else break; } return best.f; };
+      setText('ovFeesCum', compactUsd(last));
+      setText('ovFees24', compactUsd(Math.max(0, last - at(86400))));
+      setText('ovFees7', compactUsd(Math.max(0, last - at(7 * 86400))));
+    } catch {}
+  }
+
+  async function loadHolders() {
+    try {
+      const r = await fetch('/api/hs?path=/holdersStats'); if (!r.ok) { hideCard('cardHolders'); return; }
+      const d = await r.json(); let n = null;
+      if (typeof d === 'number') n = d;
+      else if (Array.isArray(d)) n = d.length;
+      else if (d) n = Number(d.holders ?? d.numHolders ?? d.holdersCount ?? d.count ?? d.total ?? NaN);
+      if (n && isFinite(n) && n > 0) setText('ovHolders', compact(n)); else hideCard('cardHolders');
+    } catch { hideCard('cardHolders'); }
+  }
+
+  window.addEventListener('resize', () => { if (lastSpark) drawSpark(lastSpark); });
+
+  loadCg(); loadPerps(); loadSpot(); loadStaking(); loadAf(); loadFees(); loadHolders();
   setInterval(loadCg, 30000);
   setInterval(loadPerps, 30000);
+  setInterval(loadSpot, 45000);
+  setInterval(loadStaking, 60000);
+  setInterval(loadAf, 30000);
+  setInterval(loadFees, 120000);
+  setInterval(loadHolders, 300000);
 </script>

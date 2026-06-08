@@ -8,7 +8,7 @@ export const GET: APIRoute = async ({ url }) => {
   const id = url.searchParams.get('id') || 'hyperliquid';
   const endpoint = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${encodeURIComponent(
     id
-  )}&precision=6`;
+  )}&precision=6&sparkline=true&price_change_percentage=24h,7d`;
   try {
     const resp = await fetch(endpoint, { headers: { accept: 'application/json' } });
     const text = await resp.text();

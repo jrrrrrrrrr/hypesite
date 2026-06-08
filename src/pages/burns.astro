@@ -3,14 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import BuybackLive from '../components/BuybackLive.astro';
 import BurnHistory from '../components/BurnHistory.astro';
 ---
-<Layout title="Buybacks" path="/burns" description="Hyperliquid HYPE buyback tracker — a live Assistance Fund chart, the standing buyback bid, dry powder, and on-chain fee burns.">
+<Layout title="Buybacks" path="/burns" description="Hyperliquid HYPE buyback tracker — a live Assistance Fund chart, fee-buyback history, the AQAv2 reserve-yield stream, and on-chain fee burns.">
   <section class="wrap section">
     <span class="eyebrow">Buyback engine · live</span>
     <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">The HYPE <span class="prism-text">buyback</span> tracker.</h1>
     <p class="section-lede" style="font-size:16px">
-      Roughly 97% of Hyperliquid trading fees are recycled into HYPE through the Assistance Fund — effectively
-      removing it from circulation. The fund is sampled live below; watch it climb as buybacks settle. The new
-      AQAv2 reserve-yield flow stacks on top — see the <a href="/treasury" style="color:var(--accent)">treasury page</a>.
+      Most Hyperliquid trading fees are recycled into HYPE through the Assistance Fund — effectively removing it
+      from circulation. The fund is sampled live below; watch it climb as buybacks settle, with the full history beneath.
     </p>
 
     <div style="margin-top:26px"><BuybackLive showAddr={true} /></div>
@@ -19,6 +18,38 @@ import BurnHistory from '../components/BurnHistory.astro';
   <section class="wrap section-sm">
     <h2 style="font-size:20px;margin-bottom:16px">Buyback history</h2>
     <BurnHistory />
+  </section>
+
+  <!-- ============ AQAv2 RESERVE-YIELD STREAM ============ -->
+  <section class="wrap section-sm">
+    <span class="eyebrow">Second buyback stream</span>
+    <h2 class="section-title" style="font-size:clamp(24px,3vw,34px)">AQAv2 reserve-yield buybacks.</h2>
+    <p class="section-lede">
+      Beyond trading fees, most of the yield earned on USDC reserves held on Hyperliquid is routed back into the same
+      buyback machinery under the AQAv2 framework (Coinbase as treasury deployer, Circle on cross-chain rails). It's an
+      estimate, not an on-chain meter — adjust the inputs to size it, and see it stacked on the live fee buybacks above.
+    </p>
+    <div class="grid grid-2" style="margin-top:22px">
+      <div class="card">
+        <div class="aq-label">USDC on Hyperliquid <b id="aqUsdcL">$5.5B</b></div>
+        <input id="aqUsdc" type="range" min="1" max="12" step="0.5" value="5.5" />
+        <div class="aq-label">Reserve yield · APY <b id="aqYieldL">4.0%</b></div>
+        <input id="aqYield" type="range" min="0" max="8" step="0.1" value="4" />
+        <div class="aq-label">Share routed to protocol <b id="aqShareL">90%</b></div>
+        <input id="aqShare" type="range" min="0" max="100" step="5" value="90" />
+        <p class="dim mono" style="font-size:11px;margin-top:4px">Defaults reflect public reporting around AQAv2; USDC balances and yields move.</p>
+      </div>
+      <div class="card card-prism">
+        <div class="stat-label">AQAv2 buyback fuel · annualized (est.)</div>
+        <div class="bigval mono" id="aqOut">—</div>
+        <div class="aq-split">
+          <div><span class="stat-label">+ fee buybacks · annualized run-rate</span><span class="mono" data-live id="aqFee">—</span></div>
+        </div>
+        <div class="stat-label" style="margin-top:16px">Combined annual buyback fuel (est.)</div>
+        <div class="bigval mono" id="aqTotal" style="color:var(--accent)">—</div>
+        <div class="stat-sub">estimate only · stacks on top of the live fee buybacks above</div>
+      </div>
+    </div>
   </section>
 
   <section class="wrap section-sm">
@@ -34,7 +65,7 @@ import BurnHistory from '../components/BurnHistory.astro';
       </div>
     </div>
     <p class="dim mono" style="font-size:11px;margin-top:14px">
-      AF HYPE was formally recognised as effectively burned by community vote. All figures update live from on-chain state; the session chart begins when you open the page.
+      AF HYPE was formally recognised as effectively burned by community vote. Live figures update from on-chain state; the session chart begins when you open the page. Buyback-fuel figures derive from HypurrScan fee data and are approximate.
     </p>
   </section>
 </Layout>
@@ -45,10 +76,22 @@ import BurnHistory from '../components/BurnHistory.astro';
   .bar-legend { display: flex; gap: 22px; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-mid); flex-wrap: wrap; }
   .bar-legend b { color: var(--text-bright); margin-left: 4px; }
   .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+
+  .aq-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-mid); margin-bottom: 2px; }
+  .aq-label b { color: var(--text-bright); font-family: var(--font-mono); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 999px; background: var(--surface-3); outline: none; margin: 6px 0 18px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: none; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  .bigval { font-size: 30px; font-weight: 600; color: var(--text-bright); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .aq-split { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .aq-split > div { display: flex; flex-direction: column; gap: 4px; }
+  .aq-split .mono { font-size: 18px; color: var(--text); }
 </style>
 
 <script>
-  import { hlInfo, hypeMarket, stakeDivisor, MAX_SUPPLY, setText } from '../lib/hl';
+  import { hlInfo, stakeDivisor, MAX_SUPPLY, setText, F } from '../lib/hl';
+
+  // ── staked-share bar ──
   async function loadStakeBar() {
     let circ: number | null = null;
     try {
@@ -64,7 +107,6 @@ import BurnHistory from '../components/BurnHistory.astro';
         const pct = Math.min(100, (staked / base) * 100);
         const bar = document.getElementById('stakeBar'); if (bar) (bar as HTMLElement).style.width = pct.toFixed(1) + '%';
         setText('stakeShareLbl', pct.toFixed(1) + '% staked');
-        const { F } = await import('../lib/hl');
         setText('legStaked', F.c(staked));
         setText('legLiquid', F.c(Math.max(0, base - staked)));
       }
@@ -72,4 +114,39 @@ import BurnHistory from '../components/BurnHistory.astro';
   }
   loadStakeBar();
   setInterval(loadStakeBar, 60000);
+
+  // ── AQAv2 reserve-yield estimator (+ combined with fee run-rate) ──
+  let feeAnnual: number | null = null;
+
+  async function feeRunRate() {
+    try {
+      const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
+      const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
+      const s = items.map((x: any) => ({ t: Number(x.time), f: Number(x.total_fees) / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+      const last = s[s.length - 1].f;
+      const target = Date.now() / 1000 - 30 * 86400; let best = s[0];
+      for (const it of s) { if (it.t <= target) best = it; else break; }
+      const d30 = Math.max(0, last - best.f);
+      feeAnnual = (d30 * 365) / 30;
+      recalc();
+    } catch {}
+  }
+
+  function recalc() {
+    const usdc = parseFloat((document.getElementById('aqUsdc') as HTMLInputElement).value);
+    const yld = parseFloat((document.getElementById('aqYield') as HTMLInputElement).value);
+    const share = parseFloat((document.getElementById('aqShare') as HTMLInputElement).value);
+    setText('aqUsdcL', '$' + usdc.toFixed(1) + 'B');
+    setText('aqYieldL', yld.toFixed(1) + '%');
+    setText('aqShareL', share.toFixed(0) + '%');
+    const aq = usdc * 1e9 * (yld / 100) * (share / 100);
+    setText('aqOut', F.uc(aq));
+    setText('aqFee', feeAnnual != null ? F.uc(feeAnnual) : '…');
+    setText('aqTotal', F.uc(aq + (feeAnnual || 0)));
+  }
+
+  ['aqUsdc', 'aqYield', 'aqShare'].forEach((id) => document.getElementById(id)?.addEventListener('input', recalc));
+  recalc();
+  feeRunRate();
+  setInterval(feeRunRate, 120000);
 </script>
