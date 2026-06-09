@@ -1,50 +1,16 @@
 ---
-import Layout from '../layouts/Layout.astro';
-
-const etfs = [
-  { name: 'Bitwise HYPE ETF', ticker: 'BHYP', status: 'US spot' },
-  { name: '21Shares HYPE ETF', ticker: 'THYP', status: 'US spot' },
-  { name: 'Grayscale HYPE', ticker: 'GHYP', status: 'Filing' },
-];
+const to = '/';
 ---
-<Layout title="Ecosystem" path="/ecosystem" description="The HYPE ecosystem — spot ETFs, structural demand, HIP-3 markets and where the token sits in the wider market.">
-  <section class="wrap section">
-    <span class="eyebrow">Ecosystem · HYPE</span>
-    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">Where HYPE plugs into the wider market.</h1>
-    <p class="section-lede" style="font-size:17px">
-      Beyond the protocol itself, HYPE has picked up the kind of external, structurally-additive demand most
-      tokens never get: regulated US spot ETFs, a fee-funded buyback engine, and the AQAv2 reserve-yield flow.
-    </p>
-
-    <h2 style="font-size:20px;margin:34px 0 16px">US spot ETFs</h2>
-    <div class="grid grid-3">
-      {etfs.map((e) => (
-        <div class="card card-hover">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <span class="stat-label">{e.status}</span>
-            <span class="badge">{e.ticker}</span>
-          </div>
-          <h3 style="font-size:18px;margin-top:12px">{e.name}</h3>
-        </div>
-      ))}
-    </div>
-    <p class="dim mono" style="font-size:11px;margin-top:10px">ETF availability and tickers change; confirm current status with the issuer before acting. Not investment advice.</p>
-
-    <h2 style="font-size:20px;margin:40px 0 16px">Structural context</h2>
-    <div class="grid grid-2">
-      <div class="card">
-        <h3 style="font-size:17px;margin-bottom:8px">Fee buybacks</h3>
-        <p class="mid" style="font-size:14px;line-height:1.65">Roughly 97% of trading fees are recycled into HYPE via the Assistance Fund on an ongoing basis — demand sourced directly from real usage. <a href="/burns" style="color:var(--accent)">Buyback tracker →</a></p>
-      </div>
-      <div class="card card-prism">
-        <h3 style="font-size:17px;margin-bottom:8px">AQAv2 reserve yield</h3>
-        <p class="mid" style="font-size:14px;line-height:1.65">Up to ~90% of yield on USDC held on Hyperliquid is returned to the protocol, adding an estimated $135–160M/yr of buyback fuel. <a href="/treasury" style="color:var(--accent)">Treasury detail →</a></p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:24px">
-      <h3 style="font-size:17px;margin-bottom:8px">HIP-3 builder markets</h3>
-      <p class="mid" style="font-size:14px;line-height:1.65">HIP-3 lets builders deploy their own perp markets on Hyperliquid — including pre-IPO equity perps for names like SpaceX, OpenAI and Anthropic. <a href="/hip3" style="color:var(--accent)">HIP-3 markets →</a></p>
-    </div>
-  </section>
-</Layout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0; url=${to}`} />
+    <link rel="canonical" href={`https://hype-site.com${to}`} />
+    <meta name="robots" content="noindex" />
+    <title>Moved → Overview</title>
+  </head>
+  <body style="background:#0a0e14;color:#93a0b6;font-family:ui-monospace,monospace;padding:40px">
+    This page moved. Redirecting to <a href={to} style="color:#28e0c8">{to}</a>…
+  </body>
+</html>

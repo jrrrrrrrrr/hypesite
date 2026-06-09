@@ -1,7 +1,7 @@
 ---
 // Historical buyback / burn charts, sourced from HypurrScan /fees (via /api/hs).
-// total_fees / total_spot_fees are cumulative micro-USD; ~99% of fees fund the
-// Assistance Fund's HYPE buybacks (the "holders share"), per the protocol.
+// total_fees is cumulative micro-USD; ~99% of fees fund the Assistance Fund's
+// HYPE buybacks (the "holders share"), per the protocol.
 ---
 <div class="bh">
   <div class="bh-head">
@@ -61,9 +61,9 @@
     const ratio = (tSec: number) => (tSec > 1756512000 ? 0.99 : 0.97);
 
     type Pt = { t: number; v: number };
-    let cumAll: Pt[] = [];      // {t: ms, v: cumulative buyback USD}
-    let barsAll: Pt[] = [];     // {t: ms (day), v: daily buyback USD}
-    let range = 0;              // days; 0 = all
+    let cumAll: Pt[] = [];
+    let barsAll: Pt[] = [];
+    let range = 0;
     let prog = 0, animStart = 0;
 
     function sizeOf(cv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, h: number) {
@@ -94,21 +94,18 @@
       const y = (v: number) => padT + (1 - (v * p) / yMax) * (h - padT - padB);
       cc.strokeStyle = 'rgba(255,255,255,0.05)';
       for (let g = 0; g <= 3; g++) { const gy = padT + (g / 3) * (h - padT - padB); cc.beginPath(); cc.moveTo(padL, gy); cc.lineTo(w - padR, gy); cc.stroke(); }
-      // area
       cc.beginPath(); cc.moveTo(x(0), y(data[0].v));
       for (let i = 1; i < data.length; i++) cc.lineTo(x(i), y(data[i].v));
       cc.lineTo(x(data.length - 1), h - padB); cc.lineTo(x(0), h - padB); cc.closePath();
       const fill = cc.createLinearGradient(0, padT, 0, h - padB);
       fill.addColorStop(0, 'rgba(40,224,200,0.26)'); fill.addColorStop(1, 'rgba(40,224,200,0.01)');
       cc.fillStyle = fill; cc.fill();
-      // line
       const grad = cc.createLinearGradient(padL, 0, w - padR, 0);
       PRISM.forEach((c, i) => grad.addColorStop(i / (PRISM.length - 1), c));
       cc.beginPath(); cc.moveTo(x(0), y(data[0].v));
       for (let i = 1; i < data.length; i++) cc.lineTo(x(i), y(data[i].v));
       cc.strokeStyle = grad; cc.lineWidth = 2.2; cc.lineJoin = 'round';
       cc.shadowColor = 'rgba(40,224,200,0.45)'; cc.shadowBlur = 12; cc.stroke(); cc.shadowBlur = 0;
-      // labels
       cc.fillStyle = 'rgba(147,160,182,0.6)'; cc.font = '10px ui-monospace, monospace'; cc.textAlign = 'left';
       cc.fillText('$' + F.c(max), padL + 2, padT + 2);
       cc.fillText(new Date(data[0].t).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }), padL + 2, h - 5);
@@ -156,8 +153,6 @@
         .filter((x) => isFinite(x.t) && isFinite(x.fees))
         .sort((a, b) => a.t - b.t);
       if (sorted.length < 2) return;
-
-      // cumulative buyback (apply time-based ratio incrementally)
       let cum = sorted[0].fees * ratio(sorted[0].t);
       cumAll = [{ t: sorted[0].t * 1000, v: cum }];
       const dayMap: Record<number, number> = {};
@@ -165,14 +160,11 @@
         const d = (sorted[i].fees - sorted[i - 1].fees) * ratio(sorted[i].t);
         cum += Math.max(0, d);
         cumAll.push({ t: sorted[i].t * 1000, v: cum });
-        // spread the interval's buyback evenly across calendar days
         const d0 = Math.floor(sorted[i - 1].t / 86400), d1 = Math.floor(sorted[i].t / 86400);
         if (d1 <= d0) { dayMap[d1] = (dayMap[d1] || 0) + Math.max(0, d); }
         else { const per = Math.max(0, d) / (d1 - d0); for (let dd = d0 + 1; dd <= d1; dd++) dayMap[dd] = (dayMap[dd] || 0) + per; }
       }
       barsAll = Object.keys(dayMap).map((k) => ({ t: Number(k) * 86400000, v: dayMap[Number(k)] })).sort((a, b) => a.t - b.t);
-
-      // stats
       const setT = (id: string, v: string) => { const e = document.getElementById(id); if (e) e.textContent = v; };
       setT('bhCum', F.uc(cum));
       const now = Date.now();
@@ -205,6 +197,6 @@
     window.addEventListener('resize', () => { drawCum(1); drawBars(1); });
 
     load();
-    setInterval(load, 120000); // refresh history every 2 min
+    setInterval(load, 120000);
   }
 </script>

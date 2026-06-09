@@ -8,9 +8,8 @@ export const SITE = {
     'Live Hyperliquid (HYPE) analytics — price, perp & spot volume, open interest, the fee buyback engine, staking, holders and HIP-3 markets — plus the Prism suite of TradingView indicators.',
   twitter: 'https://x.com/search?q=hyperliquid',
   tradingviewProfile: 'https://www.tradingview.com/u/jrrrrrr/',
-  // Checkout / indicator access
-  contactEmail: '', // set this to receive "request access" emails (e.g. you@hype-site.com)
-  accessDeliveryHours: '24 hours', // shown to buyers as the invite turnaround
+  contactEmail: '',
+  accessDeliveryHours: '24 hours',
 };
 
 export const NAV: { label: string; href: string; tag?: string }[] = [
@@ -22,8 +21,6 @@ export const NAV: { label: string; href: string; tag?: string }[] = [
   { label: 'Indicators', href: '/indicators', tag: 'Prism' },
 ];
 
-
-// Optional affiliate/referral promos. Set enabled:false to hide site-wide.
 export const REFERRALS = {
   hyperliquidCode: { enabled: true, code: 'HYPESITE', note: 'fee discount on signup', url: 'https://app.hyperliquid.xyz/join/HYPESITE' },
 };

@@ -91,7 +91,6 @@ import BurnHistory from '../components/BurnHistory.astro';
 <script>
   import { hlInfo, stakeDivisor, MAX_SUPPLY, setText, F } from '../lib/hl';
 
-  // ── staked-share bar ──
   async function loadStakeBar() {
     let circ: number | null = null;
     try {
@@ -115,9 +114,7 @@ import BurnHistory from '../components/BurnHistory.astro';
   loadStakeBar();
   setInterval(loadStakeBar, 60000);
 
-  // ── AQAv2 reserve-yield estimator (+ combined with fee run-rate) ──
   let feeAnnual: number | null = null;
-
   async function feeRunRate() {
     try {
       const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
@@ -131,7 +128,6 @@ import BurnHistory from '../components/BurnHistory.astro';
       recalc();
     } catch {}
   }
-
   function recalc() {
     const usdc = parseFloat((document.getElementById('aqUsdc') as HTMLInputElement).value);
     const yld = parseFloat((document.getElementById('aqYield') as HTMLInputElement).value);
@@ -144,7 +140,6 @@ import BurnHistory from '../components/BurnHistory.astro';
     setText('aqFee', feeAnnual != null ? F.uc(feeAnnual) : '…');
     setText('aqTotal', F.uc(aq + (feeAnnual || 0)));
   }
-
   ['aqUsdc', 'aqYield', 'aqShare'].forEach((id) => document.getElementById(id)?.addEventListener('input', recalc));
   recalc();
   feeRunRate();
