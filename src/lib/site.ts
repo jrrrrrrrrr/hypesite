@@ -1,11 +1,11 @@
 // Central site configuration. Edit values here rather than hunting through markup.
 
 export const SITE = {
-  name: 'Hype Site',
-  tagline: 'The Hyperliquid intelligence terminal',
+  name: 'HYPE Intelligence',
+  tagline: 'Hyperliquid analytics dashboard',
   url: 'https://hype-site.com',
   description:
-    'Live Hyperliquid (HYPE) analytics — price, perp & spot volume, open interest, the fee buyback engine, staking, holders and HIP-3 markets — plus the Prism suite of TradingView indicators.',
+    'Real-time Hyperliquid (HYPE) analytics dashboard — live burns, session fees, the Assistance Fund monitor, staking, trading signals and HIP-3 markets, plus the Prism suite of TradingView indicators.',
   twitter: 'https://x.com/search?q=hyperliquid',
   tradingviewProfile: 'https://www.tradingview.com/u/jrrrrrr/',
   contactEmail: '',
@@ -14,7 +14,7 @@ export const SITE = {
 
 export const NAV: { label: string; href: string; tag?: string }[] = [
   { label: 'Overview', href: '/' },
-  { label: 'Buybacks', href: '/burns', tag: 'Burns' },
+  { label: 'Burns', href: '/burns' },
   { label: 'Staking', href: '/staking' },
   { label: 'Live Trades', href: '/trades' },
   { label: 'HIP-3', href: '/hip3' },

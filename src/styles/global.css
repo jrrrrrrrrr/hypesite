@@ -4,7 +4,7 @@
 
 .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 .section { padding: 64px 0; }
-.section-sm { padding: 40px 0; }
+.section-sm { padding: 48px 0; }
 
 /* ---- Eyebrow / section heads ---- */
 .eyebrow {
@@ -178,4 +178,34 @@ footer.site a:hover { color: var(--accent); }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   KEYNOTE LAYER — responsive light, focus, and touch physics
+   ════════════════════════════════════════════════════════════ */
+.card { transition: border-color 0.35s var(--ease), transform 0.35s var(--ease), box-shadow 0.35s var(--ease); }
+.card:not(.card-hover):hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 26%, var(--border)); box-shadow: var(--shadow-lg); }
+.card::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(0, 212, 255, 0.075), transparent 65%);
+}
+.card:hover::after { opacity: 1; }
+
+.mono { font-variant-numeric: tabular-nums; }
+button:active { transform: scale(0.985); }
+:focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent); outline-offset: 3px; border-radius: 6px; }
+
+@media (hover: none) {
+  .card::after { display: none; }
+  .card:not(.card-hover):hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .card::after { transition: none; }
+  .card:not(.card-hover):hover { transform: none; }
 }

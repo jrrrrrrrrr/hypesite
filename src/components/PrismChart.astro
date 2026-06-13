@@ -1,0 +1,316 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  PRISM LIVE CHART — live HYPE candles with simplified previews
+//  of all four Prism indicators, each in its product accent:
+//    Auto Fib Engine → auto swing fib levels (price lines)
+//    Prism VRVP      → visible-range volume profile + POC
+//    Prism Arc       → log growth-arc fit ± band
+//    Prism Coil      → volatility-compression bands + dots
+//  The full engines live on TradingView (see /indicators).
+// ═══════════════════════════════════════════════════════════════
+import { INDICATORS } from '../lib/indicators';
+---
+<div class="card pch">
+  <div class="pch-head">
+    <div class="pch-tl">
+      <span class="pch-title">📈 Prism Live Chart</span>
+      <span class="mono dim pch-meta" id="pchMeta">loading candles…</span>
+    </div>
+    <div class="pch-tfs mono" role="group" aria-label="Timeframe">
+      <button data-tf="1h" class="active">1H</button>
+      <button data-tf="4h">4H</button>
+      <button data-tf="1D">1D</button>
+    </div>
+  </div>
+
+  <div class="pch-chips mono">
+    {INDICATORS.map((ind) => (
+      <button class="pch-chip active" data-ov={ind.id} style={`--c:${ind.accent}`} title={ind.tagline}>
+        <i></i>{ind.name}
+      </button>
+    ))}
+  </div>
+
+  <div class="pch-wrap">
+    <div id="pchChart"></div>
+    <canvas id="pchOverlay"></canvas>
+  </div>
+
+  <div class="pch-foot mono">
+    <span class="dim">Live HYPE/USDC · previews are simplified — the full engines run on TradingView.</span>
+    <a class="pch-cta" href="/indicators">Get the Prism suite →</a>
+  </div>
+</div>
+
+<style>
+  .pch { padding: 16px 18px; }
+  .pch-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .pch-tl { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pch-title { font-weight: 700; color: var(--text-bright); font-size: 15px; }
+  .pch-meta { font-size: 10.5px; }
+  .pch-tfs { display: inline-flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+  .pch-tfs button { font-size: 11px; color: var(--text-dim); padding: 5px 12px; border-radius: 999px; transition: all 0.2s; }
+  .pch-tfs button.active { color: #04121a; background: var(--accent); font-weight: 700; }
+  .pch-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .pch-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; letter-spacing: 0.03em; color: var(--text-dim); background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; transition: all 0.2s; }
+  .pch-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); opacity: 0.35; transition: all 0.2s; }
+  .pch-chip.active { color: var(--text-bright); border-color: color-mix(in srgb, var(--c) 55%, var(--border)); background: color-mix(in srgb, var(--c) 8%, var(--bg-2)); }
+  .pch-chip.active i { opacity: 1; box-shadow: 0 0 8px var(--c); }
+  .pch-wrap { position: relative; height: 380px; border-radius: 8px; overflow: hidden; }
+  #pchChart { position: absolute; inset: 0; }
+  #pchOverlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+  .pch-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 10.5px; }
+  .pch-cta { color: var(--accent); font-weight: 600; }
+  .pch-cta:hover { text-decoration: underline; }
+  @media (max-width: 700px) { .pch-wrap { height: 300px; } }
+</style>
+
+<script>
+  import { hlInfo, F, setText } from '../lib/hl';
+
+  const wrapEl = document.getElementById('pchChart');
+  const ovEl = document.getElementById('pchOverlay') as HTMLCanvasElement | null;
+  if (wrapEl && ovEl) {
+    const octx = ovEl.getContext('2d')!;
+    type C = { time: number; open: number; high: number; low: number; close: number; volume: number };
+    let candles: C[] = [];
+    let chart: any = null, sCandle: any = null, sVol: any = null;
+    let tf = '1h';
+    const tog: Record<string, boolean> = { fib: true, vrvp: true, arc: true, coil: true };
+    let fibLines: any[] = [];
+    let squeeze: boolean[] = [];
+    let arcFit: { a: number; b: number; c: number; sig: number } | null = null;
+
+    const ovKey = (id: string) => (id.includes('fib') ? 'fib' : id.includes('vrvp') ? 'vrvp' : id.includes('arc') ? 'arc' : 'coil');
+
+    function initChart() {
+      const LW = (window as any).LightweightCharts;
+      if (!LW || !wrapEl) return false;
+      const w = Math.max((wrapEl.parentElement as HTMLElement).clientWidth, 300);
+      const h = (wrapEl.parentElement as HTMLElement).clientHeight || 380;
+      chart = LW.createChart(wrapEl, {
+        width: w, height: h,
+        layout: { background: { color: 'transparent' }, textColor: '#5a6580', fontFamily: "'JetBrains Mono',monospace", fontSize: 10 },
+        grid: { vertLines: { color: 'rgba(34,39,56,0.5)' }, horzLines: { color: 'rgba(34,39,56,0.5)' } },
+        crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(0,212,255,0.3)', labelBackgroundColor: '#181c25' }, horzLine: { color: 'rgba(0,212,255,0.3)', labelBackgroundColor: '#181c25' } },
+        rightPriceScale: { borderColor: '#222738', scaleMargins: { top: 0.06, bottom: 0.22 } },
+        timeScale: { borderColor: '#222738', timeVisible: true, secondsVisible: false, rightOffset: 3 },
+      });
+      sCandle = chart.addCandlestickSeries({ upColor: '#00e676', downColor: '#ff3d5a', borderUpColor: '#00e676', borderDownColor: '#ff3d5a', wickUpColor: 'rgba(0,230,118,0.6)', wickDownColor: 'rgba(255,61,90,0.6)' });
+      sVol = chart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: 'vol', lastValueVisible: false, priceLineVisible: false });
+      chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
+      chart.timeScale().subscribeVisibleTimeRangeChange(() => drawOverlay());
+      return true;
+    }
+
+    // ── data ──
+    async function load(fit: boolean) {
+      try {
+        const ivMs: Record<string, number> = { '1h': 3600e3, '4h': 14400e3, '1D': 86400e3 };
+        const bars = 220;
+        const et = Date.now(), st = et - ivMs[tf] * bars;
+        const d = await hlInfo<any[]>({ type: 'candleSnapshot', req: { coin: '@107', interval: tf, startTime: st, endTime: et } });
+        if (!Array.isArray(d) || d.length < 30) return;
+        candles = d.map((c) => ({ time: Math.floor(c.t / 1000), open: +c.o, high: +c.h, low: +c.l, close: +c.c, volume: +c.v })).sort((a, b) => a.time - b.time);
+        sCandle.setData(candles.map((c) => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+        sVol.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(0,230,118,0.16)' : 'rgba(255,61,90,0.16)' })));
+        if (fit) chart.timeScale().fitContent();
+        computeCoil(); computeArc(); applyFib();
+        setText('pchMeta', candles.length + ' candles · HYPE @107 · ' + tf);
+        requestAnimationFrame(() => drawOverlay());
+      } catch {}
+    }
+
+    // ── Auto Fib Engine preview: swing-range retracement price lines ──
+    function applyFib() {
+      const LW = (window as any).LightweightCharts;
+      fibLines.forEach((l) => { try { sCandle.removePriceLine(l); } catch {} });
+      fibLines = [];
+      if (!tog.fib || candles.length < 30) return;
+      const hi = Math.max(...candles.map((c) => c.high));
+      const lo = Math.min(...candles.map((c) => c.low));
+      [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].forEach((lvl) => {
+        fibLines.push(sCandle.createPriceLine({
+          price: lo + (hi - lo) * lvl,
+          color: '#ffd166',
+          lineWidth: 1,
+          lineStyle: LW.LineStyle.Dashed,
+          axisLabelVisible: true,
+          title: lvl === 0 ? '0' : lvl === 1 ? '1.0' : String(lvl),
+        }));
+      });
+    }
+
+    // ── Prism Coil preview: BB(20,2) inside KC(20,1.5) ──
+    function computeCoil() {
+      const n = candles.length;
+      squeeze = new Array(n).fill(false);
+      if (n < 22) return;
+      const closes = candles.map((c) => c.close);
+      const ema: number[] = []; const k = 2 / 21;
+      closes.forEach((c, i) => ema.push(i === 0 ? c : c * k + ema[i - 1] * (1 - k)));
+      let atr = 0;
+      for (let i = 1; i < n; i++) {
+        const tr = Math.max(candles[i].high - candles[i].low, Math.abs(candles[i].high - closes[i - 1]), Math.abs(candles[i].low - closes[i - 1]));
+        atr = i <= 20 ? (atr * (i - 1) + tr) / i : (atr * 19 + tr) / 20;
+        if (i < 20) continue;
+        let sum = 0; for (let j = i - 19; j <= i; j++) sum += closes[j];
+        const sma = sum / 20;
+        let v = 0; for (let j = i - 19; j <= i; j++) v += (closes[j] - sma) ** 2;
+        const sd = Math.sqrt(v / 20);
+        const bbU = sma + 2 * sd, bbL = sma - 2 * sd;
+        const kcU = ema[i] + 1.5 * atr, kcL = ema[i] - 1.5 * atr;
+        squeeze[i] = bbU < kcU && bbL > kcL;
+      }
+    }
+
+    // ── Prism Arc preview: quadratic fit on log(price) ± σ band ──
+    function computeArc() {
+      arcFit = null;
+      const n = candles.length;
+      if (n < 40) return;
+      let s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, sy = 0, sxy = 0, sx2y = 0;
+      for (let i = 0; i < n; i++) {
+        const x = i, y = Math.log(candles[i].close);
+        s0++; s1 += x; s2 += x * x; s3 += x * x * x; s4 += x * x * x * x;
+        sy += y; sxy += x * y; sx2y += x * x * y;
+      }
+      const det = (m: number[][]) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+      const M = [[s4, s3, s2], [s3, s2, s1], [s2, s1, s0]];
+      const dM = det(M);
+      if (!dM) return;
+      const a = det([[sx2y, s3, s2], [sxy, s2, s1], [sy, s1, s0]]) / dM;
+      const b = det([[s4, sx2y, s2], [s3, sxy, s1], [s2, sy, s0]]) / dM;
+      const c = det([[s4, s3, sx2y], [s3, s2, sxy], [s2, s1, sy]]) / dM;
+      let rss = 0;
+      for (let i = 0; i < n; i++) rss += (Math.log(candles[i].close) - (a * i * i + b * i + c)) ** 2;
+      arcFit = { a, b, c, sig: Math.sqrt(rss / n) };
+    }
+
+    // ── overlay renderer (VRVP + Arc + Coil) ──
+    function drawOverlay() {
+      if (!chart || !ovEl) return;
+      const host = ovEl.parentElement as HTMLElement;
+      const rect = host.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      if (ovEl.width !== Math.round(rect.width * dpr) || ovEl.height !== Math.round(rect.height * dpr)) {
+        ovEl.width = Math.round(rect.width * dpr); ovEl.height = Math.round(rect.height * dpr);
+      }
+      octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      octx.clearRect(0, 0, rect.width, rect.height);
+      if (!candles.length) return;
+      const ts = chart.timeScale();
+      const plotH = rect.height - 26;
+
+      // visible index range + bar half-width
+      let firstVis = -1, lastVis = -1, x0: number | null = null, x1: number | null = null;
+      for (let i = 0; i < candles.length; i++) {
+        const x = ts.timeToCoordinate(candles[i].time);
+        if (x == null) continue;
+        if (firstVis === -1) { firstVis = i; x0 = x; }
+        lastVis = i; x1 = x;
+      }
+      if (firstVis === -1 || x0 == null || x1 == null) return;
+      const half = lastVis > firstVis ? Math.max(1.5, ((x1 - x0) / (lastVis - firstVis)) * 0.46) : 3;
+
+      // COIL — compression bands + dots
+      if (tog.coil) {
+        octx.fillStyle = 'rgba(106,168,255,0.07)';
+        for (let i = firstVis; i <= lastVis; i++) {
+          if (!squeeze[i]) continue;
+          const x = ts.timeToCoordinate(candles[i].time);
+          if (x == null) continue;
+          octx.fillRect(x - half, 0, half * 2, plotH);
+        }
+        for (let i = firstVis; i <= lastVis; i++) {
+          if (!squeeze[i]) continue;
+          const x = ts.timeToCoordinate(candles[i].time);
+          if (x == null) continue;
+          octx.globalAlpha = 0.9; octx.fillStyle = '#6aa8ff';
+          octx.beginPath(); octx.arc(x, plotH - 8, 2, 0, 7); octx.fill();
+          octx.globalAlpha = 1;
+        }
+      }
+
+      // VRVP — visible-range volume profile + POC
+      if (tog.vrvp && lastVis > firstVis + 5) {
+        let lo = Infinity, hi = -Infinity;
+        for (let i = firstVis; i <= lastVis; i++) { lo = Math.min(lo, candles[i].low); hi = Math.max(hi, candles[i].high); }
+        const B = 34, buckets = new Array(B).fill(0);
+        for (let i = firstVis; i <= lastVis; i++) {
+          const bi = Math.min(B - 1, Math.max(0, Math.floor(((candles[i].close - lo) / (hi - lo || 1)) * B)));
+          buckets[bi] += candles[i].volume;
+        }
+        const mx = Math.max(...buckets) || 1;
+        const poc = buckets.indexOf(Math.max(...buckets));
+        for (let bi = 0; bi < B; bi++) {
+          if (!buckets[bi]) continue;
+          const pTop = lo + ((bi + 1) / B) * (hi - lo);
+          const pBot = lo + (bi / B) * (hi - lo);
+          const yT = sCandle.priceToCoordinate(pTop);
+          const yB = sCandle.priceToCoordinate(pBot);
+          if (yT == null || yB == null) continue;
+          const w = (buckets[bi] / mx) * rect.width * 0.22;
+          octx.fillStyle = bi === poc ? 'rgba(40,224,200,0.5)' : 'rgba(40,224,200,0.2)';
+          octx.fillRect(0, Math.min(yT, yB) + 0.5, w, Math.abs(yB - yT) - 1);
+          if (bi === poc) {
+            octx.fillStyle = '#28e0c8'; octx.font = '700 9px JetBrains Mono, monospace';
+            octx.fillText('POC', w + 5, (yT + yB) / 2 + 3);
+          }
+        }
+      }
+
+      // ARC — log growth-arc fit ± σ
+      if (tog.arc && arcFit) {
+        const path = (off: number, dash: boolean) => {
+          octx.beginPath();
+          let started = false;
+          for (let s = 0; s <= 64; s++) {
+            const idx = firstVis + ((lastVis - firstVis) * s) / 64;
+            const i = Math.round(idx);
+            const x = ts.timeToCoordinate(candles[i].time);
+            if (x == null) continue;
+            const ln = arcFit!.a * idx * idx + arcFit!.b * idx + arcFit!.c + off;
+            const y = sCandle.priceToCoordinate(Math.exp(ln));
+            if (y == null) continue;
+            if (!started) { octx.moveTo(x, y); started = true; } else octx.lineTo(x, y);
+          }
+          octx.setLineDash(dash ? [4, 4] : []);
+          octx.stroke();
+          octx.setLineDash([]);
+        };
+        octx.shadowColor = '#b388ff'; octx.shadowBlur = 10;
+        octx.strokeStyle = '#b388ff'; octx.lineWidth = 2.2; path(0, false);
+        octx.shadowBlur = 0; octx.globalAlpha = 0.45; octx.lineWidth = 1;
+        path(arcFit.sig, true); path(-arcFit.sig, true);
+        octx.globalAlpha = 1;
+      }
+    }
+
+    // ── wiring ──
+    document.querySelectorAll('.pch-chip').forEach((b) => b.addEventListener('click', () => {
+      const key = ovKey((b as HTMLElement).dataset.ov || '');
+      tog[key] = !tog[key];
+      b.classList.toggle('active', tog[key]);
+      if (key === 'fib') applyFib();
+      drawOverlay();
+    }));
+    document.querySelectorAll('.pch-tfs button').forEach((b) => b.addEventListener('click', () => {
+      document.querySelectorAll('.pch-tfs button').forEach((x) => x.classList.remove('active'));
+      b.classList.add('active');
+      tf = (b as HTMLElement).dataset.tf || '1h';
+      load(true);
+    }));
+    window.addEventListener('resize', () => {
+      if (chart && wrapEl.parentElement) chart.applyOptions({ width: Math.max((wrapEl.parentElement as HTMLElement).clientWidth, 300) });
+      drawOverlay();
+    });
+
+    let tries = 0;
+    const wait = setInterval(() => {
+      tries++;
+      if (initChart()) { clearInterval(wait); load(true); setInterval(() => load(false), 60000); setInterval(drawOverlay, 400); }
+      else if (tries > 80) { clearInterval(wait); setText('pchMeta', 'chart library blocked'); }
+    }, 150);
+  }
+</script>

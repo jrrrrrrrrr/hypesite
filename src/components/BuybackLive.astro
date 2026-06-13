@@ -1,254 +1,504 @@
 ---
+// ═══════════════════════════════════════════════════════════════
+//  AF INTELLIGENCE DECK — ported from the original HYPE Intelligence
+//  dashboard: session fees/burns, 5-min momentum, the AF Live Monitor
+//  (lightweight-charts, 3 series) and the 4-indicator Trade Signal.
+// ═══════════════════════════════════════════════════════════════
 import { AF_ADDRESS } from '../lib/hl';
-import { shortAddr } from '../lib/format';
 interface Props { showAddr?: boolean; }
 const { showAddr = false } = Astro.props;
+const SHORT = AF_ADDRESS.slice(0, 6) + '…' + AF_ADDRESS.slice(-4);
 ---
-<div class="bb">
-  <div class="bb-main card card-prism">
-    <div class="bb-head">
-      <div class="bb-headline">
-        <span class="eyebrow">Assistance Fund · live</span>
-        <div class="bb-hype mono" data-live id="bbHype"></div>
-        <div class="bb-usd mono" id="bbUsd"></div>
-      </div>
-      <div class="bb-toggle" role="group" aria-label="Chart series">
-        <button data-series="usd" class="active" id="bbTglUsd">Fund value</button>
-        <button data-series="hype" id="bbTglHype">HYPE held</button>
-      </div>
-    </div>
+<div class="deck">
 
-    <div class="bb-canvas-wrap">
-      <canvas id="bbCanvas"></canvas>
-      <div class="bb-empty" id="bbEmpty">Sampling the chain…</div>
+  <!-- Session stats + AF + Volume (original grid-5) -->
+  <div class="deck-grid5">
+    <div class="card mc"><div class="mc-glow" style="background:var(--green)"></div>
+      <div class="mc-label">💵 Session Fees</div>
+      <div class="mc-value green mono" data-live id="afSessionFees">$0.00</div>
+      <div class="mc-sub mono" id="afSessionTime">since page load</div>
     </div>
-
-    <div class="bb-foot">
-      <span class="badge badge-live"><span class="dot"></span><span id="bbStatus">connecting…</span></span>
-      <span class="dim mono" id="bbMeta">session 0:00</span>
+    <div class="card mc"><div class="mc-glow" style="background:var(--fire)"></div>
+      <div class="mc-label">🔥 Session Burned</div>
+      <div class="mc-value fire mono" data-live id="afSessionBurns">0 HYPE</div>
+      <div class="mc-sub">on-chain burns this session</div>
+    </div>
+    <div class="card mc"><div class="mc-glow" style="background:var(--accent)"></div>
+      <div class="mc-label">🏦 AF Limit Bid</div>
+      <div class="mc-value fire mono" data-live id="afLiveBid">—</div>
+      <div class="mc-sub"><span id="afLiveSpread" class="mono" style="color:var(--green)">—</span> spread</div>
+    </div>
+    <div class="card mc"><div class="mc-glow" style="background:var(--purple)"></div>
+      <div class="mc-label">🏦 AF USDC</div>
+      <div class="mc-value mono" data-live id="afLiveUsdc">—</div>
+      <div class="mc-sub">Buyback balance</div>
+    </div>
+    <div class="card mc"><div class="mc-glow" style="background:var(--yellow)"></div>
+      <div class="mc-label">💰 24h Volume</div>
+      <div class="mc-value mono" data-live id="mVol">—</div>
+      <div class="mc-sub">Spot trading</div>
     </div>
   </div>
 
-  <div class="bb-stats">
-    <div class="card"><div class="stat-label">Session buyback</div><div class="stat-value up" data-live id="bbSession"></div><div class="stat-sub">HYPE bought since you opened</div></div>
-    <div class="card"><div class="stat-label">Live rate</div><div class="stat-value" data-live id="bbRate"></div><div class="stat-sub">HYPE / hr · this session</div></div>
-    <div class="card"><div class="stat-label">Standing bid</div><div class="stat-value" data-live id="bbBid"></div><div class="stat-sub" id="bbBidSz">limit order</div></div>
-    <div class="card"><div class="stat-label">USDC dry powder</div><div class="stat-value" data-live id="bbUsdc"></div><div class="stat-sub">ready to deploy</div></div>
-    <div class="card"><div class="stat-label">Fee burns</div><div class="stat-value" data-live id="bbFee"></div><div class="stat-sub">on-chain, HYPE</div></div>
+  <!-- HYPE 5-min Momentum Bar -->
+  <div class="card deck-momo">
+    <div class="momo-head">
+      <div class="mc-label" style="margin:0">HYPE 5-MIN MOMENTUM</div>
+      <div class="mono momo-sig" id="hypeMomLabel">—</div>
+    </div>
+    <div class="momo-track">
+      <div class="momo-mid"></div>
+      <div id="hypeMomBuyBar" class="momo-buy"></div>
+      <div id="hypeMomSellBar" class="momo-sell"></div>
+    </div>
+    <div class="momo-foot mono">
+      <span style="color:var(--green)" id="hypeMomBuyAmt">—</span>
+      <span style="color:var(--text-faint)" id="hypeMomTradeCount">—</span>
+      <span style="color:var(--red)" id="hypeMomSellAmt">—</span>
+    </div>
+  </div>
+
+  <!-- AF Live Monitor (lightweight-charts) -->
+  <div class="card deck-mon">
+    <div class="mon-head">
+      <span class="mon-title">🏦 AF Live Monitor</span>
+      <span class="mono dim" id="afChartMeta">Collecting data…</span>
+    </div>
+    <div class="mon-stats">
+      <div class="af-stat"><div class="lbl">HYPE Price</div><div class="val cyan mono" data-live id="afLivePrice">—</div></div>
+      <div class="af-stat"><div class="lbl">AF HYPE</div><div class="val fire mono" data-live id="afHype">—</div></div>
+      <div class="af-stat"><div class="lbl">Fee Burns</div><div class="val mono" data-live id="afFeeBurns">—</div></div>
+      <div class="af-stat"><div class="lbl">Bid Info</div><div class="val mono" data-live id="afBidInfo">—</div></div>
+    </div>
+    <div class="mon-wrap" id="afWrap"></div>
     {showAddr && (
-      <a class="card bb-addr" href={`https://blockscan.com/address/${AF_ADDRESS}`} target="_blank" rel="noopener">
-        <div class="stat-label">AF address</div>
-        <div class="stat-value mono" style="font-size:15px">{shortAddr(AF_ADDRESS)}</div>
-        <div class="stat-sub">view on explorer ↗</div>
-      </a>
+      <div class="mon-foot mono">
+        <span class="dim">Assistance Fund</span>
+        <a href={`https://hypurrscan.io/address/${AF_ADDRESS}`} target="_blank" rel="noopener" style="color:var(--accent)">{SHORT} ↗</a>
+      </div>
     )}
+  </div>
+
+  <!-- Trade Signal -->
+  <div class="card deck-sig">
+    <div class="sig-strip">
+      <div id="tradeSignalMarker" class="sig-marker"></div>
+    </div>
+    <div class="sig-body">
+      <div class="sig-top">
+        <div class="sig-left">
+          <div id="ratingLabel" class="sig-pill mono">Loading…</div>
+          <span id="ratingScore" class="mono sig-score">—</span>
+        </div>
+        <div class="mono sig-note">Based on 4 technical indicators</div>
+      </div>
+      <div id="tradeSignalSummary" class="sig-summary">Analyzing price action…</div>
+      <div class="sig-rows">
+        <div class="sig-row" id="riRsiRow">
+          <div><div class="sr-k mono">RSI (14)</div><div class="sr-d">Overbought / oversold</div></div>
+          <div class="sr-r"><div class="sr-v mono" id="riRsi">—</div><div class="sr-s mono" id="riRsiSig">—</div></div>
+        </div>
+        <div class="sig-row" id="riSmaRow">
+          <div><div class="sr-k mono">SMA 20</div><div class="sr-d">Short-term trend</div></div>
+          <div class="sr-r"><div class="sr-v mono" id="riSma20">—</div><div class="sr-s mono" id="riSma20Sig">—</div></div>
+        </div>
+        <div class="sig-row" id="riMacdRow">
+          <div><div class="sr-k mono">MACD</div><div class="sr-d">Buy vs sell pressure</div></div>
+          <div class="sr-r"><div class="sr-v mono" id="riMacd">—</div><div class="sr-s mono" id="riMacdSig">—</div></div>
+        </div>
+        <div class="sig-row" id="riMomRow">
+          <div><div class="sr-k mono">MOMENTUM</div><div class="sr-d">Price acceleration</div></div>
+          <div class="sr-r"><div class="sr-v mono" id="riMom">—</div><div class="sr-s mono" id="riMomSig">—</div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
-  .bb { display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px; }
-  .bb-main { padding: 22px; display: flex; flex-direction: column; }
-  .bb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .bb-hype { font-size: clamp(30px, 4vw, 44px); font-weight: 600; color: var(--text-bright); letter-spacing: -0.02em; line-height: 1.05; margin-top: 8px; font-variant-numeric: tabular-nums; }
-  .bb-usd { font-size: 15px; color: var(--accent); margin-top: 2px; }
-  .bb-toggle { display: inline-flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; flex-shrink: 0; }
-  .bb-toggle button { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); padding: 6px 11px; border-radius: 999px; transition: all 0.2s; white-space: nowrap; }
-  .bb-toggle button.active { color: #06120f; background: var(--accent); font-weight: 600; }
-  .bb-canvas-wrap { position: relative; margin-top: 16px; flex: 1; min-height: 240px; }
-  #bbCanvas { width: 100%; height: 240px; display: block; }
-  .bb-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); pointer-events: none; }
-  .bb-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
-  .bb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
-  .bb-stats .stat-value { font-size: 20px; }
-  .bb-addr:hover { border-color: var(--accent); }
-  @media (max-width: 900px) { .bb { grid-template-columns: 1fr; } }
-  @media (max-width: 520px) { .bb-stats { grid-template-columns: 1fr 1fr; } }
+  .deck { display: flex; flex-direction: column; gap: 14px; }
+  .deck-grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .mc { position: relative; overflow: hidden; padding: 16px 18px; }
+  .mc-glow { position: absolute; top: 0; left: 0; right: 0; height: 2px; opacity: 0.55; }
+  .mc-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .mc-value { font-size: 19px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+  .mc-value.green { color: var(--green); }
+  .mc-value.fire { color: var(--fire); }
+  .mc-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  .deck-momo { padding: 14px 20px; }
+  .momo-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .momo-sig { font-size: 12px; font-weight: 700; }
+  .momo-track { position: relative; height: 24px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
+  .momo-mid { position: absolute; left: 50%; width: 2px; height: 100%; background: var(--border-bright); z-index: 2; }
+  .momo-buy { position: absolute; right: 50%; height: 100%; width: 0; border-radius: 4px 0 0 4px; transition: width 0.8s ease; background: linear-gradient(270deg, rgba(0,230,118,0.9), rgba(0,212,255,0.7), rgba(167,139,250,0.3)); }
+  .momo-sell { position: absolute; left: 50%; height: 100%; width: 0; border-radius: 0 4px 4px 0; transition: width 0.8s ease; background: linear-gradient(90deg, rgba(255,61,90,0.9), rgba(255,107,43,0.7), rgba(251,191,36,0.3)); }
+  .momo-foot { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; }
+
+  .deck-mon { padding: 16px 18px; }
+  .mon-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .mon-title { font-weight: 700; color: var(--text-bright); font-size: 15px; }
+  .mon-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .af-stat .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px; }
+  .af-stat .val { font-size: 15px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+  .af-stat .val.cyan { color: var(--accent); }
+  .af-stat .val.fire { color: var(--fire); }
+  .mon-wrap { height: 260px; border-radius: 8px; overflow: hidden; }
+  .mon-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11px; }
+
+  .deck-sig { padding: 0; overflow: hidden; }
+  .sig-strip { height: 4px; background: linear-gradient(90deg, #ff3d5a, #ff8a00, #888, #00e676, #00ff88); position: relative; }
+  .sig-marker { position: absolute; top: -2px; width: 8px; height: 8px; background: #fff; border-radius: 50%; transition: left 0.8s ease; left: 50%; transform: translateX(-50%); box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .sig-body { padding: 16px; }
+  .sig-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+  .sig-left { display: flex; align-items: center; gap: 10px; }
+  .sig-pill { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; background: rgba(100,100,100,0.15); color: var(--text-dim); }
+  .sig-score { font-size: 14px; font-weight: 600; color: var(--text-dim); }
+  .sig-note { font-size: 10px; color: var(--text-faint); letter-spacing: 0.04em; }
+  .sig-summary { font-size: 13px; color: var(--text-bright); line-height: 1.7; margin-bottom: 14px; }
+  .sig-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sig-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-2); border-radius: 6px; border-left: 3px solid transparent; }
+  .sr-k { font-size: 9px; color: var(--text-faint); letter-spacing: 0.04em; }
+  .sr-d { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .sr-r { text-align: right; }
+  .sr-v { font-size: 15px; font-weight: 700; }
+  .sr-s { font-size: 10px; font-weight: 600; }
+
+  @media (max-width: 1000px) { .deck-grid5 { grid-template-columns: repeat(2, 1fr); } .deck-grid5 .mc:last-child { grid-column: span 2; } }
+  @media (max-width: 700px) { .mon-stats { grid-template-columns: 1fr 1fr; } .sig-rows { grid-template-columns: 1fr; } }
 </style>
 
 <script>
-  import { hlInfo, AF_ADDRESS, MAX_SUPPLY, F } from '../lib/hl';
+  import { hlInfo, AF_ADDRESS, MAX_SUPPLY, WS_URL, F, setText } from '../lib/hl';
 
-  const canvas = document.getElementById('bbCanvas') as HTMLCanvasElement | null;
-  if (canvas) {
-    const ctx = canvas.getContext('2d')!;
-    const wrap = canvas.parentElement as HTMLElement;
-    const emptyEl = document.getElementById('bbEmpty');
+  const HYPE_TID = '0x0d01dc56dcaaca66ad901c959b4011ec';
+  const $id = (i: string) => document.getElementById(i);
+  if ($id('afWrap')) {
+    // shared live store — other page scripts (hero, burned card, ring) read this
+    const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+    D.burnRateSamples = D.burnRateSamples || [];
+    const emit = () => window.dispatchEvent(new CustomEvent('hype:tick'));
 
-    const PRISM = ['#b388ff', '#6aa8ff', '#28e0c8', '#ffd166'];
-    const ACCENT = '#28e0c8';
+    // ── AF LIVE MONITOR (lightweight-charts, like the original) ──
+    let chart: any = null, sPrice: any = null, sBid: any = null, sUsdc: any = null;
+    let points: { time: number; price: number | null; bid: number | null; usdc: number | null }[] = [];
 
-    type Sample = { t: number; hype: number; usd: number };
-    const samples: Sample[] = [];
-    const MAX_PTS = 360; // ~30 min at 5s
-    let series: 'usd' | 'hype' = 'usd';
-    let price = 0;
-    let firstHype: number | null = null;
-    let animHype = 0; // odometer
-    let W = 0, H = 0, started = Date.now();
-
-    const $ = (id: string) => document.getElementById(id);
-    const setStatus = (s: string) => { const e = $('bbStatus'); if (e) e.textContent = s; };
-
-    function size() {
-      const r = wrap.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const h = 240;
-      if (canvas!.width !== Math.round(r.width * dpr) || canvas!.height !== Math.round(h * dpr)) {
-        canvas!.width = Math.round(r.width * dpr);
-        canvas!.height = Math.round(h * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      W = r.width; H = h;
+    function initChart() {
+      const LW = (window as any).LightweightCharts;
+      const wrap = $id('afWrap');
+      if (!LW || !wrap) return false;
+      if (chart) { try { chart.remove(); } catch {} chart = null; }
+      wrap.innerHTML = '';
+      const w = Math.max(wrap.clientWidth || (wrap.parentElement?.clientWidth || 800) - 36, 300);
+      chart = LW.createChart(wrap, {
+        width: w, height: 260,
+        layout: { background: { color: 'transparent' }, textColor: '#5a6580', fontFamily: "'JetBrains Mono',monospace", fontSize: 10 },
+        grid: { vertLines: { color: 'rgba(34,39,56,0.55)' }, horzLines: { color: 'rgba(34,39,56,0.55)' } },
+        crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(0,212,255,0.3)', labelBackgroundColor: '#181c25', width: 1 }, horzLine: { color: 'rgba(0,212,255,0.3)', labelBackgroundColor: '#181c25', width: 1 } },
+        rightPriceScale: { borderColor: '#222738', textColor: '#5a6580', scaleMargins: { top: 0.05, bottom: 0.05 } },
+        leftPriceScale: { visible: false },
+        timeScale: { borderColor: '#222738', textColor: '#5a6580', timeVisible: true, secondsVisible: true, rightOffset: 4 },
+      });
+      sPrice = chart.addLineSeries({ color: '#00d4ff', lineWidth: 2, priceLineVisible: false, lastValueVisible: true, title: 'HYPE Price', crosshairMarkerVisible: true, crosshairMarkerRadius: 4, crosshairMarkerBackgroundColor: '#00d4ff' });
+      sBid = chart.addLineSeries({ color: '#ff3d5a', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: true, title: 'Limit Order Price', crosshairMarkerVisible: true, crosshairMarkerRadius: 3, crosshairMarkerBackgroundColor: '#ff3d5a' });
+      sUsdc = chart.addLineSeries({ color: '#ff9a3c', lineWidth: 1.5, priceScaleId: 'usdc', priceLineVisible: false, lastValueVisible: true, title: 'USDC Balance', crosshairMarkerVisible: true, crosshairMarkerRadius: 3, crosshairMarkerBackgroundColor: '#ff9a3c' });
+      chart.priceScale('usdc').applyOptions({ scaleMargins: { top: 0.7, bottom: 0 }, visible: true, borderColor: '#222738', textColor: '#5a6580' });
+      chart.subscribeCrosshairMove((p: any) => {
+        if (!p.time) return;
+        const px = p.seriesData.get(sPrice), bd = p.seriesData.get(sBid), ud = p.seriesData.get(sUsdc);
+        if (px) setText('afLivePrice', '$' + F.f2(px.value));
+        if (bd) setText('afLiveBid', '$' + F.f2(bd.value));
+        if (ud) setText('afLiveUsdc', F.full(ud.value) + ' USDC');
+        if (px && bd) spread(px.value, bd.value);
+      });
+      redraw();
+      return true;
     }
-
-    function vals(): number[] {
-      return samples.map((s) => (series === 'usd' ? s.usd : s.hype));
-    }
-
-    function draw(now: number) {
-      size();
-      ctx.clearRect(0, 0, W, H);
-      const data = vals();
-      if (data.length < 2) { requestAnimationFrame(draw); return; }
-
-      const padL = 8, padR = 14, padT = 14, padB = 22;
-      const min = Math.min(...data), max = Math.max(...data);
-      const range = max - min || Math.abs(max) * 0.01 || 1;
-      const yMin = min - range * 0.12, yMax = max + range * 0.18;
-      const x = (i: number) => padL + (i / (data.length - 1)) * (W - padL - padR);
-      const y = (v: number) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
-
-      // baseline grid
-      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-      ctx.lineWidth = 1;
-      for (let g = 0; g <= 3; g++) {
-        const gy = padT + (g / 3) * (H - padT - padB);
-        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(W - padR, gy); ctx.stroke();
-      }
-
-      // area fill
-      ctx.beginPath();
-      ctx.moveTo(x(0), y(data[0]));
-      for (let i = 1; i < data.length; i++) ctx.lineTo(x(i), y(data[i]));
-      ctx.lineTo(x(data.length - 1), H - padB);
-      ctx.lineTo(x(0), H - padB);
-      ctx.closePath();
-      const fill = ctx.createLinearGradient(0, padT, 0, H - padB);
-      fill.addColorStop(0, 'rgba(40,224,200,0.28)');
-      fill.addColorStop(1, 'rgba(40,224,200,0.01)');
-      ctx.fillStyle = fill; ctx.fill();
-
-      // line with prism gradient + glow
-      const grad = ctx.createLinearGradient(padL, 0, W - padR, 0);
-      PRISM.forEach((c, i) => grad.addColorStop(i / (PRISM.length - 1), c));
-      ctx.beginPath();
-      ctx.moveTo(x(0), y(data[0]));
-      for (let i = 1; i < data.length; i++) ctx.lineTo(x(i), y(data[i]));
-      ctx.strokeStyle = grad; ctx.lineWidth = 2.2; ctx.lineJoin = 'round';
-      ctx.shadowColor = 'rgba(40,224,200,0.5)'; ctx.shadowBlur = 14;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      // leading pulsing dot
-      const lx = x(data.length - 1), ly = y(data[data.length - 1]);
-      const pulse = (Math.sin(now / 420) + 1) / 2;
-      ctx.beginPath();
-      ctx.arc(lx, ly, 7 + pulse * 7, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(40,224,200,${0.18 * (1 - pulse)})`; ctx.fill();
-      ctx.beginPath();
-      ctx.arc(lx, ly, 3.4, 0, Math.PI * 2);
-      ctx.fillStyle = '#eafff9'; ctx.shadowColor = ACCENT; ctx.shadowBlur = 12; ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // min/max labels
-      ctx.fillStyle = 'rgba(147,160,182,0.55)';
-      ctx.font = '10px ui-monospace, monospace';
-      ctx.textAlign = 'left';
-      const fmtY = (v: number) => (series === 'usd' ? '$' + F.c(v) : F.c(v));
-      ctx.fillText(fmtY(max), padL + 2, padT + 2);
-      ctx.fillText(fmtY(min), padL + 2, H - padB + 12);
-
-      requestAnimationFrame(draw);
-    }
-
-    // Odometer headline
-    function tick() {
-      const target = samples.length ? samples[samples.length - 1].hype : 0;
-      animHype += (target - animHype) * 0.12;
-      if (Math.abs(target - animHype) < 1) animHype = target;
-      const hEl = $('bbHype');
-      if (hEl) hEl.textContent = Math.round(animHype).toLocaleString('en-US') + ' HYPE';
-      const uEl = $('bbUsd');
-      if (uEl && price) uEl.textContent = F.uc(animHype * price) + ' at $' + F.f2(price);
-      requestAnimationFrame(tick);
-    }
-
-    async function poll() {
+    function redraw() {
+      if (!chart || !points.length) return;
       try {
-        // price (fast, frequent)
+        const dedup = (arr: any[]) => { const seen = new Set(), out: any[] = []; for (const p of arr) { if (!seen.has(p.time)) { seen.add(p.time); out.push(p); } } return out; };
+        sPrice.setData(dedup(points.filter((p) => p.price != null).map((p) => ({ time: p.time, value: p.price }))));
+        sBid.setData(dedup(points.filter((p) => p.bid != null).map((p) => ({ time: p.time, value: p.bid }))));
+        sUsdc.setData(dedup(points.filter((p) => p.usdc != null).map((p) => ({ time: p.time, value: p.usdc }))));
+        chart.timeScale().fitContent();
+      } catch {}
+    }
+    // wait for the CDN script, then init
+    let lwTries = 0;
+    const lwWait = setInterval(() => {
+      lwTries++;
+      if (initChart()) clearInterval(lwWait);
+      else if (lwTries > 80) { clearInterval(lwWait); const w = $id('afWrap'); if (w) w.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-mono);font-size:12px;color:var(--text-faint)">Chart library blocked — stats above remain live.</div>'; }
+    }, 150);
+    window.addEventListener('resize', () => { if (chart) { const w = $id('afWrap'); if (w) chart.applyOptions({ width: Math.max(w.clientWidth, 300) }); } });
+
+    function spread(px: number, bid: number) {
+      const sp = ((px - bid) / px * 100).toFixed(3);
+      const el = $id('afLiveSpread');
+      if (el) { el.textContent = sp + '%'; (el as HTMLElement).style.color = parseFloat(sp) < 0.5 ? 'var(--green)' : 'var(--yellow)'; }
+    }
+
+    // ── SESSION TRACKING (the addictive bit) ──
+    const sessionStart = Date.now();
+    D.sessStart = sessionStart;
+    let lastUsdc: number | null = null, lastHype: number | null = null;
+    let feesCollected = 0, hypePurchased = 0;
+    let burnBaseline: number | null = null;
+
+    // ── 5s LIVE TICK ──
+    async function tick() {
+      try {
+        // 1. price
         try {
-          const m = await hlInfo<Record<string, string>>({ type: 'allMids' });
-          const p = parseFloat(m?.['@107'] ?? m?.['HYPE'] ?? '0');
-          if (isFinite(p) && p > 0) price = p;
+          const mids = await hlInfo<Record<string, string>>({ type: 'allMids' });
+          const px = parseFloat(mids?.['@107'] ?? mids?.['HYPE'] ?? '0');
+          if (isFinite(px) && px > 0) D.price = px;
         } catch {}
 
-        // AF spot balances
-        let hype = samples.length ? samples[samples.length - 1].hype : 0;
+        // 2. AF balances
+        let usdc: number | null = null;
         try {
-          const s = await hlInfo<any>({ type: 'spotClearinghouseState', user: AF_ADDRESS });
-          if (s?.balances) {
-            const h = s.balances.find((b: any) => b.coin === 'HYPE' || b.token === 150);
-            if (h) hype = parseFloat(h.total ?? h.hold ?? hype);
-            const u = s.balances.find((b: any) => b.coin === 'USDC');
-            if (u) { const usdc = parseFloat(u.total ?? u.hold ?? 0); $('bbUsdc') && ($('bbUsdc')!.textContent = F.uc(usdc)); }
+          const st = await hlInfo<any>({ type: 'spotClearinghouseState', user: AF_ADDRESS });
+          if (st?.balances) {
+            const u = st.balances.find((b: any) => b.coin === 'USDC');
+            if (u) usdc = parseFloat(u.total ?? u.hold ?? 0);
+            const h = st.balances.find((b: any) => b.coin === 'HYPE' || b.token === 150);
+            if (h) D.afHype = parseFloat(h.total ?? h.hold ?? 0);
+          }
+        } catch {}
+        if (usdc != null) D.afUsdc = usdc;
+
+        // 3. AF limit orders
+        try {
+          const orders = await hlInfo<any[]>({ type: 'openOrders', user: AF_ADDRESS });
+          if (Array.isArray(orders)) {
+            const buys = orders.filter((o) => o.side === 'B').sort((a, b) => parseFloat(b.limitPx || 0) - parseFloat(a.limitPx || 0));
+            if (buys[0]) { D.afBid = parseFloat(buys[0].limitPx ?? buys[0].px ?? 0); D.afBidSz = parseFloat(buys[0].sz ?? 0); }
+            else { D.afBid = null; D.afBidSz = null; }
           }
         } catch {}
 
-        if (hype > 0) {
-          if (firstHype == null) { firstHype = hype; animHype = hype; }
-          const usd = price ? hype * price : (samples.at(-1)?.usd ?? 0);
-          samples.push({ t: Date.now(), hype, usd });
-          if (samples.length > MAX_PTS) samples.shift();
-          if (emptyEl) emptyEl.style.display = samples.length >= 2 ? 'none' : 'flex';
+        // 4. push chart point
+        const t = Math.floor(Date.now() / 1000);
+        points.push({ time: t, price: D.price || null, bid: D.afBid || null, usdc: usdc != null ? usdc : null });
+        if (points.length > 1440) points = points.slice(-1440);
 
-          // session + rate
-          const sess = hype - (firstHype ?? hype);
-          $('bbSession') && ($('bbSession')!.textContent = (sess >= 0 ? '+' : '') + F.c(sess));
-          const hrs = (Date.now() - started) / 3.6e6;
-          $('bbRate') && ($('bbRate')!.textContent = hrs > 0.002 ? (sess / hrs >= 0 ? '+' : '') + F.c(sess / hrs) : '—');
+        // 5. live stat row
+        if (D.price) setText('afLivePrice', '$' + F.f2(D.price));
+        if (D.afHype) setText('afHype', F.hype(D.afHype) + ' HYPE');
+        if (D.feesBurned) setText('afFeeBurns', F.hype(D.feesBurned) + ' HYPE');
+        if (D.afBid) { setText('afLiveBid', '$' + F.f2(D.afBid)); setText('afBidInfo', '$' + F.f2(D.afBid) + (D.afBidSz ? ' · ' + F.c(D.afBidSz) + ' HYPE' : '')); }
+        else { setText('afLiveBid', '—'); setText('afBidInfo', '—'); const el = $id('afLiveSpread'); if (el) el.textContent = '—'; }
+        if (usdc != null) setText('afLiveUsdc', F.full(usdc) + ' USDC');
+        if (D.price && D.afBid) spread(D.price, D.afBid);
+
+        // 6. session tracking — fees arrive as USDC into the AF; purchases = HYPE up-ticks
+        if (usdc != null) {
+          if (lastUsdc != null) { const dlt = usdc - lastUsdc; if (dlt > 0) feesCollected += dlt; }
+          lastUsdc = usdc;
         }
-        setStatus('live');
-      } catch { setStatus('retrying…'); }
+        if (D.afHype > 0) {
+          if (lastHype !== null) { const hd = D.afHype - lastHype; if (hd > 0) hypePurchased += hd; }
+          lastHype = D.afHype;
+        }
+        if (D.feesBurned > 0 && burnBaseline === null) burnBaseline = D.feesBurned;
+        const onChainBurned = burnBaseline !== null ? Math.max(0, (D.feesBurned || 0) - burnBaseline) : 0;
+        const sessionTotal = onChainBurned + hypePurchased;
+        D.sessFees = feesCollected; D.sessBurn = sessionTotal;
 
-      // session clock
-      const el = $('bbMeta');
-      if (el) { const s = Math.floor((Date.now() - started) / 1000); el.textContent = 'session ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+        const el = Date.now() - sessionStart;
+        const m = Math.floor(el / 60000), s = Math.floor((el % 60000) / 1000);
+        setText('afSessionTime', m + 'm ' + s + 's on page');
+        setText('afSessionFees', '$' + F.f2(feesCollected));
+        const burnUsd = D.price ? sessionTotal * D.price : 0;
+        setText('afSessionBurns', F.c(sessionTotal) + ' HYPE' + (burnUsd > 0.005 ? ' · $' + F.c(burnUsd) : ''));
+
+        // 7. live burn rate from on-chain samples (original bounds + ratios)
+        if (D.feesBurned > 0) {
+          D.burnRateSamples.push({ time: Date.now(), burned: D.feesBurned });
+          if (D.burnRateSamples.length > 720) D.burnRateSamples = D.burnRateSamples.slice(-720);
+          if (D.burnRateSamples.length > 24) {
+            const first = D.burnRateSamples[0], last = D.burnRateSamples[D.burnRateSamples.length - 1];
+            const dtH = (last.time - first.time) / 3600000;
+            const burned = last.burned - first.burned;
+            if (dtH > 0.03 && burned > 0 && D.price) {
+              const dailyBurnUsd = (burned / dtH) * 24 * D.price;
+              const weeklyBurnUsd = dailyBurnUsd * 7;
+              if (weeklyBurnUsd > 100000 && weeklyBurnUsd < 50000000) {
+                D.weeklyBurnUsd = weeklyBurnUsd;
+                D.dailyAvgFees = dailyBurnUsd / 0.97;
+              }
+            }
+          }
+        }
+
+        setText('afChartMeta', 'Live · ' + new Date().toLocaleTimeString() + ' · ' + points.length + ' pts');
+        redraw();
+        emit();
+      } catch {}
     }
 
-    // point-in-time stats (slower cadence)
-    async function slow() {
+    // ── fee burns + circulating (tokenDetails primary, spot ctx fallback) + spot volume ──
+    async function loadSupply() {
       try {
-        const o = await hlInfo<any[]>({ type: 'openOrders', user: AF_ADDRESS });
-        const buys = (Array.isArray(o) ? o : []).filter((x) => x.side === 'B').sort((a, b) => parseFloat(b.limitPx ?? b.px ?? 0) - parseFloat(a.limitPx ?? a.px ?? 0));
-        if (buys.length) { $('bbBid') && ($('bbBid')!.textContent = '$' + F.f2(parseFloat(buys[0].limitPx ?? buys[0].px ?? 0))); $('bbBidSz') && ($('bbBidSz')!.textContent = F.c(parseFloat(buys[0].sz ?? 0)) + ' HYPE bid'); }
-        else { $('bbBid') && ($('bbBid')!.textContent = '—'); $('bbBidSz') && ($('bbBidSz')!.textContent = 'no open bid'); }
+        const td = await hlInfo<any>({ type: 'tokenDetails', tokenId: HYPE_TID });
+        if (td?.totalSupply) {
+          const ts = parseFloat(td.totalSupply), ms = parseFloat(td.maxSupply || MAX_SUPPLY);
+          if (ts > 0 && ms > ts) { D.feesBurned = ms - ts; if (td.circulatingSupply) D.circSupply = parseFloat(td.circulatingSupply); }
+        }
       } catch {}
       try {
-        const d = await hlInfo<any[]>({ type: 'spotMetaAndAssetCtxs' });
+        const d = await hlInfo<any>({ type: 'spotMetaAndAssetCtxs' });
         const ctxs = Array.isArray(d) ? d[1] || [] : [];
-        const c = ctxs.find((x: any) => x.coin === '@107' || x.coin === 'HYPE/USDC') || ctxs[107];
-        if (c?.totalSupply) { const ts = parseFloat(c.totalSupply); if (ts > 0 && ts < MAX_SUPPLY) $('bbFee') && ($('bbFee')!.textContent = F.c(MAX_SUPPLY - ts)); }
+        let svol = 0;
+        ctxs.forEach((c: any) => { const v = Number(c.dayNtlVlm); if (isFinite(v)) svol += v; });
+        if (svol > 0) { D.spotVol = svol; setText('mVol', F.uc(svol)); }
+        if (!D.feesBurned) {
+          const hy = ctxs.find((c: any) => c.coin === '@107' || c.coin === 'HYPE/USDC');
+          if (hy?.totalSupply) { const ts = parseFloat(hy.totalSupply); if (ts > 0 && ts < MAX_SUPPLY) D.feesBurned = MAX_SUPPLY - ts; }
+        }
+      } catch {}
+      if (D.feesBurned) setText('afFeeBurns', F.hype(D.feesBurned) + ' HYPE');
+      emit();
+    }
+
+    // ── 5-MIN MOMENTUM — HYPE trades over the live websocket ──
+    type T = { time: number; usd: number; side: string };
+    let buf: T[] = [];
+    let ws: WebSocket | null = null, lastMsg = 0;
+    function wsConnect() {
+      if (ws && (ws.readyState === 0 || ws.readyState === 1)) return;
+      try {
+        ws = new WebSocket(WS_URL);
+        ws.onopen = () => { lastMsg = Date.now(); ws!.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin: 'HYPE' } })); };
+        ws.onmessage = (e) => {
+          lastMsg = Date.now();
+          try {
+            const m = JSON.parse(e.data);
+            if (m.channel === 'trades' && Array.isArray(m.data)) {
+              for (const tr of m.data) {
+                const px = parseFloat(tr.px), sz = parseFloat(tr.sz);
+                if (isFinite(px) && isFinite(sz)) buf.push({ time: tr.time || Date.now(), usd: px * sz, side: tr.side });
+              }
+            }
+          } catch {}
+        };
+        ws.onclose = () => setTimeout(wsConnect, 2500);
+        ws.onerror = () => { try { ws?.close(); } catch {} };
+      } catch { setTimeout(wsConnect, 4000); }
+    }
+    setInterval(() => { if (ws && ws.readyState === 1) { try { ws.send(JSON.stringify({ method: 'ping' })); } catch {} } if (lastMsg && Date.now() - lastMsg > 45000) { try { ws?.close(); } catch {} } }, 20000);
+
+    function momentum() {
+      const cut = Date.now() - 300000;
+      buf = buf.filter((t) => t.time >= cut);
+      let bV = 0, sV = 0;
+      for (const t of buf) { if (t.side === 'B') bV += t.usd; else sV += t.usd; }
+      const tot = bV + sV;
+      D.buy5 = bV; D.sell5 = sV; D.trades5 = buf.length;
+      const bBar = $id('hypeMomBuyBar'), sBar = $id('hypeMomSellBar');
+      if (bBar && sBar) {
+        (bBar as HTMLElement).style.width = (tot > 0 ? (bV / tot) * 50 : 0) + '%';
+        (sBar as HTMLElement).style.width = (tot > 0 ? (sV / tot) * 50 : 0) + '%';
+      }
+      setText('hypeMomBuyAmt', tot > 0 ? 'Buy $' + F.c(bV) : '—');
+      setText('hypeMomSellAmt', tot > 0 ? 'Sell $' + F.c(sV) : '—');
+      setText('hypeMomTradeCount', buf.length ? buf.length + ' trades · 5m' : 'listening…');
+      const lab = $id('hypeMomLabel');
+      if (lab) {
+        let txt = '—', col = 'var(--text-dim)';
+        if (tot > 500) {
+          const r = bV / tot;
+          if (r >= 0.7) { txt = '🟢 STRONG BUY'; col = 'var(--green)'; }
+          else if (r >= 0.58) { txt = 'BUY'; col = 'var(--green)'; }
+          else if (r > 0.42) { txt = 'NEUTRAL'; col = 'var(--text-dim)'; }
+          else if (r > 0.3) { txt = 'SELL'; col = 'var(--red)'; }
+          else { txt = '🔴 STRONG SELL'; col = 'var(--red)'; }
+        }
+        lab.textContent = txt; (lab as HTMLElement).style.color = col;
+      }
+    }
+
+    // ── TRADE SIGNAL — 4 technical indicators from 1h candles (original math) ──
+    const sma = (d: number[], p: number) => { const r: (number | null)[] = []; for (let i = 0; i < d.length; i++) { if (i < p - 1) { r.push(null); continue; } let s = 0; for (let j = i - p + 1; j <= i; j++) s += d[j]; r.push(s / p); } return r; };
+    const ema = (d: number[], p: number) => { const r: number[] = []; const k = 2 / (p + 1); for (let i = 0; i < d.length; i++) r.push(i === 0 ? d[i] : d[i] * k + r[i - 1] * (1 - k)); return r; };
+    const rsiF = (c: number[], p = 14) => { if (c.length < p + 1) return null; let g = 0, l = 0; for (let i = 1; i <= p; i++) { const d = c[i] - c[i - 1]; if (d > 0) g += d; else l += Math.abs(d); } let ag = g / p, al = l / p; for (let i = p + 1; i < c.length; i++) { const d = c[i] - c[i - 1]; ag = (ag * (p - 1) + (d > 0 ? d : 0)) / p; al = (al * (p - 1) + (d < 0 ? Math.abs(d) : 0)) / p; } if (al === 0) return 100; return 100 - 100 / (1 + ag / al); };
+    const macdF = (c: number[]) => { if (c.length < 26) return { macd: null as number | null, hist: null as number | null }; const e12 = ema(c, 12), e26 = ema(c, 26); const ml = e12.map((v, i) => v - e26[i]); const sig = ema(ml.slice(26), 9); const m = ml[ml.length - 1], s = sig[sig.length - 1]; return { macd: m, hist: m - s }; };
+
+    async function rating() {
+      try {
+        const et = Date.now(), st = et - 60 * 60 * 1000 * 200;
+        const d = await hlInfo<any[]>({ type: 'candleSnapshot', req: { coin: '@107', interval: '1h', startTime: st, endTime: et } });
+        if (!Array.isArray(d) || d.length < 50) return;
+        const closes = d.map((c) => parseFloat(c.c)).filter((x) => isFinite(x));
+        const last = closes[closes.length - 1];
+
+        const rsi = rsiF(closes, 14);
+        const rsiSig = rsi == null ? '—' : rsi < 30 ? 'Buy' : rsi > 70 ? 'Sell' : rsi < 45 ? 'Buy' : 'Neutral';
+        const rsiScore = rsi == null ? 50 : rsi < 30 ? 85 : rsi < 40 ? 70 : rsi < 45 ? 60 : rsi > 70 ? 15 : rsi > 60 ? 35 : 50;
+
+        const s20a = sma(closes, 20); const s20 = s20a[s20a.length - 1] as number;
+        const sma20Sig = last > s20 ? 'Buy' : 'Sell';
+        const sma20Score = last > s20 ? 70 : 30;
+
+        const s50a = sma(closes, 50); const s50 = s50a[s50a.length - 1] as number | null;
+        const sma50Score = s50 ? (last > s50 ? 70 : 30) : 50;
+
+        const macd = macdF(closes);
+        const macdSig = (macd.hist ?? 0) > 0 ? 'Buy' : 'Sell';
+        const macdScore = (macd.hist ?? 0) > 0 ? ((macd.hist ?? 0) > 0.5 ? 80 : 65) : ((macd.hist ?? 0) < -0.5 ? 20 : 35);
+
+        const mp = 10;
+        const mom = closes.length > mp ? ((last - closes[closes.length - mp - 1]) / closes[closes.length - mp - 1]) * 100 : null;
+        const momSig = (mom ?? 0) > 0 ? 'Buy' : 'Sell';
+        const momScore = mom == null ? 50 : mom > 5 ? 80 : mom > 0 ? 60 : mom > -5 ? 40 : 20;
+
+        const sigCol = (sg: string) => (sg === 'Buy' ? 'var(--green)' : sg === 'Sell' ? 'var(--red)' : 'var(--text-dim)');
+        const put = (id: string, v: string) => setText(id, v);
+        const putSig = (id: string, sg: string) => { const e = $id(id); if (e) { e.textContent = sg; (e as HTMLElement).style.color = sigCol(sg); } };
+        put('riRsi', rsi != null ? rsi.toFixed(1) : '—'); putSig('riRsiSig', rsiSig);
+        put('riSma20', s20 ? '$' + F.f2(s20) : '—'); putSig('riSma20Sig', sma20Sig);
+        put('riMacd', macd.macd != null ? macd.macd.toFixed(3) : '—'); putSig('riMacdSig', macdSig);
+        put('riMom', mom != null ? mom.toFixed(2) + '%' : '—'); putSig('riMomSig', momSig);
+
+        const scores = [rsiScore, sma20Score, sma50Score, macdScore, momScore];
+        const score = Math.round(scores.reduce((s, v) => s + v, 0) / scores.length);
+        D.taScore = score;
+        const label = score >= 75 ? 'Strong Buy' : score >= 60 ? 'Buy' : score >= 45 ? 'Neutral' : score >= 30 ? 'Sell' : 'Strong Sell';
+        D.taLabel = label;
+        const col = score >= 60 ? 'var(--green)' : score >= 45 ? 'var(--text-dim)' : score >= 30 ? 'var(--fire)' : 'var(--red)';
+        const bg = score >= 60 ? 'var(--up-dim)' : score >= 45 ? 'rgba(100,100,100,0.15)' : 'var(--down-dim)';
+        const lEl = $id('ratingLabel'); if (lEl) { lEl.textContent = label; (lEl as HTMLElement).style.color = col; (lEl as HTMLElement).style.background = bg; }
+        const sEl = $id('ratingScore'); if (sEl) { sEl.textContent = score + '/100'; (sEl as HTMLElement).style.color = col; }
+        const mk = $id('tradeSignalMarker'); if (mk) (mk as HTMLElement).style.left = score + '%';
+        const rows: Record<string, number> = { riRsiRow: rsiScore, riSmaRow: sma20Score, riMacdRow: macdScore, riMomRow: momScore };
+        Object.entries(rows).forEach(([id, sc]) => { const e = $id(id); if (e) (e as HTMLElement).style.borderLeftColor = sc >= 60 ? 'var(--green)' : sc <= 40 ? 'var(--red)' : 'var(--border)'; });
+
+        const parts: string[] = [];
+        if (rsi != null) {
+          if (rsi > 70) parts.push('RSI at ' + rsi.toFixed(0) + ' signals overbought — pullback risk elevated.');
+          else if (rsi > 60) parts.push('RSI at ' + rsi.toFixed(0) + ' shows bullish momentum with room to run.');
+          else if (rsi > 40) parts.push('RSI at ' + rsi.toFixed(0) + ' is neutral — no clear directional bias from momentum.');
+          else if (rsi > 30) parts.push('RSI at ' + rsi.toFixed(0) + ' approaching oversold — watch for a bounce.');
+          else parts.push('RSI at ' + rsi.toFixed(0) + ' is oversold — reversal probability increasing.');
+        }
+        if (s20 > 0) parts.push(last > s20 ? 'Price above SMA20 ($' + F.f2(s20) + ') — short-term trend is up.' : 'Price below SMA20 ($' + F.f2(s20) + ') — short-term trend is down, reclaim needed.');
+        if (macd.macd != null) parts.push(macd.macd > 0 ? 'MACD positive (' + macd.macd.toFixed(3) + ') — buying pressure outweighs selling.' : 'MACD negative (' + macd.macd.toFixed(3) + ') — selling pressure dominates.');
+        if (score >= 70) parts.push('Overall: Strong bullish setup. Look for entries on dips to SMA20.');
+        else if (score >= 55) parts.push('Overall: Leaning bullish. Manage risk — set stops below recent swing low.');
+        else if (score >= 45) parts.push('Overall: Mixed signals. Wait for a clearer setup before sizing in.');
+        else parts.push('Overall: Bearish bias. Consider reducing exposure or hedging.');
+        setText('tradeSignalSummary', parts.join(' '));
+        emit();
       } catch {}
     }
 
-    // toggle
-    document.getElementById('bbTglUsd')?.addEventListener('click', () => { series = 'usd'; document.getElementById('bbTglUsd')!.classList.add('active'); document.getElementById('bbTglHype')!.classList.remove('active'); });
-    document.getElementById('bbTglHype')?.addEventListener('click', () => { series = 'hype'; document.getElementById('bbTglHype')!.classList.add('active'); document.getElementById('bbTglUsd')!.classList.remove('active'); });
-
-    poll(); slow();
-    setInterval(poll, 5000);
-    setInterval(slow, 30000);
-    requestAnimationFrame(draw);
-    requestAnimationFrame(tick);
+    // boot
+    loadSupply(); tick(); rating(); wsConnect();
+    setInterval(tick, 5000);
+    setInterval(loadSupply, 60000);
+    setInterval(rating, 120000);
+    setInterval(momentum, 1000);
   }
 </script>

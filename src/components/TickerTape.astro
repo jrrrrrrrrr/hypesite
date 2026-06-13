@@ -1,0 +1,118 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  LIVE TICKER TAPE — terminal-style marquee of live protocol
+//  stats, mounted site-wide under the header. Self-sufficient
+//  (own light pollers) + upgrades from window.HYPE_D when the
+//  deck is on the page.
+// ═══════════════════════════════════════════════════════════════
+---
+<div class="tape" id="liveTape" aria-hidden="true">
+  <div class="tape-track" id="tapeTrack">
+    <span class="tape-half mono" id="tapeA">⟢ syncing live feed…</span>
+    <span class="tape-half mono" id="tapeB"></span>
+  </div>
+</div>
+
+<style>
+  .tape { border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--bg-2) 75%, transparent); overflow: hidden; position: relative; }
+  .tape::before, .tape::after { content: ''; position: absolute; top: 0; bottom: 0; width: 48px; z-index: 2; pointer-events: none; }
+  .tape::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+  .tape::after { right: 0; background: linear-gradient(270deg, var(--bg), transparent); }
+  .tape-track { display: inline-flex; white-space: nowrap; animation: tapeMove 52s linear infinite; will-change: transform; padding: 7px 0; }
+  .tape:hover .tape-track { animation-play-state: paused; }
+  .tape-half { display: inline-flex; gap: 0; font-size: 10.5px; letter-spacing: 0.02em; color: var(--text-dim); padding-right: 40px; }
+  @keyframes tapeMove { to { transform: translateX(-50%); } }
+  .tape.static .tape-track { animation: none; }
+  .tape.static { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { .tape-track { animation: none; } }
+</style>
+
+<script>
+  import { hlInfo, F } from '../lib/hl';
+
+  const trackA = document.getElementById('tapeA');
+  const trackB = document.getElementById('tapeB');
+  if (trackA && trackB) {
+    const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+    const S: any = { price: null, chg: null, fees24: null, oi: null, funding: null, apr: null, staked: null };
+
+    async function loadCg() {
+      try {
+        const r = await fetch('/api/cg?id=hyperliquid'); if (!r.ok) return;
+        const d = (await r.json())?.[0]; if (!d) return;
+        if (isFinite(+d.current_price)) S.price = +d.current_price;
+        if (isFinite(+d.price_change_percentage_24h)) S.chg = +d.price_change_percentage_24h;
+      } catch {}
+    }
+    async function loadMeta() {
+      try {
+        const data = await hlInfo<any>({ type: 'metaAndAssetCtxs' });
+        const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
+        let oi = 0;
+        for (let i = 0; i < ctxs.length; i++) {
+          const c = ctxs[i] || {};
+          const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx);
+          if (isFinite(o) && isFinite(px)) oi += o * px;
+          if ((meta[i]?.name || '') === 'HYPE') { const f = Number(c.funding); if (isFinite(f)) S.funding = f; if (isFinite(Number(c.markPx))) S.price = Number(c.markPx); }
+        }
+        if (oi > 0) S.oi = oi;
+      } catch {}
+    }
+    async function loadFees() {
+      try {
+        const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
+        const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
+        const s = items.map((x: any) => ({ t: +x.time, f: +x.total_fees / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+        const last = s[s.length - 1].f;
+        const tgt = Date.now() / 1000 - 86400; let best = s[0];
+        for (const it of s) { if (it.t <= tgt) best = it; else break; }
+        S.fees24 = Math.max(0, last - best.f);
+      } catch {}
+    }
+    async function loadStake() {
+      try {
+        const vals = await hlInfo<any[]>({ type: 'validatorSummaries' });
+        if (Array.isArray(vals) && vals.length) {
+          let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
+          for (const t of [1, 1e2, 1e4, 1e6, 1e8, 1e10, 1e12, 1e14, 1e16, 1e18]) { const x = raw / t; if (x >= 1e7 && x <= 1e9) { S.staked = x; break; } }
+          if (S.staked) S.apr = (474 / Math.sqrt(S.staked)) * 100;
+        }
+      } catch {}
+    }
+
+    const sep = '<span style="margin:0 17px;color:var(--text-faint)">·</span>';
+    const item = (k: string, v: string, cls = '') =>
+      '<span><b style="color:var(--text-faint);font-weight:600;letter-spacing:.08em">' + k + '</b> <b style="font-weight:700;color:' +
+      (cls === 'up' ? 'var(--green)' : cls === 'down' ? 'var(--red)' : cls === 'fire' ? 'var(--fire)' : cls === 'cyan' ? 'var(--accent)' : 'var(--text)') + '">' + v + '</b></span>';
+
+    function render() {
+      const px = D.price || S.price;
+      const burned = (D.afHype || 0) + (D.feesBurned || 0);
+      const parts: string[] = [];
+      if (px) parts.push(item('HYPE', '$' + F.f2(px) + (S.chg != null ? ' (' + (S.chg >= 0 ? '+' : '') + S.chg.toFixed(2) + '%)' : ''), S.chg != null && S.chg < 0 ? 'down' : 'up'));
+      if (S.fees24) parts.push(item('FEES 24H', F.uc(S.fees24), 'up'));
+      const daily = D.weeklyBurnUsd ? D.weeklyBurnUsd / 7 : S.fees24 ? S.fees24 * 0.99 : null;
+      if (daily) parts.push(item('BURN RATE', F.uc(daily) + '/day', 'fire'));
+      if (burned > 0) parts.push(item('TOTAL BURNED', F.c(burned) + ' HYPE', 'fire'));
+      if (S.oi) parts.push(item('OPEN INTEREST', F.uc(S.oi)));
+      if (S.funding != null) { const ann = S.funding * 24 * 365 * 100; parts.push(item('HYPE FUNDING', (ann >= 0 ? '+' : '') + ann.toFixed(1) + '% ann', ann >= 0 ? 'up' : 'down')); }
+      if (S.apr) parts.push(item('STAKING APR', S.apr.toFixed(2) + '%', 'up'));
+      if (S.staked) parts.push(item('STAKED', F.c(S.staked) + ' HYPE', 'cyan'));
+      if (D.spotVol) parts.push(item('SPOT VOL 24H', F.uc(D.spotVol)));
+      parts.push(item('🐱', 'hype-site.com', 'cyan'));
+      if (!parts.length) return;
+      const html = parts.join(sep) + sep;
+      trackA!.innerHTML = html;
+      trackB!.innerHTML = html;
+    }
+
+    window.addEventListener('hype:tick', render);
+    setInterval(render, 5000);
+    loadCg(); loadMeta(); loadFees(); loadStake();
+    setInterval(loadCg, 60000);
+    setInterval(loadMeta, 90000);
+    setInterval(loadFees, 180000);
+    setInterval(loadStake, 300000);
+    setTimeout(render, 1200);
+  }
+</script>

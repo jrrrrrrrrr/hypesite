@@ -1,0 +1,92 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  BURN MILESTONE — progress to the next supply milestones with a
+//  live ETA computed from the real burn rate. Updates every tick.
+// ═══════════════════════════════════════════════════════════════
+---
+<div class="card bm">
+  <div class="bm-row">
+    <div class="bm-left">
+      <div class="bm-label mono">🎯 Burn milestone · 5% of max supply</div>
+      <div class="bm-track">
+        <div class="bm-fill" id="bmFill"></div>
+        <div class="bm-ticks"></div>
+      </div>
+      <div class="bm-axis mono dim"><span>0</span><span>50,000,000 HYPE</span></div>
+    </div>
+    <div class="bm-right mono">
+      <div class="bm-big" data-live id="bmNow">—</div>
+      <div class="bm-sub dim" id="bmPct">— of the 5% target</div>
+      <div class="bm-eta" id="bmEta">computing burn pace…</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bm { padding: 16px 20px; }
+  .bm-row { display: flex; gap: 26px; align-items: center; }
+  .bm-left { flex: 1; min-width: 0; }
+  .bm-label { font-size: 10px; letter-spacing: 0.12em; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .bm-track { position: relative; height: 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .bm-fill { position: absolute; inset: 0 auto 0 0; width: 0%; border-radius: 999px; background: linear-gradient(90deg, #a78bfa, #ff6b2b 60%, #ffd166); transition: width 1.2s var(--ease); overflow: hidden; }
+  .bm-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%); transform: translateX(-100%); animation: bmShimmer 2.8s ease-in-out infinite; }
+  @keyframes bmShimmer { 60%, 100% { transform: translateX(100%); } }
+  .bm-ticks { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(20% - 1px), rgba(238,242,255,0.14) calc(20% - 1px), rgba(238,242,255,0.14) 20%); pointer-events: none; }
+  .bm-axis { display: flex; justify-content: space-between; font-size: 9px; margin-top: 5px; }
+  .bm-right { text-align: right; flex: 0 0 auto; }
+  .bm-big { font-size: 19px; font-weight: 700; color: var(--fire); font-variant-numeric: tabular-nums; }
+  .bm-sub { font-size: 10.5px; margin-top: 2px; }
+  .bm-eta { font-size: 10.5px; margin-top: 6px; color: var(--accent); }
+  @media (max-width: 760px) { .bm-row { flex-direction: column; align-items: stretch; gap: 14px; } .bm-right { text-align: left; } }
+  @media (prefers-reduced-motion: reduce) { .bm-fill::after { animation: none; } }
+</style>
+
+<script>
+  import { F, setText } from '../lib/hl';
+
+  const fill = document.getElementById('bmFill');
+  if (fill) {
+    const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+    const TARGET = 50_000_000; // 5% of 1B max
+    let fees24: number | null = null;
+
+    async function loadRate() {
+      try {
+        const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
+        const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
+        const s = items.map((x: any) => ({ t: +x.time, f: +x.total_fees / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+        const last = s[s.length - 1].f;
+        const tgt = Date.now() / 1000 - 86400; let best = s[0];
+        for (const it of s) { if (it.t <= tgt) best = it; else break; }
+        fees24 = Math.max(0, last - best.f);
+        render();
+      } catch {}
+    }
+
+    function render() {
+      const total = (D.afHype || 0) + (D.feesBurned || 0);
+      if (total <= 0) return;
+      const pct = Math.min(100, (total / TARGET) * 100);
+      (fill as HTMLElement).style.width = pct.toFixed(2) + '%';
+      setText('bmNow', F.hype(total) + ' HYPE');
+      setText('bmPct', pct.toFixed(2) + '% of the 5% target · ' + ((total / 1e9) * 100).toFixed(2) + '% of max supply');
+      const dailyUsd = D.weeklyBurnUsd ? D.weeklyBurnUsd / 7 : fees24 != null && fees24 > 0 ? fees24 * 0.99 : null;
+      if (dailyUsd != null && D.price > 0) {
+        const perDay = dailyUsd / D.price;
+        if (perDay > 0) {
+          const nextM = (Math.floor(total / 1e6) + 1) * 1e6;
+          const dM = (nextM - total) / perDay;
+          const dT = (TARGET - total) / perDay;
+          const fmt = (d: number) => (d < 1.5 ? '~' + Math.max(1, Math.round(d * 24)) + 'h' : d < 90 ? '~' + Math.round(d) + 'd' : '~' + (d / 30.44).toFixed(1) + 'mo');
+          const dateT = new Date(Date.now() + dT * 86400e3).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+          setText('bmEta', '⏱ ' + F.c(nextM) + ' in ' + fmt(dM) + ' · 5% milestone in ' + fmt(dT) + ' (' + dateT + ') at ' + F.c(perDay) + ' HYPE/day');
+        }
+      }
+    }
+
+    window.addEventListener('hype:tick', render);
+    setInterval(render, 5000);
+    loadRate();
+    setInterval(loadRate, 180000);
+  }
+</script>

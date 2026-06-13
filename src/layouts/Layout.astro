@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import TickerTape from '../components/TickerTape.astro';
 import { SITE } from '../lib/site';
 
 interface Props {
@@ -46,17 +47,65 @@ const jsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      <!-- lightweight-charts (AF Live Monitor) — same lib as the original dashboard -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <script is:inline>
+      if (typeof LightweightCharts === 'undefined') {
+        var _lw = document.createElement('script');
+        _lw.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
+        document.head.appendChild(_lw);
+      }
+    </script>
   </head>
   <body>
     <a href="#main" class="sr-only">Skip to content</a>
     <Header path={path} />
+    <TickerTape />
     <main id="main">
       <slot />
     </main>
     <Footer />
+    <style is:global>
+      .rv { opacity: 0; transform: translateY(14px); }
+      .rv.in { opacity: 1; transform: none; transition: opacity 0.55s var(--ease), transform 0.55s var(--ease); }
+    </style>
+    <script is:inline>
+      (function () {
+        try {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          if (!('IntersectionObserver' in window)) return;
+          var io = new IntersectionObserver(function (es) {
+            var k = 0;
+            es.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              var el = e.target;
+              el.style.transitionDelay = (k++ * 70) + 'ms';
+              el.classList.add('in');
+              io.unobserve(el);
+              setTimeout(function () { el.style.transitionDelay = ''; }, 900);
+            });
+          }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+          document.querySelectorAll('.card').forEach(function (el) {
+            var r = el.getBoundingClientRect();
+            if (r.top > window.innerHeight * 0.92) { el.classList.add('rv'); io.observe(el); }
+          });
+        } catch (e) {}
+      })();
+      // light follows the hand — cursor-tracked card spotlight
+      (function () {
+        if (window.matchMedia('(hover: none)').matches) return;
+        document.addEventListener('pointermove', function (e) {
+          var c = e.target && e.target.closest ? e.target.closest('.card') : null;
+          if (!c) return;
+          var r = c.getBoundingClientRect();
+          c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        }, { passive: true });
+      })();
+    </script>
   </body>
 </html>

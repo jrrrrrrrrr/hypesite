@@ -90,6 +90,13 @@ export const F = {
   addr(a: string): string {
     return a && a.length > 12 ? a.slice(0, 6) + '…' + a.slice(-4) : a;
   },
+  // Full-precision format from the original dashboard: 45,898,020.17
+  hype(n: number | null | undefined): string {
+    return n == null || !isFinite(+n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  },
+  full(n: number | null | undefined): string {
+    return n == null || !isFinite(+n) ? '—' : Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  },
 };
 
 export function setText(id: string, v: string) {

@@ -2,22 +2,42 @@
 import Layout from '../layouts/Layout.astro';
 import BuybackLive from '../components/BuybackLive.astro';
 import BurnHistory from '../components/BurnHistory.astro';
+import LiveFurnace from '../components/LiveFurnace.astro';
+import BurnMilestone from '../components/BurnMilestone.astro';
 ---
-<Layout title="Buybacks" path="/burns" description="Hyperliquid HYPE buyback tracker — a live Assistance Fund chart, fee-buyback history, the AQAv2 reserve-yield stream, and on-chain fee burns.">
+<Layout title="Burns" path="/burns" description="Watch HYPE burn live — the Assistance Fund monitor, session burn counters, full buyback history, supply breakdown, and the AQAv2 reserve-yield stream.">
   <section class="wrap section">
     <span class="eyebrow">Buyback engine · live</span>
-    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">The HYPE <span class="prism-text">buyback</span> tracker.</h1>
+    <h1 class="section-title" style="font-size:clamp(32px,5vw,52px)">Watch the <span class="prism-text">burn</span>, live.</h1>
     <p class="section-lede" style="font-size:16px">
-      Most Hyperliquid trading fees are recycled into HYPE through the Assistance Fund — effectively removing it
-      from circulation. The fund is sampled live below; watch it climb as buybacks settle, with the full history beneath.
+      Most Hyperliquid trading fees are recycled into HYPE through the Assistance Fund — formally recognized
+      as burned by community vote. The monitor samples the fund every 5 seconds: fees arrive as USDC, buybacks
+      land as HYPE, and the session counters move the moment they do.
     </p>
-
-    <div style="margin-top:26px"><BuybackLive showAddr={true} /></div>
+    <div style="margin-top:26px"><LiveFurnace /></div>
+    <div style="margin-top:14px"><BurnMilestone /></div>
+    <div style="margin-top:14px"><BuybackLive showAddr={true} /></div>
   </section>
 
   <section class="wrap section-sm">
-    <h2 style="font-size:20px;margin-bottom:16px">Buyback history</h2>
+    <h2 class="blk-title">📜 Buyback history</h2>
     <BurnHistory />
+  </section>
+
+  <!-- ============ SUPPLY RING ============ -->
+  <section class="wrap section-sm">
+    <div class="card ring-card">
+      <h2 class="blk-title" style="margin-bottom:18px">🍩 Supply breakdown</h2>
+      <div class="ring-flex">
+        <canvas id="ringCanvas" width="200" height="200"></canvas>
+        <div class="ring-legend mono">
+          <div class="rl-row"><i style="background:#00d4ff"></i><span>Unstaked circulating</span><b data-live id="lgCirc">—</b></div>
+          <div class="rl-row"><i style="background:#00e676"></i><span>Staked by holders</span><b data-live id="lgStaked">—</b></div>
+          <div class="rl-row"><i style="background:#ff6b2b"></i><span>Burned</span><b data-live id="lgBurned">—</b></div>
+          <div class="rl-row"><i style="background:#2e3448"></i><span>Locked / Foundation</span><b data-live id="lgOther">—</b></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ AQAv2 RESERVE-YIELD STREAM ============ -->
@@ -25,9 +45,9 @@ import BurnHistory from '../components/BurnHistory.astro';
     <span class="eyebrow">Second buyback stream</span>
     <h2 class="section-title" style="font-size:clamp(24px,3vw,34px)">AQAv2 reserve-yield buybacks.</h2>
     <p class="section-lede">
-      Beyond trading fees, most of the yield earned on USDC reserves held on Hyperliquid is routed back into the same
-      buyback machinery under the AQAv2 framework (Coinbase as treasury deployer, Circle on cross-chain rails). It's an
-      estimate, not an on-chain meter — adjust the inputs to size it, and see it stacked on the live fee buybacks above.
+      Beyond trading fees, most of the yield earned on USDC reserves held on Hyperliquid is routed into the same
+      buyback machinery under the AQAv2 framework. It's an estimate, not an on-chain meter — size it with the
+      sliders and see it stacked on the live fee buybacks above.
     </p>
     <div class="grid grid-2" style="margin-top:22px">
       <div class="card">
@@ -47,73 +67,113 @@ import BurnHistory from '../components/BurnHistory.astro';
         </div>
         <div class="stat-label" style="margin-top:16px">Combined annual buyback fuel (est.)</div>
         <div class="bigval mono" id="aqTotal" style="color:var(--accent)">—</div>
-        <div class="stat-sub">estimate only · stacks on top of the live fee buybacks above</div>
+        <div class="stat-sub">estimate only · stacks on the live fee buybacks above</div>
       </div>
     </div>
   </section>
 
   <section class="wrap section-sm">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-        <h3 style="font-size:17px">Staked share of circulating supply</h3>
-        <span class="mono dim" id="stakeShareLbl" style="font-size:12px">—</span>
-      </div>
-      <div class="bar"><div class="bar-fill" id="stakeBar" style="width:0%"></div></div>
-      <div class="bar-legend">
-        <span><i class="sw" style="background:var(--prism)"></i>Staked <b class="mono" id="legStaked">—</b></span>
-        <span><i class="sw" style="background:var(--surface-3)"></i>Liquid <b class="mono" id="legLiquid">—</b></span>
-      </div>
-    </div>
-    <p class="dim mono" style="font-size:11px;margin-top:14px">
-      AF HYPE was formally recognised as effectively burned by community vote. Live figures update from on-chain state; the session chart begins when you open the page. Buyback-fuel figures derive from HypurrScan fee data and are approximate.
+    <p class="dim mono" style="font-size:11px">
+      AF HYPE was formally recognised as effectively burned by community vote. Live figures update from on-chain
+      state; session counters and the monitor chart begin when you open the page. Buyback-fuel figures derive from
+      HypurrScan fee data and are approximate.
     </p>
   </section>
 </Layout>
 
 <style>
-  .bar { height: 16px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--prism); border-radius: 999px; transition: width 0.8s var(--ease); }
-  .bar-legend { display: flex; gap: 22px; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-mid); flex-wrap: wrap; }
-  .bar-legend b { color: var(--text-bright); margin-left: 4px; }
-  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+  .blk-title { font-size: 19px; margin-bottom: 16px; }
+  .ring-card { padding: 22px 24px; }
+  .ring-flex { display: flex; align-items: center; gap: 34px; flex-wrap: wrap; }
+  #ringCanvas { width: 200px; height: 200px; flex: 0 0 auto; }
+  .ring-legend { display: flex; flex-direction: column; gap: 10px; font-size: 12px; min-width: 280px; flex: 1; }
+  .rl-row { display: flex; align-items: center; gap: 10px; }
+  .rl-row i { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
+  .rl-row span { color: var(--text-mid); }
+  .rl-row b { margin-left: auto; color: var(--text-bright); font-weight: 600; font-variant-numeric: tabular-nums; }
 
   .aq-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-mid); margin-bottom: 2px; }
   .aq-label b { color: var(--text-bright); font-family: var(--font-mono); }
   input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 999px; background: var(--surface-3); outline: none; margin: 6px 0 18px; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.18); }
   input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: none; border-radius: 50%; background: var(--accent); cursor: pointer; }
   .bigval { font-size: 30px; font-weight: 600; color: var(--text-bright); margin-top: 6px; font-variant-numeric: tabular-nums; }
   .aq-split { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
   .aq-split > div { display: flex; flex-direction: column; gap: 4px; }
   .aq-split .mono { font-size: 18px; color: var(--text); }
+  @media (max-width: 640px) { .ring-flex { justify-content: center; } }
 </style>
 
 <script>
-  import { hlInfo, stakeDivisor, MAX_SUPPLY, setText, F } from '../lib/hl';
+  import { hlInfo, stakeDivisor, MAX_SUPPLY, F, setText } from '../lib/hl';
 
-  async function loadStakeBar() {
-    let circ: number | null = null;
+  const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+  let cgCirc: number | null = null;
+
+  // ── Supply ring (ported from the original drawRing) ──
+  function drawRing() {
+    const cv = document.getElementById('ringCanvas') as HTMLCanvasElement | null;
+    if (!cv) return;
+    const ctx = cv.getContext('2d'); if (!ctx) return;
+    const circ = D.circSupply || cgCirc;
+    if (!circ) return;
+    const burned = (D.afHype || 0) + (D.feesBurned || 0);
+    const pub = D.publicStaked || 0;
+    const locked = Math.max(0, MAX_SUPPLY - circ - burned);
+    const unst = Math.max(0, circ - pub);
+    setText('lgCirc', F.hype(unst));
+    setText('lgStaked', F.hype(pub));
+    setText('lgBurned', F.hype(burned));
+    setText('lgOther', F.hype(locked));
+    const sz = 200, dpr = window.devicePixelRatio || 1;
+    cv.width = sz * dpr; cv.height = sz * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, sz, sz);
+    const segs = [
+      { v: unst, c: '#00d4ff' },
+      { v: pub, c: '#00e676' },
+      { v: burned, c: '#ff6b2b' },
+      { v: locked, c: '#2e3448' },
+    ];
+    const total = segs.reduce((s, x) => s + x.v, 0) || 1;
+    const cx = sz / 2, cy = sz / 2, r = 75;
+    let a = -Math.PI / 2;
+    for (const s of segs) {
+      const sw = (s.v / total) * Math.PI * 2;
+      if (sw < 0.002) continue;
+      ctx.beginPath(); ctx.arc(cx, cy, r, a, a + sw);
+      ctx.strokeStyle = s.c; ctx.lineWidth = 24; ctx.lineCap = 'butt'; ctx.stroke();
+      a += sw;
+    }
+  }
+
+  async function loadRingData() {
     try {
       const r = await fetch('/api/cg?id=hyperliquid');
-      if (r.ok) { const d = (await r.json())?.[0]; const c = Number(d?.circulating_supply); if (isFinite(c)) circ = c; }
+      if (r.ok) { const d = (await r.json())?.[0]; const c = Number(d?.circulating_supply); if (isFinite(c)) cgCirc = c; }
     } catch {}
     try {
       const vals = await hlInfo<any[]>({ type: 'validatorSummaries' });
       if (Array.isArray(vals) && vals.length) {
         let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
-        const staked = raw / stakeDivisor(raw);
-        const base = circ && circ > staked ? circ : MAX_SUPPLY;
-        const pct = Math.min(100, (staked / base) * 100);
-        const bar = document.getElementById('stakeBar'); if (bar) (bar as HTMLElement).style.width = pct.toFixed(1) + '%';
-        setText('stakeShareLbl', pct.toFixed(1) + '% staked');
-        setText('legStaked', F.c(staked));
-        setText('legLiquid', F.c(Math.max(0, base - staked)));
+        const div = stakeDivisor(raw);
+        let total = 0, fnd = 0, pub = 0;
+        vals.forEach((v) => {
+          const s = parseFloat(v.stake || 0) / div;
+          total += s;
+          const nm = (v.name || '').toLowerCase();
+          if (nm.includes('hyper foundation') || nm.includes('hyperfoundation')) fnd += s; else pub += s;
+        });
+        D.staked = total; D.publicStaked = pub; D.foundationStaked = fnd;
       }
     } catch {}
+    drawRing();
   }
-  loadStakeBar();
-  setInterval(loadStakeBar, 60000);
+  window.addEventListener('hype:tick', drawRing);
+  loadRingData();
+  setInterval(loadRingData, 60000);
 
+  // ── AQAv2 estimator ──
   let feeAnnual: number | null = null;
   async function feeRunRate() {
     try {

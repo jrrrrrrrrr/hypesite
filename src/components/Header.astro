@@ -1,5 +1,5 @@
 ---
-import PrismLogo from './PrismLogo.astro';
+import CatLogo from './CatLogo.astro';
 import { NAV, SITE } from '../lib/site';
 interface Props { path?: string; }
 const { path = '/' } = Astro.props;
@@ -8,8 +8,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 <header class="nav">
   <div class="wrap nav-inner">
     <a href="/" class="brand" aria-label={`${SITE.name} home`}>
-      <PrismLogo size={28} />
-      <span class="brand-name">HYPE<span class="prism-text">SITE</span></span>
+      <CatLogo size={26} />
+      <span class="brand-name">HYPE <span class="intel">INTELLIGENCE</span></span>
     </a>
 
     <nav class="nav-links" aria-label="Primary">
@@ -50,6 +50,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     background: color-mix(in srgb, var(--bg) 78%, transparent);
     border-bottom: 1px solid var(--border);
   }
+  .nav::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1.5px; background: var(--prism); opacity: 0.65; }
   .nav-inner { height: 100%; display: flex; align-items: center; gap: 18px; }
   .brand { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.03em; color: var(--text-bright); }
@@ -65,7 +66,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .nav-tag {
     font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
     padding: 2px 5px; border-radius: 5px; color: var(--accent);
-    background: rgba(40, 224, 200, 0.1); border: 1px solid rgba(40, 224, 200, 0.2);
+    background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.22);
   }
   .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   .ticker {
@@ -90,6 +91,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   @media (max-width: 600px) {
     .ticker-sym { display: none; }
   }
+  .brand-name .intel { color: var(--accent); letter-spacing: 0.06em; }
 </style>
 
 <script>

@@ -1,93 +1,102 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import CatLogo from '../components/CatLogo.astro';
 import BuybackLive from '../components/BuybackLive.astro';
 import BurnHistory from '../components/BurnHistory.astro';
+import LiveFurnace from '../components/LiveFurnace.astro';
+import PrismChart from '../components/PrismChart.astro';
+import BurnMilestone from '../components/BurnMilestone.astro';
+import OrderFlow from '../components/OrderFlow.astro';
+import MarketHeatmap from '../components/MarketHeatmap.astro';
 import { INDICATORS } from '../lib/indicators';
 const featured = INDICATORS.slice(0, 4);
 ---
 <Layout path="/">
-  <!-- ============ HERO ============ -->
-  <section class="hero wrap">
-    <div class="hero-copy reveal">
-      <span class="eyebrow">Hyperliquid · Live intelligence</span>
-      <h1 class="hero-title">
-        The <span class="prism-text">Hyperliquid</span><br />
-        intelligence terminal.
-      </h1>
-      <p class="section-lede" style="margin-top:18px">
-        Real-time HYPE price, perp &amp; spot volume, open interest, the fee buyback engine,
-        staking, holders and HIP-3 markets — plus the
-        <a href="/indicators" style="color:var(--accent)">Prism</a> suite of TradingView indicators.
-      </p>
-      <div class="hero-cta">
-        <a href="/burns" class="btn btn-primary">Watch the buyback engine →</a>
-        <a href="/indicators" class="btn">Shop Prism indicators</a>
-      </div>
-    </div>
-
-    <div class="hero-price card card-prism reveal" style="animation-delay:.08s">
-      <div class="hp-top">
-        <span class="badge badge-live"><span class="dot"></span>Live</span>
-        <span class="stat-label">HYPE / USD</span>
-      </div>
-      <div class="hp-price mono" data-live id="ovPrice"></div>
-      <div class="hp-chg mono" id="ovChg"></div>
-      <canvas id="ovSpark" class="hp-spark"></canvas>
-      <div class="hp-mini">
-        <div><span class="stat-label">Mkt cap</span><span class="mono" data-live id="ovMcap"></span></div>
-        <div><span class="stat-label">24h vol</span><span class="mono" data-live id="ovCgVol"></span></div>
-        <div><span class="stat-label">ATH</span><span class="mono" data-live id="ovAth"></span></div>
-      </div>
-    </div>
+  <!-- ============ HERO — HYPER SOUND MONEY ============ -->
+  <section class="wrap hero">
+    <div class="hero-aura" aria-hidden="true"></div>
+    <div class="hero-cat"><CatLogo size={72} /></div>
+    <div class="hero-tagline mono">HYPER SOUND MONEY — MAX SUPPLY FIXED · FEES BURNED</div>
+    <div class="hero-price mono"><span class="dollar">$</span><span data-live id="heroPrice">—</span></div>
+    <div class="hero-sub mono"><span id="heroChg">—</span><span class="dim"> · MCap <span data-live id="heroMcap">—</span> · FDV <span data-live id="heroFdv">—</span></span></div>
+    <div id="heroSentiment" class="mono hero-sent">Analyzing…</div>
+    <button id="shareStatsBtn" class="share-btn mono" type="button">📸 Share Stats</button>
   </section>
 
-  <!-- ============ DENSE LIVE STATS ============ -->
+  <!-- ============ LIVE FURNACE ============ -->
   <section class="wrap section-sm">
-    <div class="cluster-label">Market &amp; volume</div>
-    <div class="grid grid-4">
-      <div class="card stat"><div class="stat-label">Perp volume · 24h</div><div class="stat-value" data-live id="ovPerpVol"></div><div class="stat-sub">Σ all HL perps</div></div>
-      <div class="card stat"><div class="stat-label">Spot volume · 24h</div><div class="stat-value" data-live id="ovSpotVol"></div><div class="stat-sub">HL spot pairs</div></div>
-      <div class="card stat"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="ovOi"></div><div class="stat-sub">notional, USD</div></div>
-      <div class="card stat"><div class="stat-label">Perp markets</div><div class="stat-value" data-live id="ovMkts"></div><div class="stat-sub">listed on HL</div></div>
-    </div>
+    <LiveFurnace />
+  </section>
 
-    <div class="cluster-label">Supply &amp; burns</div>
-    <div class="grid grid-4">
-      <div class="card stat"><div class="stat-label">Circulating</div><div class="stat-value" data-live id="ovSupply"></div><div class="stat-sub">of 1B max HYPE</div></div>
-      <div class="card stat"><div class="stat-label">Held by AF</div><div class="stat-value" data-live id="ovAfHype"></div><div class="stat-sub">HYPE in the Assistance Fund</div></div>
-      <div class="card stat"><div class="stat-label">AF fund value</div><div class="stat-value" data-live id="ovAfUsd"></div><div class="stat-sub">USD value of the stack</div></div>
-      <div class="card stat"><div class="stat-label">Supply removed</div><div class="stat-value" data-live id="ovBurnPct"></div><div class="stat-sub">AF + fee burns, % of max</div></div>
-    </div>
-
-    <div class="cluster-label">Fees &amp; buybacks</div>
-    <div class="grid grid-4">
-      <div class="card stat"><div class="stat-label">Fees · 24h</div><div class="stat-value" data-live id="ovFees24"></div><div class="stat-sub">→ HYPE buybacks</div></div>
-      <div class="card stat"><div class="stat-label">Fees · 7d</div><div class="stat-value" data-live id="ovFees7"></div><div class="stat-sub">→ HYPE buybacks</div></div>
-      <div class="card stat"><div class="stat-label">Fees · all-time</div><div class="stat-value" data-live id="ovFeesCum"></div><div class="stat-sub">cumulative since launch</div></div>
-      <div class="card stat"><div class="stat-label">Fee burns</div><div class="stat-value" data-live id="ovFeeBurn"></div><div class="stat-sub">HYPE, protocol-level</div></div>
-    </div>
-
-    <div class="cluster-label">Staking &amp; network</div>
-    <div class="grid grid-4">
-      <div class="card stat"><div class="stat-label">Staked</div><div class="stat-value" data-live id="ovStaked"></div><div class="stat-sub">HYPE delegated</div></div>
-      <div class="card stat"><div class="stat-label">Staking ratio</div><div class="stat-value" data-live id="ovStakePct"></div><div class="stat-sub">of circulating</div></div>
-      <div class="card stat"><div class="stat-label">Validators</div><div class="stat-value" data-live id="ovVals"></div><div class="stat-sub">active set</div></div>
-      <div class="card stat" id="cardHolders"><div class="stat-label">HYPE holders</div><div class="stat-value" data-live id="ovHolders"></div><div class="stat-sub">on HyperCore</div></div>
+  <!-- ============ TOP METRICS (full precision) ============ -->
+  <section class="wrap section-sm">
+    <div class="grid grid-3">
+      <div class="card mc2"><div class="mc2-glow" style="background:var(--fire)"></div>
+        <div class="mc2-label">🔥 Total Burned</div>
+        <div class="mc2-value fire mono" data-live id="mBurned">—</div>
+        <div class="mc2-sub mono" id="mBurnedSub">—</div>
+        <div class="mc2-brk" id="mBurnedBreakdown"></div>
+      </div>
+      <div class="card mc2"><div class="mc2-glow" style="background:var(--green)"></div>
+        <div class="mc2-label">🥩 Total Staked</div>
+        <div class="mc2-value green mono" data-live id="mStaked">—</div>
+        <div class="mc2-sub mono" id="mStakedSub">—</div>
+      </div>
+      <div class="card mc2"><div class="mc2-glow" style="background:var(--accent)"></div>
+        <div class="mc2-label">📊 Circulating</div>
+        <div class="mc2-value cyan mono" data-live id="mCirc">—</div>
+        <div class="mc2-sub mono" id="mCircSub">—</div>
+      </div>
     </div>
   </section>
 
-  <!-- ============ LIVE BUYBACK ENGINE ============ -->
-  <section class="wrap section">
-    <div class="ind-head">
+  <!-- ============ BURN MILESTONE ============ -->
+  <section class="wrap section-sm">
+    <BurnMilestone />
+  </section>
+
+  <!-- ============ AF INTELLIGENCE DECK (live) ============ -->
+  <section class="wrap section-sm">
+    <BuybackLive />
+  </section>
+
+  <!-- ============ ORDER FLOW ============ -->
+  <section class="wrap section-sm">
+    <OrderFlow />
+  </section>
+
+  <!-- ============ PRISM LIVE CHART ============ -->
+  <section class="wrap section-sm">
+    <div class="ind-head" style="margin-bottom:16px">
       <div>
-        <span class="eyebrow">Buyback engine · live</span>
-        <h2 class="section-title">Watch the burn, in real time.</h2>
-        <p class="section-lede">The Assistance Fund converts trading fees into HYPE and holds it — effectively removing it from supply. This samples the fund live; the chart climbs as buybacks land.</p>
+        <span class="eyebrow">Prism suite · live demo</span>
+        <h2 class="section-title" style="font-size:clamp(22px,3vw,30px)">Your indicators, on live HYPE.</h2>
       </div>
-      <a href="/burns" class="btn btn-ghost">Full tracker →</a>
+      <a href="/indicators" class="btn btn-ghost">Full versions →</a>
     </div>
-    <div style="margin-top:24px"><BuybackLive /></div>
-    <div style="margin-top:16px"><BurnHistory /></div>
+    <PrismChart />
+  </section>
+
+  <!-- ============ BUYBACK HISTORY ============ -->
+  <section class="wrap section-sm">
+    <h2 class="blk-title">📜 Buyback history</h2>
+    <BurnHistory />
+  </section>
+
+  <!-- ============ PLATFORM ============ -->
+  <section class="wrap section-sm">
+    <div class="cluster-label">Platform</div>
+    <div class="grid grid-4">
+      <div class="card stat"><div class="stat-label">Perp volume · 24h</div><div class="stat-value" data-live id="psVol">—</div><div class="stat-sub">Σ all HL perps</div></div>
+      <div class="card stat"><div class="stat-label">Open interest</div><div class="stat-value" data-live id="psOI">—</div><div class="stat-sub">notional, USD</div></div>
+      <div class="card stat"><div class="stat-label">Perp markets</div><div class="stat-value" data-live id="psMarkets">—</div><div class="stat-sub">listed on HL</div></div>
+      <div class="card stat"><div class="stat-label">Staking APR</div><div class="stat-value" data-live id="psApr">—</div><div class="stat-sub">474 / √staked</div></div>
+    </div>
+  </section>
+
+  <!-- ============ MARKET HEATMAP ============ -->
+  <section class="wrap section-sm">
+    <MarketHeatmap />
   </section>
 
   <!-- ============ INDICATORS TEASER ============ -->
@@ -112,26 +121,96 @@ const featured = INDICATORS.slice(0, 4);
       ))}
     </div>
   </section>
+
+  <!-- hidden share card (html2canvas target) -->
+  <div id="shareCard" style="position:fixed;left:-9999px;top:0;width:600px;padding:24px;background:#08090c;border:2px solid #222738;border-radius:12px;z-index:-1">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <CatLogo size={24} />
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#eef2ff">HYPE</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#00d4ff">INTELLIGENCE</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580;margin-left:auto">hype-site.com</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px">
+      <div id="sharePrice" style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#eef2ff"></div>
+      <div id="shareChg" style="font-family:'JetBrains Mono',monospace;font-size:14px"></div>
+      <div id="shareRating" style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin-left:auto;padding:4px 10px;border-radius:4px"></div>
+    </div>
+    <div id="shareHeadline" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fbbf24;margin-bottom:12px;padding:10px 12px;background:rgba(251,191,36,0.06);border-radius:6px;border-left:3px solid #fbbf24"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">5M FLOW</div>
+        <div id="shareFlow" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
+      </div>
+      <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">🔥 BURNED</div>
+        <div id="shareBurned" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff6b2b"></div>
+      </div>
+      <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">SUPPLY</div>
+        <div id="shareSupply" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700"></div>
+      </div>
+      <div style="padding:8px 10px;background:#12151c;border-radius:6px;border:1px solid #222738;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#5a6580;margin-bottom:3px">24H SPOT VOL</div>
+        <div id="shareVol" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#eef2ff"></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div id="shareStaked" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#00e676"></div>
+      <div id="shareTime" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#5a6580"></div>
+    </div>
+  </div>
 </Layout>
 
 <style>
-  .hero { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 40px; align-items: center; padding-top: 64px; padding-bottom: 28px; }
-  .hero-title { font-size: clamp(40px, 6vw, 76px); font-weight: 800; letter-spacing: -0.04em; }
-  .hero-cta { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 60px; padding-bottom: 12px; }
+  .hero-aura { position: absolute; top: -120px; left: 50%; width: min(720px, 90vw); height: 380px; transform: translateX(-50%); pointer-events: none; z-index: -1; filter: blur(80px) saturate(1.2); opacity: 0.5;
+    background:
+      radial-gradient(40% 55% at 36% 42%, rgba(0, 212, 255, 0.5), transparent 70%),
+      radial-gradient(38% 50% at 64% 50%, rgba(255, 107, 157, 0.34), transparent 70%),
+      radial-gradient(30% 42% at 50% 28%, rgba(167, 139, 250, 0.4), transparent 72%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-aura { animation: auraDrift 22s var(--ease) infinite alternate; }
+    @keyframes auraDrift {
+      0% { transform: translateX(-54%) rotate(-4deg) scale(1); }
+      100% { transform: translateX(-46%) rotate(5deg) scale(1.12); }
+    }
+    .hero > :not(.hero-aura) { opacity: 0; animation: heroIn 0.85s var(--ease) forwards; }
+    .hero > :nth-child(2) { animation-delay: 0.05s; }
+    .hero > :nth-child(3) { animation-delay: 0.16s; }
+    .hero > :nth-child(4) { animation-delay: 0.27s; }
+    .hero > :nth-child(5) { animation-delay: 0.38s; }
+    .hero > :nth-child(6) { animation-delay: 0.49s; }
+    .hero > :nth-child(7) { animation-delay: 0.6s; }
+    @keyframes heroIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  }
+  .hero-cat { filter: drop-shadow(0 0 22px rgba(0, 212, 255, 0.25)); }
+  .hero-tagline { margin-top: 16px; font-size: 11px; letter-spacing: 0.28em; color: var(--text-dim); }
+  .hero-price { margin-top: 14px; font-size: clamp(48px, 9vw, 76px); font-weight: 700; color: var(--text-bright); letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .hero-price .dollar { color: var(--text-faint); font-weight: 400; }
+  .hero-sub { margin-top: 10px; font-size: 13px; color: var(--text-mid); }
+  .hero-sent { margin-top: 10px; font-size: 11px; color: var(--text-dim); line-height: 1.5; max-width: 640px; padding: 0 12px; min-height: 17px; }
+  .share-btn { margin-top: 12px; font-size: 10px; letter-spacing: 0.04em; color: var(--accent); background: rgba(0, 212, 255, 0.04); border: 1px solid rgba(0, 212, 255, 0.18); border-radius: 6px; padding: 6px 16px; opacity: 0.75; transition: all 0.2s; }
+  .share-btn:hover { opacity: 1; border-color: var(--accent); }
+  #heroPrice.tick-up { animation: tkUp 0.7s ease; }
+  #heroPrice.tick-down { animation: tkDn 0.7s ease; }
+  @keyframes tkUp { 0% { color: var(--green); text-shadow: 0 0 28px rgba(0, 230, 118, 0.55); } 100% { color: var(--text-bright); } }
+  @keyframes tkDn { 0% { color: var(--red); text-shadow: 0 0 28px rgba(255, 61, 90, 0.55); } 100% { color: var(--text-bright); } }
 
-  .hero-price { padding: 26px; }
-  .hp-top { display: flex; align-items: center; justify-content: space-between; }
-  .hp-price { font-size: 52px; font-weight: 600; letter-spacing: -0.03em; margin-top: 14px; color: var(--text-bright); }
-  .hp-chg { font-size: 16px; margin-top: 2px; }
-  .hp-spark { width: 100%; height: 46px; display: block; margin-top: 14px; }
-  .hp-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
-  .hp-mini > div { display: flex; flex-direction: column; gap: 4px; }
-  .hp-mini .mono { font-size: 14px; color: var(--text); }
+  .mc2 { position: relative; overflow: hidden; padding: 18px 20px; }
+  .mc2-glow { position: absolute; top: 0; left: 0; right: 0; height: 2px; opacity: 0.55; }
+  .mc2-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 9px; }
+  .mc2-value { font-size: 23px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .mc2-value.fire { color: var(--fire); }
+  .mc2-value.green { color: var(--green); }
+  .mc2-value.cyan { color: var(--accent); }
+  .mc2-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 5px; }
+  .mc2-brk { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
 
-  .cluster-label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin: 26px 0 12px; display: flex; align-items: center; gap: 9px; }
+  .blk-title { font-size: 19px; margin-bottom: 16px; }
+  .cluster-label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 12px; display: flex; align-items: center; gap: 9px; }
   .cluster-label::before { content: ''; width: 16px; height: 2px; border-radius: 2px; background: var(--prism); }
-  .cluster-label:first-child { margin-top: 4px; }
-  .stat .stat-value { font-size: 23px; }
+  .stat .stat-value { font-size: 22px; }
 
   .ind-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
   .ind-mini { padding: 0; overflow: hidden; --ac: var(--accent); }
@@ -142,112 +221,103 @@ const featured = INDICATORS.slice(0, 4);
   .ind-badge { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ac); border: 1px solid color-mix(in srgb, var(--ac) 35%, transparent); padding: 2px 7px; border-radius: 5px; }
   .ind-mini-name { font-size: 17px; margin: 10px 0 6px; }
   .ind-mini-tag { font-size: 13px; color: var(--text-mid); line-height: 1.5; }
-
-  @media (max-width: 920px) {
-    .hero { grid-template-columns: 1fr; }
-    .hero-price { max-width: 460px; }
-  }
 </style>
 
 <script>
-  const AF = '0xfefefefefefefefefefefefefefefefefefefefe';
-  const MAXS = 1e9;
-  let circ = null, price = null, afHype = null, feeBurns = null, staked = null, lastSpark = null;
+  import { hlInfo, MAX_SUPPLY, stakeDivisor, F, setText } from '../lib/hl';
 
-  function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
-  function hideCard(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
-  function compactUsd(n) { return (n == null || !isFinite(n)) ? '—' : '$' + compact(n); }
-  function compact(n) {
-    if (n == null || !isFinite(n)) return '—';
-    const a = Math.abs(n), s = n < 0 ? '-' : '';
-    if (a >= 1e9) return s + (a / 1e9).toFixed(2) + 'B';
-    if (a >= 1e6) return s + (a / 1e6).toFixed(2) + 'M';
-    if (a >= 1e3) return s + (a / 1e3).toFixed(1) + 'K';
-    return s + a.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+  const $id = (i: string) => document.getElementById(i);
+  let cgChg: number | null = null, cgCirc: number | null = null, fees24: number | null = null;
+
+  let lastPx: number | null = null;
+  function renderHero() {
+    if (D.price) {
+      setText('heroPrice', F.f2(D.price));
+      const hp = $id('heroPrice');
+      if (hp && lastPx !== null && D.price !== lastPx) {
+        hp.classList.remove('tick-up', 'tick-down');
+        void (hp as HTMLElement).offsetWidth;
+        hp.classList.add(D.price > lastPx ? 'tick-up' : 'tick-down');
+      }
+      lastPx = D.price;
+    }
+    const circ = D.circSupply || cgCirc;
+    if (D.price && circ) setText('heroMcap', F.uc(D.price * circ));
+    if (D.price) setText('heroFdv', F.uc(D.price * MAX_SUPPLY));
+    if (cgChg != null) {
+      const el = $id('heroChg');
+      if (el) { el.textContent = (cgChg >= 0 ? '+' : '') + cgChg.toFixed(2) + '% 24h'; (el as HTMLElement).style.color = cgChg >= 0 ? 'var(--green)' : 'var(--red)'; }
+    }
   }
-  function stakeDivisor(raw) { for (const t of [1, 1e2, 1e4, 1e6, 1e8, 1e10, 1e12, 1e14, 1e16, 1e18]) { const x = raw / t; if (x >= 1e7 && x <= 1e9) return t; } return 1; }
-  async function postHl(body) { const r = await fetch('/api/hl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!r.ok) throw new Error('hl'); return r.json(); }
 
-  function recompute() {
-    if (afHype != null && price != null) setText('ovAfUsd', compactUsd(afHype * price));
-    if (afHype != null || feeBurns != null) { const rem = (afHype || 0) + (feeBurns || 0); setText('ovBurnPct', ((rem / MAXS) * 100).toFixed(2) + '%'); }
-    if (staked != null && circ) setText('ovStakePct', ((staked / circ) * 100).toFixed(1) + '%');
+  function renderBurned() {
+    const total = (D.afHype || 0) + (D.feesBurned || 0);
+    const circ = D.circSupply || cgCirc;
+    if (circ) { setText('mCirc', F.hype(circ) + ' HYPE'); setText('mCircSub', ((circ / MAX_SUPPLY) * 100).toFixed(1) + '% of max'); }
+    if (total <= 0) return;
+    setText('mBurned', F.hype(total) + ' HYPE');
+    const base = circ || MAX_SUPPLY;
+    setText('mBurnedSub', ((total / MAX_SUPPLY) * 100).toFixed(2) + '% of max · ' + ((total / base) * 100).toFixed(2) + '% of circ supply');
+    const brk = $id('mBurnedBreakdown');
+    if (brk) {
+      const row = (k: string, v: string) => '<div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;color:#8a94ac;padding:2px 0"><span>' + k + '</span><span style="color:#eef2ff;font-family:var(--font-mono)">' + v + '</span></div>';
+      brk.innerHTML =
+        row('AF HYPE (burned by vote)', F.hype(D.afHype || 0)) +
+        row('Fee burns (on-chain)', F.hype(D.feesBurned || 0)) +
+        (D.price ? row('Total value burned', F.uc(total * D.price)) : '');
+    }
   }
 
-  function drawSpark(prices) {
-    const cv = document.getElementById('ovSpark'); if (!cv || !Array.isArray(prices) || prices.length < 2) return;
-    lastSpark = prices;
-    const ctx = cv.getContext('2d'); const rect = cv.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1;
-    cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const w = rect.width, h = rect.height;
-    const min = Math.min.apply(null, prices), max = Math.max.apply(null, prices), rng = (max - min) || 1;
-    const up = prices[prices.length - 1] >= prices[0], col = up ? '#28e0c8' : '#ff6b8b';
-    ctx.clearRect(0, 0, w, h);
-    const X = (i) => (i / (prices.length - 1)) * w, Y = (p) => h - 3 - ((p - min) / rng) * (h - 6);
-    ctx.beginPath(); ctx.moveTo(X(0), Y(prices[0])); for (let i = 1; i < prices.length; i++) ctx.lineTo(X(i), Y(prices[i]));
-    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
-    const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, up ? 'rgba(40,224,200,0.22)' : 'rgba(255,107,139,0.22)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(X(0), Y(prices[0])); for (let i = 1; i < prices.length; i++) ctx.lineTo(X(i), Y(prices[i]));
-    ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.stroke();
+  function renderSentiment() {
+    const el = $id('heroSentiment'); if (!el) return;
+    const parts: string[] = [];
+    const dailyBurnUsd = D.weeklyBurnUsd ? D.weeklyBurnUsd / 7 : fees24 != null && fees24 > 0 ? fees24 * 0.99 : null;
+    if (dailyBurnUsd != null && D.price && D.staked) {
+      const emis = ((474 * 86400) / Math.sqrt(D.staked)) * D.price;
+      const net = dailyBurnUsd - emis;
+      parts.push(net > 0 ? '🔥 Net deflationary -$' + F.c(net) + '/day' : '⚖️ Net inflationary +$' + F.c(Math.abs(net)) + '/day');
+    }
+    const elapsed = D.sessStart ? (Date.now() - D.sessStart) / 1000 : 0;
+    if (D.sessFees > 0 && elapsed > 60 && D.dailyAvgFees) {
+      const dailyRate = (D.sessFees / (elapsed / 3600)) * 24;
+      parts.push('💵 Fees pacing ' + ((dailyRate / D.dailyAvgFees) * 100).toFixed(0) + '% of daily avg ($' + F.c(dailyRate) + '/day)');
+    } else if (elapsed > 30) {
+      parts.push('💵 Collecting fee data…');
+    }
+    el.textContent = parts.length ? parts.join(' · ') : 'Analyzing…';
+    (el as HTMLElement).style.color = parts.some((p) => p.includes('deflationary')) ? 'var(--green)' : parts.some((p) => p.includes('inflationary')) ? 'var(--red)' : 'var(--text-dim)';
   }
 
   async function loadCg() {
     try {
       const r = await fetch('/api/cg?id=hyperliquid'); if (!r.ok) return;
       const d = (await r.json())?.[0]; if (!d) return;
-      price = Number(d.current_price);
-      setText('ovPrice', '$' + price.toLocaleString('en-US', { maximumFractionDigits: price < 10 ? 4 : 2 }));
-      const chg = Number(d.price_change_percentage_24h), c = document.getElementById('ovChg');
-      if (c && isFinite(chg)) { c.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%'; c.className = 'hp-chg mono ' + (chg >= 0 ? 'up' : 'down'); }
-      setText('ovMcap', compactUsd(Number(d.market_cap)));
-      setText('ovCgVol', compactUsd(Number(d.total_volume)));
-      setText('ovAth', '$' + Number(d.ath).toLocaleString('en-US', { maximumFractionDigits: 2 }));
-      circ = Number(d.circulating_supply); setText('ovSupply', compact(circ));
-      if (d.sparkline_in_7d && Array.isArray(d.sparkline_in_7d.price)) drawSpark(d.sparkline_in_7d.price);
-      recompute();
-    } catch {}
-  }
-
-  async function loadPerps() {
-    try {
-      const data = await postHl({ type: 'metaAndAssetCtxs' });
-      const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
-      let vol = 0, oi = 0;
-      for (let i = 0; i < ctxs.length; i++) {
-        const c = ctxs[i] || {}; const v = Number(c.dayNtlVlm); if (isFinite(v)) vol += v;
-        const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx); if (isFinite(o) && isFinite(px)) oi += o * px;
-      }
-      setText('ovPerpVol', compactUsd(vol)); setText('ovOi', compactUsd(oi)); setText('ovMkts', String(meta.length || ctxs.length || '—'));
-    } catch {}
-  }
-
-  async function loadSpot() {
-    try {
-      const data = await postHl({ type: 'spotMetaAndAssetCtxs' });
-      const ctxs = Array.isArray(data) ? (data[1] || []) : [];
-      let svol = 0; ctxs.forEach((c) => { const v = Number(c.dayNtlVlm); if (isFinite(v)) svol += v; });
-      setText('ovSpotVol', compactUsd(svol));
-      const hy = ctxs.find((c) => c.coin === '@107' || c.coin === 'HYPE/USDC') || ctxs[107];
-      if (hy && hy.totalSupply) { const ts = Number(hy.totalSupply); if (ts > 0 && ts < MAXS) { feeBurns = MAXS - ts; setText('ovFeeBurn', compact(feeBurns) + ' HYPE'); recompute(); } }
+      if (!D.price && isFinite(+d.current_price)) D.price = +d.current_price;
+      if (isFinite(+d.price_change_percentage_24h)) cgChg = +d.price_change_percentage_24h;
+      if (isFinite(+d.circulating_supply)) cgCirc = +d.circulating_supply;
+      renderHero(); renderBurned();
     } catch {}
   }
 
   async function loadStaking() {
     try {
-      const vals = await postHl({ type: 'validatorSummaries' });
-      if (Array.isArray(vals) && vals.length) {
-        let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
-        staked = raw / stakeDivisor(raw);
-        setText('ovStaked', compact(staked) + ' HYPE'); setText('ovVals', String(vals.length)); recompute();
-      }
-    } catch {}
-  }
-
-  async function loadAf() {
-    try {
-      const s = await postHl({ type: 'spotClearinghouseState', user: AF });
-      if (s && s.balances) { const h = s.balances.find((b) => b.coin === 'HYPE' || b.token === 150); if (h) { afHype = parseFloat(h.total ?? h.hold ?? 0); setText('ovAfHype', compact(afHype) + ' HYPE'); recompute(); } }
+      const vals = await hlInfo<any[]>({ type: 'validatorSummaries' });
+      if (!Array.isArray(vals) || !vals.length) return;
+      let raw = 0; vals.forEach((v) => (raw += parseFloat(v.stake || 0)));
+      const div = stakeDivisor(raw);
+      let total = 0, fnd = 0, pub = 0;
+      vals.forEach((v) => {
+        const s = parseFloat(v.stake || 0) / div;
+        total += s;
+        const nm = (v.name || '').toLowerCase();
+        if (nm.includes('hyper foundation') || nm.includes('hyperfoundation')) fnd += s; else pub += s;
+      });
+      D.staked = total; D.publicStaked = pub; D.foundationStaked = fnd;
+      if (pub > 0) { setText('mStaked', F.hype(pub) + ' HYPE'); setText('mStakedSub', 'by holders · ' + F.hype(fnd) + ' Foundation separately'); }
+      else { setText('mStaked', F.hype(total) + ' HYPE'); setText('mStakedSub', ((total / MAX_SUPPLY) * 100).toFixed(1) + '% of supply'); }
+      if (total > 0) setText('psApr', ((474 / Math.sqrt(total)) * 100).toFixed(2) + '%');
+      renderSentiment();
     } catch {}
   }
 
@@ -255,34 +325,116 @@ const featured = INDICATORS.slice(0, 4);
     try {
       const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
       const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
-      const sorted = items.map((x) => ({ t: Number(x.time), f: Number(x.total_fees) / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
-      const last = sorted[sorted.length - 1].f;
-      const at = (agoSec) => { const target = Date.now() / 1000 - agoSec; let best = sorted[0]; for (const it of sorted) { if (it.t <= target) best = it; else break; } return best.f; };
-      setText('ovFeesCum', compactUsd(last));
-      setText('ovFees24', compactUsd(Math.max(0, last - at(86400))));
-      setText('ovFees7', compactUsd(Math.max(0, last - at(7 * 86400))));
+      const s = items.map((x: any) => ({ t: Number(x.time), f: Number(x.total_fees) / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+      const last = s[s.length - 1].f;
+      const target = Date.now() / 1000 - 86400; let best = s[0];
+      for (const it of s) { if (it.t <= target) best = it; else break; }
+      fees24 = Math.max(0, last - best.f);
+      if (!D.dailyAvgFees && fees24 > 0) D.dailyAvgFees = fees24;
+      renderSentiment();
     } catch {}
   }
 
-  async function loadHolders() {
+  async function loadPerps() {
     try {
-      const r = await fetch('/api/hs?path=/holdersStats'); if (!r.ok) { hideCard('cardHolders'); return; }
-      const d = await r.json(); let n = null;
-      if (typeof d === 'number') n = d;
-      else if (Array.isArray(d)) n = d.length;
-      else if (d) n = Number(d.holders ?? d.numHolders ?? d.holdersCount ?? d.count ?? d.total ?? NaN);
-      if (n && isFinite(n) && n > 0) setText('ovHolders', compact(n)); else hideCard('cardHolders');
-    } catch { hideCard('cardHolders'); }
+      const data = await hlInfo<any>({ type: 'metaAndAssetCtxs' });
+      const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
+      let vol = 0, oi = 0;
+      for (const c of ctxs) {
+        const v = Number(c.dayNtlVlm); if (isFinite(v)) vol += v;
+        const o = Number(c.openInterest), px = Number(c.oraclePx ?? c.markPx);
+        if (isFinite(o) && isFinite(px)) oi += o * px;
+      }
+      setText('psVol', F.uc(vol)); setText('psOI', F.uc(oi)); setText('psMarkets', String(meta.length || ctxs.length || '—'));
+    } catch {}
   }
 
-  window.addEventListener('resize', () => { if (lastSpark) drawSpark(lastSpark); });
+  // ── Share Stats (html2canvas → clipboard → download → text) ──
+  async function shareStats() {
+    const btn = $id('shareStatsBtn'); if (btn) btn.textContent = '📸 …';
+    const card = $id('shareCard') as HTMLElement | null;
+    if (!card) { if (btn) btn.textContent = '📸 Share Stats'; return; }
+    const total = (D.afHype || 0) + (D.feesBurned || 0);
+    const bV = D.buy5 || 0, sV = D.sell5 || 0, tot5 = bV + sV;
+    const dailyBurnUsd = D.weeklyBurnUsd ? D.weeklyBurnUsd / 7 : fees24 != null && fees24 > 0 ? fees24 * 0.99 : null;
+    let net: number | null = null;
+    if (dailyBurnUsd != null && D.price && D.staked) net = dailyBurnUsd - ((474 * 86400) / Math.sqrt(D.staked)) * D.price;
 
-  loadCg(); loadPerps(); loadSpot(); loadStaking(); loadAf(); loadFees(); loadHolders();
+    setText('sharePrice', '$' + F.f2(D.price || 0));
+    const chgEl = $id('shareChg');
+    if (chgEl && cgChg != null) { chgEl.textContent = (cgChg >= 0 ? '+' : '') + cgChg.toFixed(2) + '%'; (chgEl as HTMLElement).style.color = cgChg >= 0 ? '#00e676' : '#ff3d5a'; }
+    const rl = $id('ratingLabel'), rs = $id('ratingScore'), rEl = $id('shareRating');
+    if (rEl) {
+      if (rl && rs && rl.textContent && rl.textContent !== 'Loading…') {
+        const sc = parseInt(rs.textContent || '50') || 50;
+        rEl.textContent = (rl.textContent || '').toUpperCase();
+        (rEl as HTMLElement).style.color = sc > 60 ? '#00e676' : sc > 40 ? '#fbbf24' : '#ff3d5a';
+        (rEl as HTMLElement).style.background = sc > 60 ? 'rgba(0,230,118,0.12)' : sc > 40 ? 'rgba(251,191,36,0.12)' : 'rgba(255,61,90,0.12)';
+      } else rEl.textContent = '';
+    }
+    let head = '🔥 Hyperliquid burns > emissions — HYPE is deflationary';
+    if (tot5 > 50000 && bV / tot5 > 0.7) head = '💪 Heavy buying: ' + ((bV / tot5) * 100).toFixed(0) + '% buy flow in 5 min ($' + F.c(bV) + ' buys vs $' + F.c(sV) + ' sells)';
+    else if (tot5 > 50000 && bV / tot5 < 0.3) head = '🔻 Heavy selling: ' + (100 - (bV / tot5) * 100).toFixed(0) + '% sell flow in 5 min ($' + F.c(sV) + ' sells vs $' + F.c(bV) + ' buys)';
+    else if (net != null && net > 0) head = '🔥 Net deflationary: -$' + F.c(net) + '/day removed from supply';
+    setText('shareHeadline', head);
+    const fEl = $id('shareFlow');
+    if (fEl) {
+      if (tot5 > 500) { fEl.textContent = ((bV / tot5) * 100).toFixed(0) + '% BUY'; (fEl as HTMLElement).style.color = bV >= sV ? '#00e676' : '#ff3d5a'; }
+      else { fEl.textContent = '—'; (fEl as HTMLElement).style.color = '#5a6580'; }
+    }
+    setText('shareBurned', total > 0 ? F.c(total) + ' HYPE' : '—');
+    const sEl = $id('shareSupply');
+    if (sEl) {
+      if (net != null) { sEl.textContent = (net > 0 ? '-$' : '+$') + F.c(Math.abs(net)) + '/d'; (sEl as HTMLElement).style.color = net > 0 ? '#00e676' : '#ff3d5a'; }
+      else { sEl.textContent = '—'; (sEl as HTMLElement).style.color = '#5a6580'; }
+    }
+    setText('shareVol', D.spotVol ? '$' + F.c(D.spotVol) : '—');
+    setText('shareStaked', D.publicStaked ? F.c(D.publicStaked) + ' HYPE staked by holders' : '');
+    setText('shareTime', new Date().toLocaleString());
+
+    card.style.left = '0'; card.style.top = '0'; card.style.zIndex = '99999';
+    try {
+      if (typeof (window as any).html2canvas === 'undefined') {
+        await new Promise<void>((res) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+          s.onload = () => res(); s.onerror = () => res();
+          document.head.appendChild(s);
+        });
+      }
+      const h2c = (window as any).html2canvas;
+      if (!h2c) throw new Error('no html2canvas');
+      const canvas = await h2c(card, { backgroundColor: '#08090c', scale: 2, useCORS: true });
+      card.style.left = '-9999px'; card.style.zIndex = '-1';
+      canvas.toBlob(async (blob: Blob | null) => {
+        if (!blob) { if (btn) btn.textContent = '📸 Share Stats'; return; }
+        try {
+          await (navigator.clipboard as any).write([new (window as any).ClipboardItem({ 'image/png': blob })]);
+          if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => (btn.textContent = '📸 Share Stats'), 3000); }
+        } catch {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = 'hype-alpha-' + Date.now() + '.png'; a.click();
+          URL.revokeObjectURL(url);
+          if (btn) { btn.textContent = '✅ Saved!'; setTimeout(() => (btn.textContent = '📸 Share Stats'), 3000); }
+        }
+      }, 'image/png');
+    } catch {
+      card.style.left = '-9999px'; card.style.zIndex = '-1';
+      try {
+        await navigator.clipboard.writeText('HYPE $' + F.f2(D.price || 0) + (cgChg != null ? ' (' + (cgChg >= 0 ? '+' : '') + cgChg.toFixed(1) + '%)' : '') + '\n' + head + '\nhype-site.com');
+        if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => (btn.textContent = '📸 Share Stats'), 3000); }
+      } catch { if (btn) btn.textContent = '📸 Share Stats'; }
+    }
+  }
+  $id('shareStatsBtn')?.addEventListener('click', shareStats);
+
+  // live re-render whenever the deck ticks (price / AF / burns move)
+  window.addEventListener('hype:tick', () => { renderHero(); renderBurned(); });
+  setInterval(renderSentiment, 5000);
+
+  loadCg(); loadStaking(); loadFees(); loadPerps();
   setInterval(loadCg, 30000);
-  setInterval(loadPerps, 30000);
-  setInterval(loadSpot, 45000);
   setInterval(loadStaking, 60000);
-  setInterval(loadAf, 30000);
   setInterval(loadFees, 120000);
-  setInterval(loadHolders, 300000);
+  setInterval(loadPerps, 60000);
 </script>

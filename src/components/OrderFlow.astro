@@ -1,0 +1,258 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  ORDER FLOW — 🐋 HYPE depth radar (live l2 book, wall detection,
+//  bid/ask imbalance) + ⚖️ funding dial with 7-day history.
+// ═══════════════════════════════════════════════════════════════
+---
+<div class="of-grid">
+  <!-- DEPTH RADAR -->
+  <div class="card of-depth">
+    <div class="of-head">
+      <span class="of-title">🐋 HYPE Depth Radar</span>
+      <span class="mono dim" id="ofMeta">connecting…</span>
+    </div>
+    <div class="of-walls mono">
+      <span class="of-wall up" id="ofBidWall">🧱 — </span>
+      <span class="of-wall down" id="ofAskWall">🧱 —</span>
+    </div>
+    <canvas id="ofDepth"></canvas>
+    <div class="of-stats mono">
+      <span><i class="dim">Bids ±2%</i> <b style="color:var(--green)" data-live id="ofBidD">—</b></span>
+      <span id="ofImb" class="of-imb">—</span>
+      <span><b style="color:var(--red)" data-live id="ofAskD">—</b> <i class="dim">Asks ±2%</i></span>
+    </div>
+  </div>
+
+  <!-- FUNDING DIAL -->
+  <div class="card of-fund">
+    <div class="of-head">
+      <span class="of-title">⚖️ HYPE Funding</span>
+      <span class="mono dim" id="ofFMeta">1h epochs</span>
+    </div>
+    <canvas id="ofGauge"></canvas>
+    <div class="of-fval mono" data-live id="ofFVal">—</div>
+    <div class="of-fsub mono" id="ofFSub">—</div>
+    <div class="of-fhist-label mono dim">last 7 days · hourly</div>
+    <canvas id="ofFHist"></canvas>
+  </div>
+</div>
+
+<style>
+  .of-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 14px; }
+  .of-depth, .of-fund { padding: 16px 18px; }
+  .of-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .of-title { font-weight: 700; color: var(--text-bright); font-size: 15px; }
+  .of-head .dim { font-size: 10.5px; }
+  .of-walls { display: flex; justify-content: space-between; gap: 10px; font-size: 10.5px; margin-bottom: 6px; flex-wrap: wrap; }
+  .of-wall.up { color: var(--green); }
+  .of-wall.down { color: var(--red); }
+  #ofDepth { width: 100%; height: 210px; display: block; }
+  .of-stats { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px; font-size: 11px; flex-wrap: wrap; }
+  .of-imb { font-weight: 700; font-size: 11.5px; }
+  .of-fund { display: flex; flex-direction: column; }
+  #ofGauge { width: 100%; height: 96px; display: block; }
+  .of-fval { font-size: 26px; font-weight: 700; text-align: center; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .of-fsub { font-size: 10.5px; color: var(--text-dim); text-align: center; margin-top: 2px; }
+  .of-fhist-label { font-size: 9.5px; margin: 12px 0 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+  #ofFHist { width: 100%; height: 52px; display: block; }
+  @media (max-width: 900px) { .of-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { hlInfo, F, setText } from '../lib/hl';
+
+  const depthCv = document.getElementById('ofDepth') as HTMLCanvasElement | null;
+  const gaugeCv = document.getElementById('ofGauge') as HTMLCanvasElement | null;
+  const histCv = document.getElementById('ofFHist') as HTMLCanvasElement | null;
+  if (depthCv && gaugeCv && histCv) {
+    const dctx = depthCv.getContext('2d')!;
+    const gctx = gaugeCv.getContext('2d')!;
+    const hctx = histCv.getContext('2d')!;
+    const dpr = () => window.devicePixelRatio || 1;
+    const fit = (cv: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+      const r = cv.getBoundingClientRect();
+      cv.width = Math.round(r.width * dpr()); cv.height = Math.round(r.height * dpr());
+      ctx.setTransform(dpr(), 0, 0, dpr(), 0, 0);
+      return r;
+    };
+
+    // ── DEPTH ──
+    type Lvl = { px: number; sz: number };
+    let bids: Lvl[] = [], asks: Lvl[] = [], mid = 0;
+
+    function drawDepth() {
+      const r = fit(depthCv!, dctx);
+      const W = r.width, H = r.height;
+      dctx.clearRect(0, 0, W, H);
+      if (!bids.length || !asks.length || !mid) return;
+      const span = Math.max(mid - bids[bids.length - 1].px, asks[asks.length - 1].px - mid) * 1.02 || mid * 0.01;
+      const lo = mid - span, hi = mid + span;
+      const X = (p: number) => ((p - lo) / (hi - lo)) * W;
+      let cum = 0; const bPts: { x: number; c: number }[] = [];
+      for (const l of bids) { cum += l.px * l.sz; bPts.push({ x: X(l.px), c: cum }); }
+      const bMax = cum;
+      cum = 0; const aPts: { x: number; c: number }[] = [];
+      for (const l of asks) { cum += l.px * l.sz; aPts.push({ x: X(l.px), c: cum }); }
+      const aMax = cum;
+      const cMax = Math.max(bMax, aMax) || 1;
+      const Y = (c: number) => H - 18 - (c / cMax) * (H - 34);
+
+      // grid baseline
+      dctx.strokeStyle = 'rgba(34,39,56,0.6)';
+      dctx.beginPath(); dctx.moveTo(0, H - 18); dctx.lineTo(W, H - 18); dctx.stroke();
+
+      const area = (pts: { x: number; c: number }[], edgeX: number, col: string, fill: string) => {
+        if (!pts.length) return;
+        dctx.beginPath();
+        dctx.moveTo(X(mid), H - 18);
+        dctx.lineTo(X(mid), Y(pts[0].c * 0 + pts[0].c) - (Y(pts[0].c) - Y(pts[0].c)));
+        dctx.lineTo(X(mid), Y(pts[0].c));
+        for (const p of pts) dctx.lineTo(p.x, Y(p.c));
+        dctx.lineTo(edgeX, Y(pts[pts.length - 1].c));
+        dctx.lineTo(edgeX, H - 18);
+        dctx.closePath();
+        dctx.fillStyle = fill; dctx.fill();
+        dctx.beginPath();
+        dctx.moveTo(X(mid), Y(pts[0].c));
+        for (const p of pts) dctx.lineTo(p.x, Y(p.c));
+        dctx.lineTo(edgeX, Y(pts[pts.length - 1].c));
+        dctx.strokeStyle = col; dctx.lineWidth = 1.8;
+        dctx.shadowColor = col; dctx.shadowBlur = 8; dctx.stroke(); dctx.shadowBlur = 0;
+      };
+      area(bPts, 0, '#00e676', 'rgba(0,230,118,0.14)');
+      area(aPts, W, '#ff3d5a', 'rgba(255,61,90,0.12)');
+
+      // mid line
+      dctx.setLineDash([4, 4]);
+      dctx.strokeStyle = 'rgba(0,212,255,0.7)';
+      dctx.beginPath(); dctx.moveTo(X(mid), 4); dctx.lineTo(X(mid), H - 18); dctx.stroke();
+      dctx.setLineDash([]);
+      dctx.fillStyle = '#00d4ff'; dctx.font = '700 10px JetBrains Mono, monospace'; dctx.textAlign = 'center';
+      dctx.fillText('$' + F.f2(mid), X(mid), 12);
+      dctx.textAlign = 'left';
+      dctx.fillStyle = 'rgba(138,148,172,0.7)'; dctx.font = '9px JetBrains Mono, monospace';
+      dctx.fillText('$' + F.f2(lo), 4, H - 5);
+      dctx.textAlign = 'right'; dctx.fillText('$' + F.f2(hi), W - 4, H - 5);
+      dctx.textAlign = 'left';
+
+      // walls (largest single level by notional)
+      const wall = (lvls: Lvl[], col: string) => {
+        let best: Lvl | null = null;
+        for (const l of lvls) if (!best || l.px * l.sz > best.px * best.sz) best = l;
+        if (!best) return null;
+        const wx = X(best.px);
+        dctx.fillStyle = col;
+        dctx.beginPath(); dctx.moveTo(wx, H - 18); dctx.lineTo(wx - 4, H - 10); dctx.lineTo(wx + 4, H - 10); dctx.closePath(); dctx.fill();
+        return best;
+      };
+      const bw = wall(bids, '#00e676');
+      const aw = wall(asks, '#ff3d5a');
+      if (bw) setText('ofBidWall', '🧱 ' + F.uc(bw.px * bw.sz) + ' bid @ $' + F.f2(bw.px));
+      if (aw) setText('ofAskWall', '🧱 ' + F.uc(aw.px * aw.sz) + ' ask @ $' + F.f2(aw.px));
+
+      // ±2% depth + imbalance
+      const within = (lvls: Lvl[], loP: number, hiP: number) => lvls.reduce((s, l) => (l.px >= loP && l.px <= hiP ? s + l.px * l.sz : s), 0);
+      const bd = within(bids, mid * 0.98, mid);
+      const ad = within(asks, mid, mid * 1.02);
+      setText('ofBidD', F.uc(bd));
+      setText('ofAskD', F.uc(ad));
+      const imb = document.getElementById('ofImb');
+      if (imb && bd > 0 && ad > 0) {
+        const ratio = bd / ad;
+        imb.textContent = ratio >= 1 ? 'Bids ' + ratio.toFixed(2) + '× heavier' : 'Asks ' + (1 / ratio).toFixed(2) + '× heavier';
+        (imb as HTMLElement).style.color = ratio >= 1.05 ? 'var(--green)' : ratio <= 0.95 ? 'var(--red)' : 'var(--text-dim)';
+      }
+    }
+
+    async function loadBook() {
+      try {
+        const d = await hlInfo<any>({ type: 'l2Book', coin: 'HYPE' });
+        const lv = d?.levels;
+        if (!Array.isArray(lv) || lv.length < 2) return;
+        bids = (lv[0] || []).map((l: any) => ({ px: +l.px, sz: +l.sz })).filter((l: Lvl) => isFinite(l.px) && isFinite(l.sz)).sort((a: Lvl, b: Lvl) => b.px - a.px);
+        asks = (lv[1] || []).map((l: any) => ({ px: +l.px, sz: +l.sz })).filter((l: Lvl) => isFinite(l.px) && isFinite(l.sz)).sort((a: Lvl, b: Lvl) => a.px - b.px);
+        if (bids[0] && asks[0]) mid = (bids[0].px + asks[0].px) / 2;
+        setText('ofMeta', 'live · ' + new Date().toLocaleTimeString() + ' · ' + (bids.length + asks.length) + ' levels');
+        drawDepth();
+      } catch {}
+    }
+
+    // ── FUNDING ──
+    let fNow: number | null = null;
+    let fHist: { t: number; v: number }[] = [];
+
+    function drawGauge() {
+      const r = fit(gaugeCv!, gctx);
+      const W = r.width, H = r.height;
+      gctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H - 6, R = Math.min(W / 2 - 8, H - 14);
+      const arc = (a0: number, a1: number, col: string) => {
+        gctx.beginPath(); gctx.arc(cx, cy, R, a0, a1);
+        gctx.strokeStyle = col; gctx.lineWidth = 9; gctx.lineCap = 'butt'; gctx.stroke();
+      };
+      arc(Math.PI, Math.PI * 1.5, 'rgba(255,61,90,0.3)');
+      arc(Math.PI * 1.5, Math.PI * 2, 'rgba(0,230,118,0.3)');
+      gctx.fillStyle = 'rgba(138,148,172,0.7)'; gctx.font = '8.5px JetBrains Mono, monospace';
+      gctx.textAlign = 'left'; gctx.fillText('-50%', 2, cy);
+      gctx.textAlign = 'center'; gctx.fillText('0', cx, cy - R - 4);
+      gctx.textAlign = 'right'; gctx.fillText('+50%', W - 2, cy);
+      gctx.textAlign = 'left';
+      if (fNow == null) return;
+      const ann = fNow * 24 * 365 * 100;
+      const t = Math.max(-1, Math.min(1, ann / 50));
+      const a = Math.PI + ((t + 1) / 2) * Math.PI;
+      const col = ann >= 0 ? '#00e676' : '#ff3d5a';
+      gctx.beginPath(); gctx.moveTo(cx, cy);
+      gctx.lineTo(cx + Math.cos(a) * (R - 4), cy + Math.sin(a) * (R - 4));
+      gctx.strokeStyle = col; gctx.lineWidth = 2.5; gctx.shadowColor = col; gctx.shadowBlur = 10; gctx.stroke(); gctx.shadowBlur = 0;
+      gctx.beginPath(); gctx.arc(cx, cy, 4, 0, 7); gctx.fillStyle = '#eef2ff'; gctx.fill();
+    }
+
+    function drawHist() {
+      const r = fit(histCv!, hctx);
+      const W = r.width, H = r.height;
+      hctx.clearRect(0, 0, W, H);
+      if (!fHist.length) return;
+      const mx = Math.max(...fHist.map((f) => Math.abs(f.v))) || 1;
+      const bw = Math.max(1, W / fHist.length - 0.6);
+      const mid = H / 2;
+      hctx.strokeStyle = 'rgba(34,39,56,0.8)';
+      hctx.beginPath(); hctx.moveTo(0, mid); hctx.lineTo(W, mid); hctx.stroke();
+      fHist.forEach((f, i) => {
+        const x = (i / fHist.length) * W;
+        const h = (Math.abs(f.v) / mx) * (H / 2 - 2);
+        hctx.fillStyle = f.v >= 0 ? 'rgba(0,230,118,0.7)' : 'rgba(255,61,90,0.7)';
+        hctx.fillRect(x, f.v >= 0 ? mid - h : mid, bw, Math.max(1, h));
+      });
+    }
+
+    async function loadFunding() {
+      try {
+        const data = await hlInfo<any>({ type: 'metaAndAssetCtxs' });
+        const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
+        for (let i = 0; i < meta.length; i++) {
+          if (meta[i]?.name === 'HYPE') { const f = Number(ctxs[i]?.funding); if (isFinite(f)) fNow = f; break; }
+        }
+        if (fNow != null) {
+          const ann = fNow * 24 * 365 * 100;
+          const el = document.getElementById('ofFVal');
+          if (el) { el.textContent = (ann >= 0 ? '+' : '') + ann.toFixed(2) + '%'; (el as HTMLElement).style.color = ann >= 0 ? 'var(--green)' : 'var(--red)'; }
+          setText('ofFSub', (ann >= 0 ? 'longs pay shorts' : 'shorts pay longs') + ' · ' + (fNow * 100).toFixed(5) + '% / 1h');
+          drawGauge();
+        }
+      } catch {}
+      try {
+        const hist = await hlInfo<any[]>({ type: 'fundingHistory', coin: 'HYPE', startTime: Date.now() - 7 * 86400e3 });
+        if (Array.isArray(hist) && hist.length) {
+          fHist = hist.map((h) => ({ t: +h.time, v: +h.fundingRate })).filter((h) => isFinite(h.v)).slice(-168);
+          drawHist();
+        }
+      } catch {}
+    }
+
+    window.addEventListener('resize', () => { drawDepth(); drawGauge(); drawHist(); });
+    loadBook(); loadFunding();
+    setInterval(loadBook, 4500);
+    setInterval(loadFunding, 60000);
+  }
+</script>

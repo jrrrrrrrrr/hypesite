@@ -1,0 +1,41 @@
+---
+// The original HYPE Intelligence cat — ported verbatim from the legacy dashboard.
+// size <= 40 renders the compact nav cat; larger sizes render the hero cat
+// with the glow filter and blinking-eye animation.
+interface Props { size?: number; }
+const { size = 24 } = Astro.props;
+const hero = size > 40;
+const uid = 'cat' + Math.random().toString(36).slice(2, 7);
+---
+{hero ? (
+  <svg class="hero-cat-svg" viewBox="0 0 80 80" width={size} height={size} aria-hidden="true">
+    <defs>
+      <linearGradient id={uid} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#a78bfa" /><stop offset="40%" stop-color="#00d4ff" /><stop offset="100%" stop-color="#ff6b9d" />
+      </linearGradient>
+      <filter id={uid + 'g'}><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+    </defs>
+    <g filter={`url(#${uid}g)`}>
+      <path d="M15 25L20 7.5c0-1.2 1.5-1.8 2.2-.8L30 16h20l7.8-9.3c.7-1 2.2-.4 2.2.8L65 25c5 6 5 14 0 20-3.7 5-10 8.7-17.5 10v3.7c0 2-1.7 3.7-3.7 3.7h-7.6c-2 0-3.7-1.7-3.7-3.7V55C25.7 53.7 19 50 15.5 45c-5-6-5-14 0-20z" fill={`url(#${uid})`} opacity="0.9" />
+      <circle cx="30" cy="34" r="6" fill="#08090c" /><circle cx="50" cy="34" r="6" fill="#08090c" />
+      <circle cx="32" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite" /></circle>
+      <circle cx="52" cy="32" r="2.2" fill="#eef2ff"><animate attributeName="cy" values="32;31;32" dur="3s" repeatCount="indefinite" /></circle>
+      <ellipse cx="40" cy="44" rx="3" ry="2" fill="#ff6b9d" />
+      <path d="M35 47q5 3.5 10 0" stroke="#08090c" stroke-width="1.4" fill="none" stroke-linecap="round" />
+      <path d="M32 42l-7 2.5M32 44.5l-7 0M32 47l-6-2M48 42l7 2.5M48 44.5l7 0M48 47l6-2" stroke="#08090c" stroke-width="0.8" opacity="0.25" />
+    </g>
+  </svg>
+) : (
+  <svg viewBox="0 0 32 32" width={size} height={size} aria-hidden="true">
+    <defs>
+      <linearGradient id={uid} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#a78bfa" /><stop offset="100%" stop-color="#00d4ff" />
+      </linearGradient>
+    </defs>
+    <path d="M6 10L8 3c0-.5.6-.7.9-.3l3 3.3h8.2l3-3.3c.3-.4.9-.2.9.3l2 7c2 2.5 2 5.5 0 8-1.5 2-4 3.5-7 4v1.5c0 .8-.7 1.5-1.5 1.5h-5c-.8 0-1.5-.7-1.5-1.5V22c-3-.5-5.5-2-7-4-2-2.5-2-5.5 0-8z" fill={`url(#${uid})`} opacity="0.9" />
+    <circle cx="12" cy="14" r="2.5" fill="#08090c" /><circle cx="20" cy="14" r="2.5" fill="#08090c" />
+    <circle cx="12.8" cy="13.3" r="0.9" fill="#eef2ff" /><circle cx="20.8" cy="13.3" r="0.9" fill="#eef2ff" />
+    <ellipse cx="16" cy="18" rx="1.2" ry="0.8" fill="#ff6b9d" />
+    <path d="M14 19.5q2 1.5 4 0" stroke="#08090c" stroke-width="0.6" fill="none" />
+  </svg>
+)}

@@ -1,7 +1,7 @@
 ---
 // Historical buyback / burn charts, sourced from HypurrScan /fees (via /api/hs).
 // total_fees is cumulative micro-USD; ~99% of fees fund the Assistance Fund's
-// HYPE buybacks (the "holders share"), per the protocol.
+// HYPE buybacks (the holders' share) — 97% before Sep 2025.
 ---
 <div class="bh">
   <div class="bh-head">
@@ -39,9 +39,9 @@
   #bhCum { color: var(--accent); }
   .bh-range { display: inline-flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
   .bh-range button { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); padding: 6px 12px; border-radius: 999px; transition: all 0.2s; }
-  .bh-range button.active { color: #06120f; background: var(--accent); font-weight: 600; }
+  .bh-range button.active { color: #04121a; background: var(--accent); font-weight: 600; }
   .bh-panel { padding: 16px; margin-bottom: 12px; }
-  .bh-clabel { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--text-mid); margin-bottom: 10px; text-transform: uppercase; }
+  .bh-clabel { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; font-weight: 600; color: var(--text-mid); margin-bottom: 10px; text-transform: uppercase; }
   .bh-cwrap, .bh-bwrap { position: relative; }
   #bhCumCanvas { width: 100%; height: 220px; display: block; }
   #bhBarCanvas { width: 100%; height: 150px; display: block; }
@@ -57,7 +57,7 @@
   if (cumCanvas && barCanvas) {
     const cc = cumCanvas.getContext('2d')!;
     const bc = barCanvas.getContext('2d')!;
-    const PRISM = ['#b388ff', '#6aa8ff', '#28e0c8', '#ffd166'];
+    const PRISM = ['#a78bfa', '#00d4ff', '#ff6b9d'];
     const ratio = (tSec: number) => (tSec > 1756512000 ? 0.99 : 0.97);
 
     type Pt = { t: number; v: number };
@@ -98,15 +98,15 @@
       for (let i = 1; i < data.length; i++) cc.lineTo(x(i), y(data[i].v));
       cc.lineTo(x(data.length - 1), h - padB); cc.lineTo(x(0), h - padB); cc.closePath();
       const fill = cc.createLinearGradient(0, padT, 0, h - padB);
-      fill.addColorStop(0, 'rgba(40,224,200,0.26)'); fill.addColorStop(1, 'rgba(40,224,200,0.01)');
+      fill.addColorStop(0, 'rgba(0,212,255,0.22)'); fill.addColorStop(1, 'rgba(0,212,255,0.01)');
       cc.fillStyle = fill; cc.fill();
       const grad = cc.createLinearGradient(padL, 0, w - padR, 0);
       PRISM.forEach((c, i) => grad.addColorStop(i / (PRISM.length - 1), c));
       cc.beginPath(); cc.moveTo(x(0), y(data[0].v));
       for (let i = 1; i < data.length; i++) cc.lineTo(x(i), y(data[i].v));
       cc.strokeStyle = grad; cc.lineWidth = 2.2; cc.lineJoin = 'round';
-      cc.shadowColor = 'rgba(40,224,200,0.45)'; cc.shadowBlur = 12; cc.stroke(); cc.shadowBlur = 0;
-      cc.fillStyle = 'rgba(147,160,182,0.6)'; cc.font = '10px ui-monospace, monospace'; cc.textAlign = 'left';
+      cc.shadowColor = 'rgba(0,212,255,0.45)'; cc.shadowBlur = 12; cc.stroke(); cc.shadowBlur = 0;
+      cc.fillStyle = 'rgba(138,148,172,0.65)'; cc.font = '10px ui-monospace, monospace'; cc.textAlign = 'left';
       cc.fillText('$' + F.c(max), padL + 2, padT + 2);
       cc.fillText(new Date(data[0].t).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }), padL + 2, h - 5);
       cc.textAlign = 'right';
@@ -123,18 +123,18 @@
       const cw = (w - padL - padR) / data.length;
       const bw = Math.max(1, Math.min(cw * 0.8, 14));
       const grad = bc.createLinearGradient(0, padT, 0, h - padB);
-      grad.addColorStop(0, '#28e0c8'); grad.addColorStop(1, 'rgba(106,168,255,0.5)');
+      grad.addColorStop(0, '#ff6b2b'); grad.addColorStop(1, 'rgba(255,107,43,0.4)');
       for (let i = 0; i < data.length; i++) {
         const bh = ((data[i].v * p) / max) * (h - padT - padB);
         const bx = padL + i * cw + (cw - bw) / 2;
         const by = h - padB - bh;
-        bc.fillStyle = i === data.length - 1 ? '#eafff9' : grad;
+        bc.fillStyle = i === data.length - 1 ? '#ffe1c7' : grad;
         bc.beginPath();
         const rr = Math.min(2, bw / 2);
         bc.roundRect(bx, by, bw, Math.max(0, bh), [rr, rr, 0, 0]);
         bc.fill();
       }
-      bc.fillStyle = 'rgba(147,160,182,0.6)'; bc.font = '10px ui-monospace, monospace'; bc.textAlign = 'left';
+      bc.fillStyle = 'rgba(138,148,172,0.65)'; bc.font = '10px ui-monospace, monospace'; bc.textAlign = 'left';
       bc.fillText('peak $' + F.c(max) + '/day', padL + 2, padT + 2);
     }
 

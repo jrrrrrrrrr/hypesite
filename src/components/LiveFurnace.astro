@@ -1,0 +1,254 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  LIVE FURNACE — fees stream in (green), HYPE burns out (fire).
+//  Every number is real: the fee odometer ticks at the true
+//  per-second rate from HypurrScan; the burn odometer ticks at the
+//  live burn rate; bursts fire only when actual on-chain deltas
+//  land (AF buys HYPE / fee-burn counter moves).
+// ═══════════════════════════════════════════════════════════════
+---
+<div class="card furnace">
+  <div class="fz-head">
+    <div class="fz-odo">
+      <div class="fz-lab mono">💵 Fees · last 24h <span class="fz-live mono">● LIVE</span></div>
+      <div class="fz-num green mono" data-live id="fzFees">—</div>
+      <div class="fz-rate mono" id="fzFeesRate">—</div>
+    </div>
+    <div class="fz-mid mono">FEES IN <span class="fz-arrow">⟶</span> 🔥 <span class="fz-arrow">⟶</span> SUPPLY OUT</div>
+    <div class="fz-odo fz-right">
+      <div class="fz-lab mono"><span class="fz-live fire mono">LIVE ●</span> Total HYPE burned 🔥</div>
+      <div class="fz-num fire mono" data-live id="fzBurned">—</div>
+      <div class="fz-rate mono" id="fzBurnRate">—</div>
+    </div>
+  </div>
+  <div class="fz-stage">
+    <canvas id="fzCanvas"></canvas>
+    <div class="fz-sync mono" id="fzSync">syncing live flow…</div>
+  </div>
+  <div class="fz-foot mono">
+    <span class="dim" id="fzSession">while you've watched: warming up…</span>
+    <span class="dim fz-note">every burst = real on-chain activity</span>
+  </div>
+</div>
+
+<style>
+  .furnace { padding: 18px 20px 14px; overflow: hidden; position: relative; }
+  .fz-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+  .fz-odo { min-width: 0; }
+  .fz-right { text-align: right; }
+  .fz-lab { font-size: 10px; letter-spacing: 0.12em; font-weight: 600; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+  .fz-right .fz-lab { justify-content: flex-end; }
+  .fz-live { font-size: 8.5px; letter-spacing: 0.12em; color: var(--green); animation: fzBlink 2.2s ease-in-out infinite; }
+  .fz-live.fire { color: var(--fire); }
+  @keyframes fzBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .fz-num { font-size: clamp(20px, 3.2vw, 30px); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; margin-top: 4px; line-height: 1.1; }
+  .fz-num.green { color: var(--green); text-shadow: 0 0 24px rgba(0, 230, 118, 0.25); }
+  .fz-num.fire { color: var(--fire); text-shadow: 0 0 24px rgba(255, 107, 43, 0.3); }
+  .fz-rate { font-size: 10.5px; color: var(--text-dim); margin-top: 3px; }
+  .fz-mid { align-self: center; font-size: 10px; letter-spacing: 0.18em; color: var(--text-faint); white-space: nowrap; padding-top: 8px; }
+  .fz-arrow { color: var(--text-dim); animation: fzFlow 1.6s linear infinite; display: inline-block; }
+  @keyframes fzFlow { 0% { transform: translateX(-2px); opacity: 0.4; } 50% { opacity: 1; } 100% { transform: translateX(2px); opacity: 0.4; } }
+  .fz-stage { position: relative; height: 190px; margin: 10px -8px 8px; }
+  #fzCanvas { width: 100%; height: 100%; display: block; }
+  .fz-sync { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-faint); pointer-events: none; transition: opacity 0.6s; }
+  .fz-foot { display: flex; justify-content: space-between; gap: 12px; font-size: 10.5px; flex-wrap: wrap; }
+  @media (max-width: 760px) {
+    .fz-mid { display: none; }
+    .fz-stage { height: 160px; }
+    .fz-num { font-size: 19px; }
+  }
+</style>
+
+<script>
+  import { F } from '../lib/hl';
+
+  const cv = document.getElementById('fzCanvas') as HTMLCanvasElement | null;
+  if (cv) {
+    const ctx = cv.getContext('2d')!;
+    const D: any = ((window as any).HYPE_D = (window as any).HYPE_D || {});
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const setT = (id: string, v: string) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    // ── the cat (static hero SVG → canvas image) ──
+    const catSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a78bfa"/><stop offset="40%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff6b9d"/></linearGradient></defs><path d="M15 25L20 7.5c0-1.2 1.5-1.8 2.2-.8L30 16h20l7.8-9.3c.7-1 2.2-.4 2.2.8L65 25c5 6 5 14 0 20-3.7 5-10 8.7-17.5 10v3.7c0 2-1.7 3.7-3.7 3.7h-7.6c-2 0-3.7-1.7-3.7-3.7V55C25.7 53.7 19 50 15.5 45c-5-6-5-14 0-20z" fill="url(#g)" opacity="0.95"/><circle cx="30" cy="34" r="6" fill="#08090c"/><circle cx="50" cy="34" r="6" fill="#08090c"/><circle cx="32" cy="32" r="2.2" fill="#eef2ff"/><circle cx="52" cy="32" r="2.2" fill="#eef2ff"/><ellipse cx="40" cy="44" rx="3" ry="2" fill="#ff6b9d"/><path d="M35 47q5 3.5 10 0" stroke="#08090c" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+    const cat = new Image();
+    cat.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(catSvg);
+
+    // ── live data feeds ──
+    let fees24: number | null = null;   // USD, rolling 24h
+    let feesAt = 0;                     // when fees24 was fetched
+    let perSec: number | null = null;   // $ / sec
+    async function loadFees() {
+      try {
+        const r = await fetch('/api/hs?path=/fees'); if (!r.ok) return;
+        const items = await r.json(); if (!Array.isArray(items) || !items.length) return;
+        const s = items.map((x: any) => ({ t: Number(x.time), f: Number(x.total_fees) / 1e6 })).filter((x) => isFinite(x.t) && isFinite(x.f)).sort((a, b) => a.t - b.t);
+        const last = s[s.length - 1].f;
+        const target = Date.now() / 1000 - 86400; let best = s[0];
+        for (const it of s) { if (it.t <= target) best = it; else break; }
+        const f24 = Math.max(0, last - best.f);
+        if (f24 > 0) { fees24 = f24; feesAt = Date.now(); perSec = f24 / 86400; if (!D.dailyAvgFees) D.dailyAvgFees = f24; setT('fzFeesRate', '+$' + perSec.toFixed(2) + ' / sec flowing in'); }
+      } catch {}
+    }
+    loadFees();
+    setInterval(loadFees, 120000);
+
+    // burn odometer base — snaps to the real total whenever the deck ticks
+    let burnBase: number | null = null, burnAt = 0;
+    let burnPerSec: number | null = null; // HYPE / sec
+    let lastReal: number | null = null;
+    let lastSessFees: number = D.sessFees || 0;
+
+    function burnRate() {
+      const dailyUsd = D.weeklyBurnUsd ? D.weeklyBurnUsd / 7 : fees24 != null ? fees24 * 0.99 : null;
+      if (dailyUsd != null && D.price > 0) {
+        burnPerSec = dailyUsd / D.price / 86400;
+        setT('fzBurnRate', '≈ ' + (burnPerSec * 60).toFixed(2) + ' HYPE / min leaving supply');
+      }
+    }
+
+    window.addEventListener('hype:tick', () => {
+      const real = (D.afHype || 0) + (D.feesBurned || 0);
+      if (real > 0) {
+        if (burnBase === null) { burnBase = real; burnAt = Date.now(); }
+        if (lastReal !== null && real > lastReal + 0.005) burst(real - lastReal);
+        if (lastReal !== null && Math.abs(real - shownBurn()) > Math.max(2, (burnPerSec || 0) * 30)) { burnBase = real; burnAt = Date.now(); }
+        lastReal = real;
+      }
+      if (D.sessFees > lastSessFees + 0.005) { feePop(D.sessFees - lastSessFees); lastSessFees = D.sessFees; }
+      burnRate();
+    });
+
+    function shownBurn() { return burnBase === null ? 0 : burnBase + (burnPerSec || 0) * ((Date.now() - burnAt) / 1000); }
+    function shownFees() { return fees24 === null ? 0 : fees24 + (perSec || 0) * ((Date.now() - feesAt) / 1000); }
+
+    // ── particles ──
+    type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; r: number; kind: string; str?: string; col?: string };
+    let parts: P[] = [];
+    let accG = 0, accF = 0;
+    let catPulse = 0;
+    let W = 0, H = 0, dpr = 1;
+
+    function size() {
+      const rect = cv!.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      W = rect.width; H = rect.height;
+      cv!.width = Math.round(W * dpr); cv!.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    size();
+    window.addEventListener('resize', size);
+
+    function spawnGreen() {
+      parts.push({ x: -14, y: H / 2 + (Math.random() - 0.5) * Math.min(96, H * 0.55), vx: 60 + Math.random() * 60, vy: 0, life: 0, max: 6, r: 1.6 + Math.random() * 1.8, kind: 'g', str: Math.random() < 0.18 ? '$' : undefined });
+    }
+    function spawnFlame(boost = 0) {
+      const cx = W / 2;
+      parts.push({ x: cx + (Math.random() - 0.5) * 26, y: H / 2 - 18, vx: 6 + Math.random() * 26 + boost * 8, vy: -(36 + Math.random() * 64) - boost * 30, life: 0, max: 1.1 + Math.random() * 0.9, r: 2.6 + Math.random() * 3.6 + boost, kind: 'f' });
+    }
+    function burst(deltaHype: number) {
+      catPulse = 1;
+      const n = Math.min(46, 14 + Math.round(deltaHype * 3));
+      for (let i = 0; i < n; i++) spawnFlame(1 + Math.random());
+      parts.push({ x: W / 2, y: H / 2, vx: 0, vy: 0, life: 0, max: 0.9, r: 14, kind: 'ring' });
+      parts.push({ x: W / 2 + 26, y: H / 2 - 34, vx: 8, vy: -26, life: 0, max: 2.4, r: 0, kind: 't', str: '+' + F.f2(deltaHype) + ' HYPE', col: '#ff8a4d' });
+    }
+    function feePop(deltaUsd: number) {
+      parts.push({ x: W / 2 - 78, y: H / 2 - 22, vx: -4, vy: -22, life: 0, max: 2.0, r: 0, kind: 't', str: '+$' + F.f2(deltaUsd), col: '#00e676' });
+      for (let i = 0; i < 6; i++) parts.push({ x: W / 2 - 46, y: H / 2 + (Math.random() - 0.5) * 24, vx: -20 - Math.random() * 30, vy: (Math.random() - 0.5) * 40, life: 0, max: 0.6, kind: 's', r: 1.4, col: '#00e676' });
+    }
+
+    let last = performance.now();
+    let hidden = false;
+    document.addEventListener('visibilitychange', () => { hidden = document.hidden; last = performance.now(); });
+
+    function frame(now: number) {
+      requestAnimationFrame(frame);
+      if (hidden) return;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+
+      // odometers (real rates)
+      if (fees24 !== null) setT('fzFees', '$' + F.f2(shownFees()));
+      if (burnBase !== null) setT('fzBurned', F.hype(shownBurn()));
+      if ((fees24 !== null || burnBase !== null)) { const s = document.getElementById('fzSync'); if (s) (s as HTMLElement).style.opacity = '0'; }
+
+      // spawn at data-driven rates
+      if (!reduced) {
+        const gR = perSec != null ? Math.min(26, Math.max(5, perSec * 0.8)) : 2;
+        const fR = burnPerSec != null ? Math.min(22, Math.max(5, burnPerSec * 45)) : 2;
+        accG += gR * dt; while (accG >= 1) { spawnGreen(); accG--; }
+        accF += fR * dt; while (accF >= 1) { spawnFlame(); accF--; }
+      }
+
+      // draw
+      ctx.clearRect(0, 0, W, H);
+      const bed = ctx.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) / 2);
+      bed.addColorStop(0, 'rgba(255,107,43,0.05)'); bed.addColorStop(0.5, 'rgba(0,212,255,0.025)'); bed.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = bed; ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2;
+      // particles
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.life += dt;
+        if (p.life >= p.max) { parts.splice(i, 1); continue; }
+        const t = p.life / p.max;
+        if (p.kind === 'g') {
+          const dx = cx - 34 - p.x, dy = cy - p.y;
+          const d = Math.hypot(dx, dy);
+          if (d < 24) { catPulse = Math.min(1, catPulse + 0.12); parts.splice(i, 1); continue; }
+          p.x += (dx / d) * p.vx * dt + 0; p.y += (dy / d) * p.vx * dt * 0.6 + Math.sin(now / 300 + p.x) * 8 * dt;
+          ctx.globalAlpha = 0.85;
+          ctx.fillStyle = '#00e676'; ctx.shadowColor = '#00e676'; ctx.shadowBlur = 8;
+          if (p.str) { ctx.font = '700 10px JetBrains Mono, monospace'; ctx.fillText(p.str, p.x, p.y); }
+          else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
+        } else if (p.kind === 'f') {
+          p.x += (p.vx + Math.sin(now / 220 + p.y * 0.05) * 14) * dt;
+          p.y += p.vy * dt; p.vy -= 14 * dt;
+          const col = t < 0.3 ? '#ffd166' : t < 0.65 ? '#ff6b2b' : '#ff3d5a';
+          ctx.globalAlpha = (1 - t) * 0.9;
+          ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 14;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 - t * 0.7), 0, 7); ctx.fill();
+        } else if (p.kind === 's') {
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          ctx.globalAlpha = 1 - t;
+          ctx.fillStyle = p.col || '#fff'; ctx.shadowBlur = 6; ctx.shadowColor = p.col || '#fff';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+        } else if (p.kind === 'ring') {
+          ctx.globalAlpha = (1 - t) * 0.7;
+          ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2; ctx.shadowColor = '#ffd166'; ctx.shadowBlur = 12;
+          ctx.beginPath(); ctx.arc(cx, cy, p.r + t * 70, 0, 7); ctx.stroke();
+        } else if (p.kind === 't') {
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          ctx.globalAlpha = t < 0.15 ? t / 0.15 : 1 - (t - 0.15) / 0.85;
+          ctx.font = '700 12px JetBrains Mono, monospace';
+          ctx.fillStyle = p.col || '#fff'; ctx.shadowColor = p.col || '#fff'; ctx.shadowBlur = 10;
+          ctx.fillText(p.str || '', p.x, p.y);
+        }
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+
+      // the cat — eats fees, breathes fire
+      catPulse = Math.max(0, catPulse - dt * 1.6);
+      if (cat.complete) {
+        const s = 72 + catPulse * 10;
+        ctx.shadowColor = catPulse > 0.05 ? '#ff6b2b' : '#00d4ff';
+        ctx.shadowBlur = 18 + catPulse * 26;
+        ctx.drawImage(cat, cx - s / 2, cy - s / 2 - 4, s, s);
+        ctx.shadowBlur = 0;
+      }
+    }
+    requestAnimationFrame(frame);
+
+    // session footer
+    setInterval(() => {
+      if (D.sessFees > 0 || D.sessBurn > 0) {
+        setT('fzSession', "while you've watched: +$" + F.f2(D.sessFees || 0) + ' in fees · ' + F.c(D.sessBurn || 0) + ' HYPE burned');
+      }
+      burnRate();
+    }, 1000);
+  }
+</script>

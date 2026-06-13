@@ -1,0 +1,197 @@
+---
+// ═══════════════════════════════════════════════════════════════
+//  PERP MARKET HEATMAP — squarified treemap of Hyperliquid perps.
+//  Tile size = 24h volume · color = 24h move · hover for details
+//  · click a tile to open it on Hyperliquid.
+// ═══════════════════════════════════════════════════════════════
+---
+<div class="card hm">
+  <div class="hm-head">
+    <div class="hm-tl">
+      <span class="hm-title">🌡️ Perp Market Heatmap</span>
+      <span class="mono dim hm-meta" id="hmMeta">loading markets…</span>
+    </div>
+    <div class="hm-movers mono">
+      <span class="hm-chip up" id="hmBest">—</span>
+      <span class="hm-chip down" id="hmWorst">—</span>
+    </div>
+  </div>
+  <div class="hm-wrap">
+    <canvas id="hmCanvas"></canvas>
+    <div class="hm-tip mono" id="hmTip"></div>
+  </div>
+  <div class="hm-foot mono dim">size = 24h volume · color = 24h move · click a tile to open it on Hyperliquid ↗</div>
+</div>
+
+<style>
+  .hm { padding: 16px 18px; }
+  .hm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .hm-tl { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .hm-title { font-weight: 700; color: var(--text-bright); font-size: 15px; }
+  .hm-meta { font-size: 10.5px; }
+  .hm-movers { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hm-chip { font-size: 10.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg-2); }
+  .hm-chip.up { color: var(--green); border-color: rgba(0, 230, 118, 0.3); }
+  .hm-chip.down { color: var(--red); border-color: rgba(255, 61, 90, 0.3); }
+  .hm-wrap { position: relative; }
+  #hmCanvas { width: 100%; height: 330px; display: block; border-radius: 8px; cursor: pointer; }
+  .hm-tip { position: absolute; pointer-events: none; background: #181c25; border: 1px solid var(--border-bright); border-radius: 8px; padding: 8px 11px; font-size: 11px; color: var(--text); display: none; z-index: 5; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); line-height: 1.65; white-space: nowrap; }
+  .hm-foot { font-size: 10px; margin-top: 9px; }
+  @media (max-width: 700px) { #hmCanvas { height: 260px; } }
+</style>
+
+<script>
+  import { hlInfo, F } from '../lib/hl';
+
+  const cv = document.getElementById('hmCanvas') as HTMLCanvasElement | null;
+  const tip = document.getElementById('hmTip') as HTMLElement | null;
+  if (cv && tip) {
+    const ctx = cv.getContext('2d')!;
+    type M = { name: string; vol: number; oi: number; px: number; chg: number; a?: number };
+    type R = M & { x: number; y: number; w: number; h: number };
+    let rects: R[] = [];
+    let hovered = -1;
+
+    const setT = (id: string, v: string) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    function chgColor(c: number, dimmed = false) {
+      const t = Math.max(-8, Math.min(8, c)) / 8;
+      const mid = [28, 32, 44], pos = [0, 200, 110], neg = [226, 56, 84];
+      const mix = (a: number[], b: number[], k: number) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+      const rgb = t < 0 ? mix(mid, neg, -t) : mix(mid, pos, t);
+      return 'rgba(' + rgb.join(',') + (dimmed ? ',0.92)' : ',1)');
+    }
+
+    // squarified treemap (Bruls et al.)
+    function worst(row: M[], s: number, len: number) {
+      let mx = 0, mn = Infinity;
+      row.forEach((r) => { mx = Math.max(mx, r.a!); mn = Math.min(mn, r.a!); });
+      const s2 = s * s, l2 = len * len;
+      return Math.max((l2 * mx) / s2, s2 / (l2 * mn));
+    }
+    function layout(items: M[], x: number, y: number, w: number, h: number): R[] {
+      const total = items.reduce((s, i) => s + i.vol, 0) || 1;
+      items.forEach((i) => (i.a = (i.vol / total) * w * h));
+      const out: R[] = [];
+      let i = 0;
+      while (i < items.length && w > 1 && h > 1) {
+        const horiz = w >= h;
+        const len = horiz ? h : w;
+        let row: M[] = [items[i]], s = items[i].a!;
+        i++;
+        let wr = worst(row, s, len);
+        while (i < items.length) {
+          const ns = s + items[i].a!;
+          const nrow = row.concat(items[i]);
+          const nw = worst(nrow, ns, len);
+          if (nw > wr) break;
+          row = nrow; s = ns; wr = nw; i++;
+        }
+        const thick = s / len;
+        let off = 0;
+        for (const r of row) {
+          const l = r.a! / thick;
+          if (horiz) out.push({ ...(r as M), x, y: y + off, w: thick, h: l });
+          else out.push({ ...(r as M), x: x + off, y, w: l, h: thick });
+          off += l;
+        }
+        if (horiz) { x += thick; w -= thick; } else { y += thick; h -= thick; }
+      }
+      return out;
+    }
+
+    function draw() {
+      const rect = cv!.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      cv!.width = Math.round(rect.width * dpr); cv!.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      for (let i = 0; i < rects.length; i++) {
+        const r = rects[i];
+        const g = 1.2;
+        ctx.fillStyle = chgColor(r.chg);
+        ctx.beginPath(); ctx.roundRect(r.x + g, r.y + g, Math.max(0, r.w - g * 2), Math.max(0, r.h - g * 2), 4); ctx.fill();
+        if (i === hovered) { ctx.strokeStyle = 'rgba(238,242,255,0.85)'; ctx.lineWidth = 1.5; ctx.stroke(); }
+        if (r.w > 54 && r.h > 30) {
+          ctx.save();
+          ctx.beginPath(); ctx.rect(r.x + 4, r.y + 2, r.w - 8, r.h - 4); ctx.clip();
+          const big = r.w > 110 && r.h > 64;
+          ctx.fillStyle = 'rgba(238,242,255,0.95)';
+          ctx.font = '700 ' + (big ? 14 : 11) + 'px JetBrains Mono, monospace';
+          ctx.fillText(r.name, r.x + 8, r.y + (big ? 22 : 17));
+          ctx.fillStyle = 'rgba(238,242,255,0.7)';
+          ctx.font = '600 ' + (big ? 11 : 9) + 'px JetBrains Mono, monospace';
+          ctx.fillText((r.chg >= 0 ? '+' : '') + r.chg.toFixed(2) + '%', r.x + 8, r.y + (big ? 38 : 28));
+          if (big) { ctx.fillStyle = 'rgba(238,242,255,0.45)'; ctx.font = '500 9px JetBrains Mono, monospace'; ctx.fillText('$' + F.c(r.vol), r.x + 8, r.y + 52); }
+          ctx.restore();
+        }
+      }
+    }
+
+    async function load() {
+      try {
+        const data = await hlInfo<any>({ type: 'metaAndAssetCtxs' });
+        const meta = data?.[0]?.universe ?? [], ctxs = data?.[1] ?? [];
+        const items: M[] = [];
+        for (let i = 0; i < ctxs.length; i++) {
+          const c = ctxs[i] || {};
+          const vol = Number(c.dayNtlVlm);
+          const px = Number(c.markPx);
+          const prev = Number(c.prevDayPx);
+          const oi = Number(c.openInterest) * px;
+          if (!isFinite(vol) || vol <= 0 || !isFinite(px) || !isFinite(prev) || prev <= 0) continue;
+          items.push({ name: meta[i]?.name || 'COIN' + i, vol, oi: isFinite(oi) ? oi : 0, px, chg: ((px - prev) / prev) * 100 });
+        }
+        items.sort((a, b) => b.vol - a.vol);
+        const top = items.slice(0, 42);
+        const rect = cv!.getBoundingClientRect();
+        rects = layout(top, 0, 0, rect.width, rect.height);
+        const liquid = items.filter((m) => m.vol > 3e6);
+        if (liquid.length) {
+          const best = liquid.reduce((a, b) => (b.chg > a.chg ? b : a));
+          const worstM = liquid.reduce((a, b) => (b.chg < a.chg ? b : a));
+          setT('hmBest', '🚀 ' + best.name + ' +' + best.chg.toFixed(1) + '%');
+          setT('hmWorst', '💀 ' + worstM.name + ' ' + worstM.chg.toFixed(1) + '%');
+        }
+        setT('hmMeta', top.length + ' markets · live · ' + new Date().toLocaleTimeString());
+        draw();
+      } catch {}
+    }
+
+    function hit(e: MouseEvent) {
+      const rect = cv!.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      return rects.findIndex((r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+    }
+    cv.addEventListener('mousemove', (e) => {
+      const i = hit(e);
+      if (i !== hovered) { hovered = i; draw(); }
+      if (i < 0) { tip!.style.display = 'none'; return; }
+      const r = rects[i];
+      tip!.innerHTML =
+        '<b style="color:#eef2ff">' + r.name + '</b> <span style="color:' + (r.chg >= 0 ? 'var(--green)' : 'var(--red)') + '">' + (r.chg >= 0 ? '+' : '') + r.chg.toFixed(2) + '%</span><br>' +
+        '<span class="dim">Price</span> $' + F.f4(r.px) + '<br>' +
+        '<span class="dim">24h vol</span> $' + F.c(r.vol) + ' · <span class="dim">OI</span> $' + F.c(r.oi);
+      const rect = cv!.getBoundingClientRect();
+      const tx = Math.min(e.clientX - rect.left + 14, rect.width - 170);
+      const ty = Math.min(e.clientY - rect.top + 14, rect.height - 80);
+      tip!.style.display = 'block';
+      tip!.style.left = tx + 'px';
+      tip!.style.top = ty + 'px';
+    });
+    cv.addEventListener('mouseleave', () => { hovered = -1; tip!.style.display = 'none'; draw(); });
+    cv.addEventListener('click', (e) => {
+      const i = hit(e);
+      if (i >= 0) window.open('https://app.hyperliquid.xyz/trade/' + rects[i].name, '_blank', 'noopener');
+    });
+    window.addEventListener('resize', () => {
+      if (!rects.length) return;
+      const rect = cv!.getBoundingClientRect();
+      rects = layout(rects.map((r) => ({ name: r.name, vol: r.vol, oi: r.oi, px: r.px, chg: r.chg })), 0, 0, rect.width, rect.height);
+      draw();
+    });
+
+    load();
+    setInterval(load, 60000);
+  }
+</script>

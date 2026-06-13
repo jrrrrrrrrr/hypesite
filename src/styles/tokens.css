@@ -4,54 +4,48 @@
    ============================================================ */
 :root {
   /* ---- Base surfaces (near-black, faintly blue) ---- */
-  --bg: #07080c;
-  --bg-2: #0a0c12;
-  --surface: #0f121a;
-  --surface-2: #141824;
-  --surface-3: #1b2030;
-  --border: #1d2333;
-  --border-bright: #2b3346;
-  --border-glow: rgba(120, 196, 255, 0.18);
+  --bg: #08090c;
+  --bg-2: #0d0f14;
+  --surface: #12151c;
+  --surface-2: #181c25;
+  --surface-3: #1e222d;
+  --border: #222738;
+  --border-bright: #2e3448;
+  --border-glow: rgba(0, 212, 255, 0.18);
 
   /* ---- Text ---- */
-  --text: #c7d0e0;
-  --text-bright: #eef3fb;
-  --text-mid: #93a0b6;
-  --text-dim: #5d6a82;
-  --text-faint: #3c465a;
+  --text: #c0c8d8;
+  --text-bright: #eef2ff;
+  --text-mid: #8a94ac;
+  --text-dim: #5a6580;
+  --text-faint: #3a4258;
 
   /* ---- Functional / market ---- */
-  --up: #2fe08a;
-  --up-dim: rgba(47, 224, 138, 0.12);
-  --down: #ff4d6a;
-  --down-dim: rgba(255, 77, 106, 0.12);
-  --warn: #ffb240;
-  --warn-dim: rgba(255, 178, 64, 0.12);
+  --up: #00e676;
+  --up-dim: rgba(0, 230, 118, 0.12);
+  --down: #ff3d5a;
+  --down-dim: rgba(255, 61, 90, 0.12);
+  --warn: #fbbf24;
+  --warn-dim: rgba(251, 191, 36, 0.12);
 
   /* ---- Signature accent + prism spectrum ---- */
-  --accent: #28e0c8;          /* mint-cyan, "live" */
-  --accent-2: #6aa8ff;        /* electric blue */
-  --accent-3: #b388ff;        /* violet */
-  --accent-glow: rgba(40, 224, 200, 0.16);
-  --prism: linear-gradient(
-    100deg,
-    #b388ff 0%,
-    #6aa8ff 28%,
-    #28e0c8 52%,
-    #5be3a0 70%,
-    #ffd166 100%
-  );
-  --prism-soft: linear-gradient(
-    100deg,
-    rgba(179, 136, 255, 0.9),
-    rgba(106, 168, 255, 0.9),
-    rgba(40, 224, 200, 0.9),
-    rgba(255, 209, 102, 0.9)
-  );
+  --accent: #00d4ff;          /* HYPE Intelligence cyan */
+  --accent-2: #a78bfa;        /* purple */
+  --accent-3: #ff6b9d;        /* pink */
+  --accent-glow: rgba(0, 212, 255, 0.16);
+  --fire: #ff6b2b;
+  --fire-glow: rgba(255, 107, 43, 0.15);
+  --green: #00e676;
+  --red: #ff3d5a;
+  --purple: #a78bfa;
+  --yellow: #fbbf24;
+  --pink: #ff6b9d;
+  --prism: linear-gradient(100deg, #a78bfa 0%, #00d4ff 50%, #ff6b9d 100%);
+  --prism-soft: linear-gradient(100deg, rgba(167,139,250,0.9), rgba(0,212,255,0.9), rgba(255,107,157,0.9));
 
   /* ---- Type ---- */
-  --font-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
-  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
 
   /* ---- Radius / shadow / motion ---- */
@@ -91,9 +85,9 @@ body::before {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(900px 600px at 78% -8%, rgba(106, 168, 255, 0.10), transparent 60%),
-    radial-gradient(800px 520px at 12% 4%, rgba(179, 136, 255, 0.08), transparent 60%),
-    radial-gradient(1200px 700px at 50% 120%, rgba(40, 224, 200, 0.07), transparent 55%);
+    radial-gradient(900px 600px at 78% -8%, rgba(0, 212, 255, 0.08), transparent 60%),
+    radial-gradient(800px 520px at 12% 4%, rgba(167, 139, 250, 0.08), transparent 60%),
+    radial-gradient(1200px 700px at 50% 120%, rgba(255, 107, 157, 0.05), transparent 55%);
   pointer-events: none;
 }
 body::after {
@@ -121,7 +115,7 @@ a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 img { display: block; max-width: 100%; }
 
-::selection { background: rgba(40, 224, 200, 0.28); color: #fff; }
+::selection { background: rgba(0, 212, 255, 0.28); color: #fff; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
